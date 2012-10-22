@@ -6,27 +6,33 @@
 #include <errno.h>
 
 
-// Append file to archive.
+/** Append file to archive.
+ */
 void append() {
 }
 
-// Get a file in the archive.
+/** Get a file in the archive.
+ */
 void get() {
 }
 
-// Delete file from archive.
+/** Delete file from archive.
+ */
 void delete() {
 }
 
-// Extract file from archive.
+/** Extract file from archive.
+ */
 void extract() {
 }
 
-// Print a table of contents.
+/** Print a table of contents.
+ */
 void toc() {
 }
 
-// Print usage guide.
+/** Print usage guide.
+ */
 void usage() {
 }
 
