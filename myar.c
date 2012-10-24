@@ -32,8 +32,6 @@ void writeToFile(int fd, char* fName, char* buffer, int bufSize)
 		unlink(fName);
 		exit(-1);
 	}
-
-	lseek(fd, bufSize, SEEK_CUR);
 }
 
 /** Append file to archive.
@@ -54,16 +52,16 @@ void append(int fd, char* arName, char* inName) {
 	/* Write ar header. */
 	/* TODO: Implement // section to make this work with sizeof(arName) > 15. */
 	struct stat st;
-	if (fstat(fd, &st) == 0) {
+	if (fstat(in_fd, &st) == 0) {
 		struct ar_hdr ah;
 		sprintf(ah.ar_name, "%-16.16s", inName);
-		sprintf(ah.ar_date, "%-12u", (unsigned) st.st_mtime);
-		sprintf(ah.ar_uid,  "%-6u", (unsigned) st.st_uid);
-		sprintf(ah.ar_gid,  "%-6u", (unsigned) st.st_gid);
-		sprintf(ah.ar_mode, "%-8u", (unsigned) st.st_mode);
-		sprintf(ah.ar_size, "%-10u", (unsigned) st.st_size);
+		sprintf(ah.ar_date, "%-12u", (uint32_t) st.st_mtime);
+		sprintf(ah.ar_uid,  "%-6u",  (uint32_t) st.st_uid);
+		sprintf(ah.ar_gid,  "%-6u",  (uint32_t) st.st_gid);
+		sprintf(ah.ar_mode, "%-8o",  (uint32_t) st.st_mode);
+		sprintf(ah.ar_size, "%-10u", (uint32_t) st.st_size);
 		sprintf(ah.ar_fmag, "%s", ARFMAG);
-		writeToFile(fd, arName, (char*) &ah, sizeof(struct ar_hdr));
+		writeToFile(fd, arName, (char*) &ah, sizeof(ah));
 	} else {
 		perror("Could not stat input file.");
 		exit(-1);
