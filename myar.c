@@ -232,6 +232,8 @@ int main(int argc, char **argv)
 		default:
 			usage();
 		}
+
+		close(fd);
 	}
 
 	return 0;
