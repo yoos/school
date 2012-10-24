@@ -79,7 +79,7 @@ void append(int fd, char* arName, char* inName) {
 
 /** Get a file in the archive.
  */
-struct ar_hdr get(int fd, char* arName, char* name) {
+struct ar_hdr getHeader(int fd, char* arName, char* name) {
 	/* Seek to first entry. */
 	lseek(fd, SARMAG, SEEK_SET);
 
@@ -110,7 +110,7 @@ void delete(int fd, char* arName, char* name) {
 /** Extract file from archive.
  */
 void extract(int fd, char* arName, char* name) {
-	struct ar_hdr f_hdr = get(fd, arName, name);
+	struct ar_hdr f_hdr = getHeader(fd, arName, name);
 
 	/* Read octal mode. */
 	int mode;
