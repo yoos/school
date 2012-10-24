@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <stdint.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -10,11 +11,35 @@
 
 #define BLOCKSIZE 4096
 
+/* Write buffer into file.
+ */
+void writeToFile(int fd, char* fName, char* buffer, int bufSize)
+{
+	int num_written = 0;
+	int location = 0;
+
+	num_written = write(fd, buffer, bufSize);
+
+	/* Make sure we've finished writing. */
+	while (bufSize != num_written) {
+		bufSize -= num_written;
+		location += num_written;
+		num_written = write(fd, buffer+location, bufSize);
+	}
+
+	if (num_written == -1) {
+		perror("Mismatch in output.");
+		unlink(fName);
+		exit(-1);
+	}
+
+	lseek(fd, bufSize, SEEK_CUR);
+}
+
 /** Append file to archive.
  */
 void append(int fd, char* arName, char* inName) {
-	int i;
-	uint8_t buffer[16];
+	char buffer[16];
 
 	/* Open file to append. */
 	int in_fd = open(inName, O_RDONLY);
@@ -28,27 +53,9 @@ void append(int fd, char* arName, char* inName) {
 
 	/* Read input file and write to archive file. */
 	int num_read = 0;
-	int num_written = 0;
-	int location = 0;
 	while ((num_read = read(in_fd, buffer, BLOCKSIZE)) > 0) {
-		num_written = write(fd, buffer, num_read);
-
-		/* Make sure we've finished writing. */
-		while (num_read != num_written) {
-			num_read -= num_written;
-			location += num_written;
-			num_written = write(fd, buffer+location, num_read);
-		}
-
-		if (num_written == -1) {
-			perror("Mismatch in output.");
-			unlink(arName);
-			exit(-1);
-		}
-
-		lseek(in_fd, BLOCKSIZE, SEEK_CUR);
+		writeToFile(fd, arName, buffer, num_read);
 	}
-
 	close(in_fd);
 }
 
@@ -102,13 +109,16 @@ int main(int argc, char **argv)
 
 		/* Check that this is an archive file. */
 		lseek(fd, 0*BLOCKSIZE, SEEK_SET);
-		if (read(fd, buffer, SARMAG) >= 0) {
+		int read_size = read(fd, buffer, SARMAG);
+		if (read_size > 0) {
 			for (i=0; i<SARMAG; i++) {
 				if (ARMAG[i] != buffer[i]) {
 					perror("This is not an archive file!\n");
 					exit(-1);
 				}
 			}
+		} else if (read_size == 0) {
+			writeToFile(fd, argv[2], ARMAG, SARMAG);
 		} else {
 			perror("Could not read archive file!");
 			exit(-1);
