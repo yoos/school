@@ -15,17 +15,6 @@
 void append(int fd, char* arName, char* inName) {
 	int i;
 	uint8_t buffer[16];
-	lseek(fd, 0*BLOCKSIZE, SEEK_SET);
-
-	/* Check that this is an archive file. */
-	if (read(fd, buffer, SARMAG) > 0) {
-		for (i=0; i<SARMAG; i++) {
-			if (ARMAG[i] != buffer[i]) {
-				perror("This is not an archive file!");
-				exit(1);
-			}
-		}
-	}
 
 	/* Open file to append. */
 	int in_fd = open(inName, O_RDONLY);
@@ -86,24 +75,42 @@ void toc() {
 /** Print usage guide.
  */
 void usage() {
+	printf("Usage:\n");
+	exit(-1);
 }
 
 
 int main(int argc, char **argv)
 {
 	int fd, i;
+	char buffer[16];
 
 	/* Has the user provided enough arguments? */
 	if (argc < 3) {
+		printf("Too few arguments!\n\n");
 		usage();
 	} else {
 		/* Set file mode creation mask to 0. */
 		umask(0);
 
 		/* Open file. */
-		fd = open(argv[2], O_WRONLY | O_CREAT, 0666);
+		fd = open(argv[2], O_RDWR | O_CREAT, 0666);
 		if (fd == -1) {
-			perror("Could not open file!");
+			perror("Could not open archive file!");
+			exit(-1);
+		}
+
+		/* Check that this is an archive file. */
+		lseek(fd, 0*BLOCKSIZE, SEEK_SET);
+		if (read(fd, buffer, SARMAG) >= 0) {
+			for (i=0; i<SARMAG; i++) {
+				if (ARMAG[i] != buffer[i]) {
+					perror("This is not an archive file!\n");
+					exit(-1);
+				}
+			}
+		} else {
+			perror("Could not read archive file!");
 			exit(-1);
 		}
 
