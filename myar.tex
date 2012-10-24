@@ -36,11 +36,30 @@
 \begin{document}
 
 Soo-Hyun Yoo \\
-CS311\\
-Homework 3\\
+CS311 \\
+Homework 3 \\
 22 October 2012
 
+
 \section*{Design}
+
+Once compiled, {\tt myar} will run in a manner similar to that of the standard
+UNIX command {\tt ar}. The program will be written in C and will support the
+following options:
+
+\begin{itemize}
+	\item -q: quickly append named files to archive
+	\item -x: extract named files
+	\item -t: print a concise table of contents of the archive
+	\item -v: print a verbose table of contents of the archive
+	\item -d: delete named files from archive
+	\item -A: quickly append all "regular" files in the current directory
+		(except the archive itself)
+\end{itemize}
+
+Each option will be paired up with a function in the code, and each function may use smaller helper functions to find files in the archive as necessary. {\tt myar} will take only one option at a time, and a switch statement will run the appropriate function.
+
+Since {\tt lseek} cannot, by itself, extend the size of a file, any append or delete operation will require the program to overwrite the old file with a new file that includes the changes.
 
 
 \section*{Worklog}
