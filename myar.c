@@ -12,7 +12,7 @@
 
 /** Append file to archive.
  */
-void append(int fd, char* name) {
+void append(int fd, char* arName, char* inName) {
 	int i;
 	uint8_t buffer[16];
 	lseek(fd, 0*BLOCKSIZE, SEEK_SET);
@@ -26,21 +26,56 @@ void append(int fd, char* name) {
 			}
 		}
 	}
+
+	/* Open file to append. */
+	int in_fd = open(inName, O_RDONLY);
+	if (in_fd == -1) {
+		perror("Cannot open input file.");
+		exit(-1);
+	}
+
+	/* Go to end of file. */
+	lseek(fd, 0*BLOCKSIZE, SEEK_END);
+
+	/* Read input file and write to archive file. */
+	int num_read = 0;
+	int num_written = 0;
+	int location = 0;
+	while ((num_read = read(in_fd, buffer, BLOCKSIZE)) > 0) {
+		num_written = write(fd, buffer, num_read);
+
+		/* Make sure we've finished writing. */
+		while (num_read != num_written) {
+			num_read -= num_written;
+			location += num_written;
+			num_written = write(fd, buffer+location, num_read);
+		}
+
+		if (num_written == -1) {
+			perror("Mismatch in output.");
+			unlink(arName);
+			exit(-1);
+		}
+
+		lseek(in_fd, BLOCKSIZE, SEEK_CUR);
+	}
+
+	close(in_fd);
 }
 
 /** Get a file in the archive.
  */
-void get(int fd, char* name) {
+void get(int fd, char* arName, char* name) {
 }
 
 /** Delete file from archive.
  */
-void delete(int fd, char* name) {
+void delete(int fd, char* arName, char* name) {
 }
 
 /** Extract file from archive.
  */
-void extract(int fd, char* name) {
+void extract(int fd, char* arName, char* name) {
 }
 
 /** Print a table of contents.
@@ -62,8 +97,11 @@ int main(int argc, char **argv)
 	if (argc < 3) {
 		usage();
 	} else {
+		/* Set file mode creation mask to 0. */
+		umask(0);
+
 		/* Open file. */
-		fd = open(argv[2], O_WRONLY | O_CREAT | S_IRWXU);
+		fd = open(argv[2], O_WRONLY | O_CREAT, 0666);
 		if (fd == -1) {
 			perror("Could not open file!");
 			exit(-1);
@@ -74,14 +112,14 @@ int main(int argc, char **argv)
 		/* Quickly append named files to archive. */
 		case 'q':
 			for (i=3; i<argc; i++) {
-				append(fd, argv[i]);
+				append(fd, argv[2], argv[i]);
 			}
 			break;
 
 		/* Extract named files. */
 		case 'x':
 			for (i=3; i<argc; i++) {
-				extract(fd, argv[i]);
+				extract(fd, argv[2], argv[i]);
 			}
 			break;
 
@@ -96,7 +134,7 @@ int main(int argc, char **argv)
 		/* Delete named files from archive. */
 		case 'd':
 			for (i=3; i<argc; i++) {
-				delete(fd, argv[i]);
+				delete(fd, argv[2], argv[i]);
 			}
 			break;
 
