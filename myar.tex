@@ -59,7 +59,7 @@ following options:
 
 Each option will be paired up with a function in the code, and each function may use smaller helper functions to find files in the archive as necessary. {\tt myar} will take only one option at a time, and a switch statement will run the appropriate function.
 
-Since {\tt lseek} cannot, by itself, extend the size of a file, any append or delete operation will require the program to overwrite the old file with a new file that includes the changes.
+Since deletion of a file from the archive will leave a gap in the archive, any delete operation will require the program to overwrite the old file with a new file without any gaps.
 
 
 \section*{Worklog}
