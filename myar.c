@@ -111,8 +111,13 @@ int main(int argc, char **argv)
 
 		/* Quickly append named files to archive. */
 		case 'q':
-			for (i=3; i<argc; i++) {
-				append(fd, argv[2], argv[i]);
+			if (argc < 4) {
+				printf("Supply at least one file to append!\n");
+			} else {
+				printf("Appending file to archive.\n");
+				for (i=3; i<argc; i++) {
+					append(fd, argv[2], argv[i]);
+				}
 			}
 			break;
 
