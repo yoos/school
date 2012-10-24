@@ -96,9 +96,6 @@ struct ar_hdr getHeader(int fd, char* arName, char* name) {
 		}
 	}
 
-	printf("Could not find %s\n", name);
-	memset(cur_hdr.ar_name, '\0', sizeof(cur_hdr.ar_name));
-
 	return cur_hdr;
 }
 
@@ -110,14 +107,30 @@ void delete(int fd, char* arName, char* name) {
 /** Extract file from archive.
  */
 void extract(int fd, char* arName, char* name) {
+	/* Get header of the file we are looking for, if it exists. */
 	struct ar_hdr f_hdr = getHeader(fd, arName, name);
+	if (memcmp(f_hdr.ar_name, name, strlen(name)) != 0) {
+		printf("Could not find %s\n", name);
+		exit(-1);
+	}
 
 	/* Read octal mode. */
 	int mode;
 	sscanf(f_hdr.ar_mode, "%o", &mode);
 
+	/* If the file exists already, prompt user. */
+	if (access(name, 0777)) {
+		char res;
+		printf("File exists! Overwrite? (y/N) ");
+		scanf("%c", &res);
+		if (res != 'y' && res != 'Y') {
+			printf("Exiting without extracting.\n");
+			exit(0);
+		}
+	}
+
 	/* Open file to write. */
-	int out_fd = open(name, O_WRONLY | O_CREAT, mode);
+	int out_fd = creat(name, mode);
 	if (out_fd == -1) {
 		perror("Cannot open file to write.");
 		exit(-1);
