@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <string.h>   // For memcmp.
 #include <ar.h>
 
 
@@ -72,12 +73,33 @@ void append(int fd, char* arName, char* inName) {
 	while ((num_read = read(in_fd, buffer, BLOCKSIZE)) > 0) {
 		writeToFile(fd, arName, buffer, num_read);
 	}
+
 	close(in_fd);
 }
 
 /** Get a file in the archive.
  */
-void get(int fd, char* arName, char* name) {
+struct ar_hdr get(int fd, char* arName, char* name) {
+	/* Seek to first entry. */
+	lseek(fd, SARMAG, SEEK_SET);
+
+	/* Read ar_hdr. */
+	int num_read = 0;
+	struct ar_hdr cur_hdr;
+	while ((num_read = read(fd, (char*) &cur_hdr, sizeof(struct ar_hdr))) == sizeof(struct ar_hdr)) {
+		/* Is this the file we are looking for? */
+		if (memcmp(cur_hdr.ar_name, name, strlen(name)) == 0) {
+			return cur_hdr;
+		} else {
+			/* Seek to next entry. */
+			lseek(fd, atoi(cur_hdr.ar_size), SEEK_CUR);
+		}
+	}
+
+	printf("Could not find %s\n", name);
+	memset(cur_hdr.ar_name, '\0', sizeof(cur_hdr.ar_name));
+
+	return cur_hdr;
 }
 
 /** Delete file from archive.
@@ -88,6 +110,27 @@ void delete(int fd, char* arName, char* name) {
 /** Extract file from archive.
  */
 void extract(int fd, char* arName, char* name) {
+	struct ar_hdr f_hdr = get(fd, arName, name);
+
+	/* Read octal mode. */
+	int mode;
+	sscanf(f_hdr.ar_mode, "%o", &mode);
+
+	/* Open file to write. */
+	int out_fd = open(name, O_WRONLY | O_CREAT, mode);
+	if (out_fd == -1) {
+		perror("Cannot open file to write.");
+		exit(-1);
+	}
+
+	/* Read file from archive and extract. */
+	int num_read = 0;
+	char buffer[16];
+	while ((num_read = read(fd, buffer, BLOCKSIZE)) > 0) {
+		writeToFile(out_fd, name, buffer, num_read);
+	}
+
+	close(out_fd);
 }
 
 /** Print a table of contents.
