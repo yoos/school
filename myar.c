@@ -51,6 +51,24 @@ void append(int fd, char* arName, char* inName) {
 	/* Go to end of file. */
 	lseek(fd, 0*BLOCKSIZE, SEEK_END);
 
+	/* Write ar header. */
+	/* TODO: Implement // section to make this work with sizeof(arName) > 15. */
+	struct stat st;
+	if (fstat(fd, &st) == 0) {
+		struct ar_hdr ah;
+		sprintf(ah.ar_name, "%-16.16s", inName);
+		sprintf(ah.ar_date, "%-12u", (unsigned) st.st_mtime);
+		sprintf(ah.ar_uid,  "%-6u", (unsigned) st.st_uid);
+		sprintf(ah.ar_gid,  "%-6u", (unsigned) st.st_gid);
+		sprintf(ah.ar_mode, "%-8u", (unsigned) st.st_mode);
+		sprintf(ah.ar_size, "%-10u", (unsigned) st.st_size);
+		sprintf(ah.ar_fmag, "%s", ARFMAG);
+		writeToFile(fd, arName, (char*) &ah, sizeof(struct ar_hdr));
+	} else {
+		perror("Could not stat input file.");
+		exit(-1);
+	}
+
 	/* Read input file and write to archive file. */
 	int num_read = 0;
 	while ((num_read = read(in_fd, buffer, BLOCKSIZE)) > 0) {
