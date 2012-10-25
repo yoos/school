@@ -6,9 +6,9 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <string.h>   // For memcmp.
+#include <string.h>
 #include <time.h>
-#include <dirent.h>   // For directory listing.
+#include <dirent.h>
 #include <ar.h>
 
 
@@ -131,8 +131,7 @@ int getHeaders(int fd, int nNum, char** names, struct ar_hdr* headers) {
 	while ((num_read = read(fd, (char*) &cur_hdr, sizeof(struct ar_hdr))) == sizeof(struct ar_hdr)) {
 		/* Loop through the list of requested file names and find first match. */
 		for (i=0; i<nNum; i++) {
-			int nameLen = MIN(16, MAX(strlen(stringify(16, cur_hdr.ar_name)), strlen(names[i])));
-			if (memcmp(cur_hdr.ar_name, names[i], nameLen) == 0) {
+			if (strncmp(cur_hdr.ar_name, names[i], 16) == 0) {
 				int dup = 0;
 				int j;
 
@@ -141,7 +140,7 @@ int getHeaders(int fd, int nNum, char** names, struct ar_hdr* headers) {
 				 * a duplicate, it will be caught here. */
 				for (j=0; j<numFound; j++) {
 					/* If the current header is a duplicate, mark it as such. */
-					if (memcmp(cur_hdr.ar_name, headers[j].ar_name, nameLen) == 0)
+					if (strncmp(cur_hdr.ar_name, headers[j].ar_name, 16) == 0)
 						dup = 1;
 				}
 
@@ -200,7 +199,7 @@ void delete(int fd, char* arName, int nNum, char** names)
 	struct ar_hdr cur_hdr;   // Store header for comparison.
 	while ((num_read = read(fd, (char*) &cur_hdr, sizeof(struct ar_hdr))) == sizeof(struct ar_hdr)) {
 		/* If names match, skip this file. */
-		if (memcmp(headers[delIndex].ar_name, cur_hdr.ar_name, 16) == 0) {
+		if (strncmp(headers[delIndex].ar_name, cur_hdr.ar_name, 16) == 0) {
 			/* Increment number of files deleted. Effectively, we no longer
 			 * check headers[delIndex] as a possible match, because we've just
 			 * found the first match. */
@@ -257,8 +256,7 @@ void extract(int fd, int nNum, char** names)
 	//for (i=0; i<nNum; i++) {
 	//	int found = 0;
 	//	for (j=0; j<hNum; j++) {
-	//		int nameLen = MIN(16, strlen(names[i]));
-	//		if (memcmp(headers[j].ar_name, names[i], nameLen) == 0)
+	//		if (strncmp(headers[j].ar_name, names[i], 16) == 0)
 	//			found = 1;
 	//		if (found == 0)
 	//			printf("Could not find %s\n", names[i]);
@@ -271,7 +269,7 @@ void extract(int fd, int nNum, char** names)
 	struct ar_hdr cur_hdr;   // Store header for comparison.
 	while ((num_read = read(fd, (char*) &cur_hdr, sizeof(struct ar_hdr))) == sizeof(struct ar_hdr) && extIndex < hNum) {
 		/* Should we extract this file? */
-		if (memcmp(headers[extIndex].ar_name, cur_hdr.ar_name, 16) == 0) {
+		if (strncmp(headers[extIndex].ar_name, cur_hdr.ar_name, 16) == 0) {
 			/* Increment number of files extracted. NOTE: Do this before the
 			 * continue operation below! */
 			extIndex++;
