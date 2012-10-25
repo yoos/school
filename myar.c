@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>   // For memcmp.
+#include <time.h>
 #include <ar.h>
 
 
@@ -17,7 +18,24 @@
 
 #define MIN(a, b)  (((a) < (b)) ? (a) : (b))
 
-/* Write buffer into file.
+/** Turn an array of characters into a string.
+ *  TODO: This is bad, dangerous, and just wrong, but it works for now.
+ */
+char* stringify(int len, char* array) {
+	char out[len+1];
+
+	sscanf(array, "%s", out);
+
+	/* For ar_name. */
+	if (out[strlen(out)-1] == '/')
+	   out[strlen(out)-1] = 0;
+	else
+		out[strlen(out)] = 0;
+
+	return out;
+}
+
+/** Write buffer into file.
  */
 void writeToFile(int fd, char* fName, char* buffer, int bufSize)
 {
@@ -244,7 +262,57 @@ void extract(int fd, char* arName, int nNum, char** names) {
 
 /** Print a table of contents.
  */
-void toc() {
+void toc(int fd, char* arName, int verbose) {
+	int num_read = 0;
+	struct ar_hdr cur_hdr;
+
+	/* Seek to first header. */
+	lseek(fd, SARMAG, SEEK_SET);
+
+	while ((num_read = read(fd, (char*) &cur_hdr, sizeof(struct ar_hdr))) == sizeof(struct ar_hdr)) {
+		if (verbose == 1) {
+			/* Generate mode string. */
+			char mode[10];
+			int modeInt;
+			sscanf(cur_hdr.ar_mode, "%o", &modeInt);
+			mode[9] = 0;
+			int i;
+			for (i=9; i>0; i--) {
+				if ((modeInt & 1) == 1) {
+					if (i%3 == 0)
+						mode[i-1] = 'x';
+					else if (i%3 == 1)
+						mode[i-1] = 'r';
+					else
+						mode[i-1] = 'w';
+				} else {
+					mode[i-1] = '-';
+				}
+				modeInt = modeInt>>1;
+			}
+
+			/* Generate time string. */
+			char date[30];
+			time_t fileTime = atoi(cur_hdr.ar_date);
+			struct tm* timeinfo;
+			timeinfo = localtime(&fileTime);
+			strftime(date, 30, "%b %d %R %Y", timeinfo);
+
+			printf("%s %s/%s %10.10s %s ", mode, stringify(6, cur_hdr.ar_uid), stringify(6, cur_hdr.ar_gid), stringify(10, cur_hdr.ar_size), date);
+		}
+
+		/* Stringify name. */
+		char name[16];
+		sscanf(cur_hdr.ar_name, "%s", name);
+		if (name[strlen(name)-1] == '/')
+		   name[strlen(name)-1] = 0;
+		else
+			name[strlen(name)] = 0;
+		printf("%s\n", name);
+
+		/* Seek to next header. */
+		lseek(fd, atoi(cur_hdr.ar_size) + (atoi(cur_hdr.ar_size)%2), SEEK_CUR);
+	}
 }
 
 /** Print usage guide.
@@ -314,10 +382,12 @@ int main(int argc, char **argv)
 
 		/* Print concise table of contents of archive. */
 		case 't':
+			toc(fd, argv[2], 0);
 			break;
 
 		/* Print verbose table of contents of archive. */
 		case 'v':
+			toc(fd, argv[2], 1);
 			break;
 
 		/* Delete named files from archive. */
