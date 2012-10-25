@@ -10,7 +10,12 @@
 #include <ar.h>
 
 
+// TODO: This program does not check for the well-formedness of the archive
+// file.
+
 #define BLOCKSIZE 4096
+
+#define MIN(a, b)  (((a) < (b)) ? (a) : (b))
 
 /* Write buffer into file.
  */
@@ -37,113 +42,196 @@ void writeToFile(int fd, char* fName, char* buffer, int bufSize)
 
 /** Append file to archive.
  */
-void append(int fd, char* arName, char* inName) {
+void append(int fd, char* arName, int nNum, char** names) {
+	int i;
 	char buffer[16];
 
-	/* Open file to append. */
-	int in_fd = open(inName, O_RDONLY);
-	if (in_fd == -1) {
-		perror("Cannot open input file.");
-		exit(-1);
-	}
-
-	/* Go to end of file. */
+	/* Go to end of archive file. */
 	lseek(fd, 0*BLOCKSIZE, SEEK_END);
 
-	/* Write ar header. */
-	/* TODO: Implement // section to make this work with sizeof(arName) > 15. */
-	struct stat st;
-	if (fstat(in_fd, &st) == 0) {
-		struct ar_hdr ah;
-		sprintf(ah.ar_name, "%-16.16s", inName);
-		sprintf(ah.ar_date, "%-12u", (uint32_t) st.st_mtime);
-		sprintf(ah.ar_uid,  "%-6u",  (uint32_t) st.st_uid);
-		sprintf(ah.ar_gid,  "%-6u",  (uint32_t) st.st_gid);
-		sprintf(ah.ar_mode, "%-8o",  (uint32_t) st.st_mode);
-		sprintf(ah.ar_size, "%-10u", (uint32_t) st.st_size);
-		sprintf(ah.ar_fmag, "%s", ARFMAG);
-		writeToFile(fd, arName, (char*) &ah, sizeof(ah));
-	} else {
-		perror("Could not stat input file.");
-		exit(-1);
-	}
+	for (i=0; i<nNum; i++) {
+		/* Open file to append. */
+		int in_fd = open(names[i], O_RDONLY);
+		if (in_fd == -1) {
+			perror("Cannot open input file.");
+			exit(-1);
+		}
 
-	/* Read input file and write to archive file. */
-	int num_read = 0;
-	while ((num_read = read(in_fd, buffer, BLOCKSIZE)) > 0) {
-		writeToFile(fd, arName, buffer, num_read);
-	}
+		/* Write ar header. */
+		/* TODO: Implement // section to make this work with sizeof(arName) > 15. */
+		struct stat st;
+		if (fstat(in_fd, &st) == 0) {
+			struct ar_hdr ah;
+			sprintf(ah.ar_name, "%-16.16s", names[i]);
+			sprintf(ah.ar_date, "%-12u", (uint32_t) st.st_mtime);
+			sprintf(ah.ar_uid,  "%-6u",  (uint32_t) st.st_uid);
+			sprintf(ah.ar_gid,  "%-6u",  (uint32_t) st.st_gid);
+			sprintf(ah.ar_mode, "%-8o",  (uint32_t) st.st_mode);
+			sprintf(ah.ar_size, "%-10u", (uint32_t) st.st_size);
+			sprintf(ah.ar_fmag, "%s", ARFMAG);
+			writeToFile(fd, arName, (char*) &ah, sizeof(ah));
+		} else {
+			perror("Could not stat input file.");
+			exit(-1);
+		}
 
-	close(in_fd);
+		/* Read input file and write to archive file. */
+		int num_read = 0;
+		while ((num_read = read(in_fd, buffer, BLOCKSIZE)) > 0) {
+			writeToFile(fd, arName, buffer, num_read);
+		}
+
+		/* Add a single newline if input filesize is odd. (This maintains
+		 * compatibility with the UNIX ar.) */
+		if (st.st_size % 2) {
+			buffer[0] = '\n';
+			writeToFile(fd, arName, buffer, 1);
+		}
+
+		close(in_fd);
+	}
 }
 
-/** Get a file in the archive.
+/** Find files in the archive (in order of appearance) and return number of
+ *  files found.
+ *  @param headers Array of headers of files found.
  */
-struct ar_hdr getHeader(int fd, char* arName, char* name) {
+int getHeaders(int fd, char* arName, int nNum, char** names, struct ar_hdr* headers) {
 	/* Seek to first entry. */
 	lseek(fd, SARMAG, SEEK_SET);
 
-	/* Read ar_hdr. */
+	int i;
 	int num_read = 0;
+	int numFound = 0;
 	struct ar_hdr cur_hdr;
+
+	/* Examine all headers until EOF. */
 	while ((num_read = read(fd, (char*) &cur_hdr, sizeof(struct ar_hdr))) == sizeof(struct ar_hdr)) {
-		/* Is this the file we are looking for? */
-		if (memcmp(cur_hdr.ar_name, name, strlen(name)) == 0) {
-			return cur_hdr;
-		} else {
-			/* Seek to next entry. */
-			lseek(fd, atoi(cur_hdr.ar_size), SEEK_CUR);
+		/* Loop through the list of requested file names and find first match. */
+		for (i=0; i<nNum; i++) {
+			int nameLen = MIN(16, strlen(names[i]));
+			if (memcmp(cur_hdr.ar_name, names[i], nameLen) == 0) {
+				int dup = 0;
+				int j;
+
+				/* This is hackish, but check against list of headers for
+				 * duplicates. If the header we are currently looking at is
+				 * a duplicate, it will be caught here. */
+				for (j=0; j<numFound; j++) {
+					printf("%d %d %d \n", i, j, numFound);
+					/* If the current header is a duplicate, mark it as such. */
+					if (memcmp(cur_hdr.ar_name, headers[j].ar_name, nameLen) == 0)
+						dup = 1;
+				}
+
+				/* If it is not a duplicate, mark as found. */
+				if (dup != 1) {
+					headers[numFound] = cur_hdr;   // TODO: Is this correct?
+					numFound++;
+				}
+			}
 		}
+
+		/* Seek to next entry. Seek forward one more byte if filesize is odd.
+		 * (This maintains compatibility with the UNIX ar.) */
+		lseek(fd, atoi(cur_hdr.ar_size) + (atoi(cur_hdr.ar_size)%2), SEEK_CUR);
 	}
 
-	return cur_hdr;
+	/* We're done. Seek once again to first header. */
+	lseek(fd, SARMAG, SEEK_SET);
+
+	return numFound;
 }
 
 /** Delete file from archive.
  */
-void delete(int fd, char* arName, char* name) {
+void delete(int fd, char* arName, int nNum, char** names) {
 }
 
 /** Extract file from archive.
+ *  TODO: Make this stop extracting after first match.
  */
-void extract(int fd, char* arName, char* name) {
-	/* Get header of the file we are looking for, if it exists. */
-	struct ar_hdr f_hdr = getHeader(fd, arName, name);
-	if (memcmp(f_hdr.ar_name, name, strlen(name)) != 0) {
-		printf("Could not find %s\n", name);
-		exit(-1);
+void extract(int fd, char* arName, int nNum, char** names) {
+	/* Get headers of the files we are looking for, if they exist. */
+	struct ar_hdr headers[nNum];
+	int hNum = getHeaders(fd, arName, nNum, names, headers);
+
+	/* If no files were found, quit. */
+	if (hNum == 0) {
+		printf("None of the requested files were found! Exiting.\n");
+		exit(0);
 	}
 
-	/* Read octal mode. */
-	int mode;
-	sscanf(f_hdr.ar_mode, "%o", &mode);
+	/* Warn the user of any files that were not found in the archive. */
+	//int i, j;
+	//for (i=0; i<nNum; i++) {
+	//	int found = 0;
+	//	for (j=0; j<hNum; j++) {
+	//		int nameLen = MIN(16, strlen(names[i]));
+	//		if (memcmp(headers[j].ar_name, names[i], nameLen) == 0)
+	//			found = 1;
+	//		if (found == 0)
+	//			printf("Could not find %s\n", names[i]);
+	//	}
+	//}
 
-	/* If the file exists already, prompt user. */
-	if (access(name, 0777)) {
-		char res;
-		printf("File exists! Overwrite? (y/N) ");
-		scanf("%c", &res);
-		if (res != 'y' && res != 'Y') {
-			printf("Exiting without extracting.\n");
-			exit(0);
+	/* Otherwise, extract all files. */
+	int num_read = 0;
+	int extIndex = 0;
+	struct ar_hdr cur_hdr;   // Store header for comparison.
+	while ((num_read = read(fd, (char*) &cur_hdr, sizeof(struct ar_hdr))) == sizeof(struct ar_hdr)) {
+		/* Should we extract this file? */
+		if (memcmp(headers[extIndex].ar_name, cur_hdr.ar_name, 16) == 0) {   // TODO: Check that this works for partial matches.
+			/* Turn char array into string. */
+			char name[16];
+			sscanf(cur_hdr.ar_name, "%s", name);
+			name[strlen(name)-1] = '\0';
+
+			/* If file already exists in destination directory, prompt user. */
+			if (access(name, F_OK) == 0) {
+				char res;
+				printf("File exists! Overwrite? (y/N) ");
+				scanf("%c", &res);
+				if (res != 'y' && res != 'Y') {
+					printf("Not extracting %s.\n", name);
+					continue;
+				}
+			}
+
+			/* Read octal mode. */
+			int mode;
+			sscanf(cur_hdr.ar_mode, "%o", &mode);
+
+			/* Open file to write. */
+			int out_fd = creat(name, mode);
+			if (out_fd == -1) {
+				perror("Cannot open file to write.");
+				exit(-1);
+			}
+
+			/* Read file from archive and extract. */
+			int out_num_read = 0;
+			int out_num_to_write = atoi(cur_hdr.ar_size);
+			int readSize = 0;
+			char buffer[16];
+			while (out_num_to_write > 0) {
+				readSize = (BLOCKSIZE < out_num_to_write) ? BLOCKSIZE : out_num_to_write;
+				out_num_read = read(fd, buffer, readSize);
+				writeToFile(out_fd, name, buffer, out_num_read);
+
+				out_num_to_write -= readSize;
+			}
+
+			/* Increment number of files extracted. */
+			extIndex++;
+
+			close(out_fd);
+		} else {
+			/* Seek to next entry. Seek forward one more byte if filesize is odd.
+			 * (This maintains compatibility with the UNIX ar.) */
+			lseek(fd, atoi(cur_hdr.ar_size) + (atoi(cur_hdr.ar_size)%2), SEEK_CUR);
 		}
 	}
-
-	/* Open file to write. */
-	int out_fd = creat(name, mode);
-	if (out_fd == -1) {
-		perror("Cannot open file to write.");
-		exit(-1);
-	}
-
-	/* Read file from archive and extract. */
-	int num_read = 0;
-	char buffer[16];
-	while ((num_read = read(fd, buffer, BLOCKSIZE)) > 0) {
-		writeToFile(out_fd, name, buffer, num_read);
-	}
-
-	close(out_fd);
 }
 
 /** Print a table of contents.
@@ -203,17 +291,16 @@ int main(int argc, char **argv)
 			if (argc < 4) {
 				printf("Supply at least one file to append!\n");
 			} else {
-				printf("Appending file to archive.\n");
-				for (i=3; i<argc; i++) {
-					append(fd, argv[2], argv[i]);
-				}
+				append(fd, argv[2], argc-3, argv+3);
 			}
 			break;
 
 		/* Extract named files. */
 		case 'x':
-			for (i=3; i<argc; i++) {
-				extract(fd, argv[2], argv[i]);
+			if (argc < 4) {
+				printf("Supply at least one file to append!\n");
+			} else {
+				extract(fd, argv[2], argc-3, argv+3);
 			}
 			break;
 
@@ -227,8 +314,10 @@ int main(int argc, char **argv)
 
 		/* Delete named files from archive. */
 		case 'd':
-			for (i=3; i<argc; i++) {
-				delete(fd, argv[2], argv[i]);
+			if (argc < 4) {
+				printf("Supply at least one file to append!\n");
+			} else {
+				delete(fd, argv[2], argc-3, argv+3);
 			}
 			break;
 
