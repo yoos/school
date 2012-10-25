@@ -8,6 +8,7 @@
 #include <errno.h>
 #include <string.h>   // For memcmp.
 #include <time.h>
+#include <dirent.h>   // For directory listing.
 #include <ar.h>
 
 
@@ -401,6 +402,8 @@ int main(int argc, char **argv)
 {
 	int fd, i;
 	char buffer[16];
+	DIR *dp;
+	struct dirent *ep;
 
 	/* Has the user provided enough arguments? */
 	if (argc < 3) {
@@ -476,6 +479,16 @@ int main(int argc, char **argv)
 		/* Quickly append all "regular" files in current directory, except the
 		 * archive itself. */
 		case 'A':
+			dp = opendir ("./");
+
+			if (dp != NULL) {
+				while ((ep = readdir(dp)))
+					printf("%s\n", ep->d_name);
+
+				(void) closedir(dp);
+			}
+			else
+				perror ("Couldn't open the directory");
 			break;
 
 		/* For a given timeout, add all modified files to the archive. */
