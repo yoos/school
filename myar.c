@@ -117,7 +117,7 @@ void append(int fd, char* arName, int nNum, char** names)
  *  files found.
  *  @param headers Array of headers of files found.
  */
-int getHeaders(int fd, char* arName, int nNum, char** names, struct ar_hdr* headers) {
+int getHeaders(int fd, int nNum, char** names, struct ar_hdr* headers) {
 	/* Seek to first entry. */
 	lseek(fd, SARMAG, SEEK_SET);
 
@@ -169,7 +169,7 @@ void delete(int fd, char* arName, int nNum, char** names)
 {
 	/* Get headers of the files we are looking for, if they exist. */
 	struct ar_hdr headers[nNum];
-	int hNum = getHeaders(fd, arName, nNum, names, headers);
+	int hNum = getHeaders(fd, nNum, names, headers);
 
 	/* If no files were found, quit. */
 	if (hNum == 0) {
@@ -239,11 +239,11 @@ void delete(int fd, char* arName, int nNum, char** names)
 
 /** Extract file from archive.
  */
-void extract(int fd, char* arName, int nNum, char** names)
+void extract(int fd, int nNum, char** names)
 {
 	/* Get headers of the files we are looking for, if they exist. */
 	struct ar_hdr headers[nNum];
-	int hNum = getHeaders(fd, arName, nNum, names, headers);
+	int hNum = getHeaders(fd, nNum, names, headers);
 
 	/* If no files were found, quit. */
 	if (hNum == 0) {
@@ -334,7 +334,7 @@ void extract(int fd, char* arName, int nNum, char** names)
 
 /** Print a table of contents.
  */
-void toc(int fd, char* arName, int verbose)
+void toc(int fd, int verbose)
 {
 	int num_read = 0;
 	struct ar_hdr cur_hdr;
@@ -450,18 +450,18 @@ int main(int argc, char **argv)
 			if (argc < 4) {
 				printf("Supply at least one file to delete!\n");
 			} else {
-				extract(fd, argv[2], argc-3, argv+3);
+				extract(fd, argc-3, argv+3);
 			}
 			break;
 
 		/* Print concise table of contents of archive. */
 		case 't':
-			toc(fd, argv[2], 0);
+			toc(fd, 0);
 			break;
 
 		/* Print verbose table of contents of archive. */
 		case 'v':
-			toc(fd, argv[2], 1);
+			toc(fd, 1);
 			break;
 
 		/* Delete named files from archive. */
