@@ -212,7 +212,10 @@ void extract(int fd, char* arName, int nNum, char** names)
 			/* Turn char array into string. */
 			char name[16];
 			sscanf(cur_hdr.ar_name, "%s", name);
-			name[strlen(name)-1] = 0;
+			if (name[strlen(name)-1] == '/')
+				name[strlen(name)-1] = 0;
+			else
+				name[strlen(name)] = 0;
 
 			/* If file already exists in destination directory, prompt user. */
 			if (access(name, F_OK) == 0) {
@@ -247,7 +250,7 @@ void extract(int fd, char* arName, int nNum, char** names)
 			int readSize = 0;
 			char buffer[16];
 			while (out_num_to_write > 0) {
-				readSize = (BLOCKSIZE < out_num_to_write) ? BLOCKSIZE : out_num_to_write;
+				readSize = MIN(BLOCKSIZE, out_num_to_write);
 				out_num_read = read(fd, buffer, readSize);
 				writeToFile(out_fd, name, buffer, out_num_read);
 
@@ -379,7 +382,7 @@ int main(int argc, char **argv)
 		/* Extract named files. */
 		case 'x':
 			if (argc < 4) {
-				printf("Supply at least one file to append!\n");
+				printf("Supply at least one file to delete!\n");
 			} else {
 				extract(fd, argv[2], argc-3, argv+3);
 			}
