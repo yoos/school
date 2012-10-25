@@ -21,7 +21,8 @@
 /** Turn an array of characters into a string.
  *  TODO: This is bad, dangerous, and just wrong, but it works for now.
  */
-char* stringify(int len, char* array) {
+char* stringify(int len, char* array)
+{
 	char out[len+1];
 
 	sscanf(array, "%s", out);
@@ -60,7 +61,8 @@ void writeToFile(int fd, char* fName, char* buffer, int bufSize)
 
 /** Append file to archive.
  */
-void append(int fd, char* arName, int nNum, char** names) {
+void append(int fd, char* arName, int nNum, char** names)
+{
 	int i;
 	char buffer[16];
 
@@ -163,18 +165,19 @@ int getHeaders(int fd, char* arName, int nNum, char** names, struct ar_hdr* head
 
 /** Delete file from archive.
  */
-void delete(int fd, char* arName, int nNum, char** names) {
+void delete(int fd, char* arName, int nNum, char** names)
+{
+
 }
 
 /** Extract file from archive.
  *  TODO: Make this stop extracting after first match.
  */
-void extract(int fd, char* arName, int nNum, char** names) {
+void extract(int fd, char* arName, int nNum, char** names)
+{
 	/* Get headers of the files we are looking for, if they exist. */
 	struct ar_hdr headers[nNum];
 	int hNum = getHeaders(fd, arName, nNum, names, headers);
-
-	printf("%d found.\n", hNum);
 
 	/* If no files were found, quit. */
 	if (hNum == 0) {
@@ -262,7 +265,8 @@ void extract(int fd, char* arName, int nNum, char** names) {
 
 /** Print a table of contents.
  */
-void toc(int fd, char* arName, int verbose) {
+void toc(int fd, char* arName, int verbose)
+{
 	int num_read = 0;
 	struct ar_hdr cur_hdr;
 
@@ -317,7 +321,8 @@ void toc(int fd, char* arName, int verbose) {
 
 /** Print usage guide.
  */
-void usage() {
+void usage()
+{
 	printf("Usage:\n");
 	exit(-1);
 }
