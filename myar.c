@@ -146,7 +146,7 @@ int getHeaders(int fd, char* arName, int nNum, char** names, struct ar_hdr* head
 
 				/* If it is not a duplicate, mark as found. */
 				if (dup != 1) {
-					headers[numFound] = cur_hdr;   // TODO: Is this correct?
+					headers[numFound] = cur_hdr;
 					numFound++;
 				}
 			}
@@ -199,7 +199,7 @@ void delete(int fd, char* arName, int nNum, char** names)
 	struct ar_hdr cur_hdr;   // Store header for comparison.
 	while ((num_read = read(fd, (char*) &cur_hdr, sizeof(struct ar_hdr))) == sizeof(struct ar_hdr)) {
 		/* If names match, skip this file. */
-		if (memcmp(headers[delIndex].ar_name, cur_hdr.ar_name, 16) == 0) {   // TODO: Check that this works for partial matches.
+		if (memcmp(headers[delIndex].ar_name, cur_hdr.ar_name, 16) == 0) {
 			/* Increment number of files deleted. Effectively, we no longer
 			 * check headers[delIndex] as a possible match, because we've just
 			 * found the first match. */
@@ -238,7 +238,6 @@ void delete(int fd, char* arName, int nNum, char** names)
 }
 
 /** Extract file from archive.
- *  TODO: Make this stop extracting after first match.
  */
 void extract(int fd, char* arName, int nNum, char** names)
 {
@@ -271,7 +270,7 @@ void extract(int fd, char* arName, int nNum, char** names)
 	struct ar_hdr cur_hdr;   // Store header for comparison.
 	while ((num_read = read(fd, (char*) &cur_hdr, sizeof(struct ar_hdr))) == sizeof(struct ar_hdr) && extIndex < hNum) {
 		/* Should we extract this file? */
-		if (memcmp(headers[extIndex].ar_name, cur_hdr.ar_name, 16) == 0) {   // TODO: Check that this works for partial matches.
+		if (memcmp(headers[extIndex].ar_name, cur_hdr.ar_name, 16) == 0) {
 			/* Increment number of files extracted. NOTE: Do this before the
 			 * continue operation below! */
 			extIndex++;
