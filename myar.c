@@ -156,6 +156,8 @@ void extract(int fd, char* arName, int nNum, char** names) {
 	struct ar_hdr headers[nNum];
 	int hNum = getHeaders(fd, arName, nNum, names, headers);
 
+	printf("%d found.\n", hNum);
+
 	/* If no files were found, quit. */
 	if (hNum == 0) {
 		printf("None of the requested files were found! Exiting.\n");
@@ -182,6 +184,10 @@ void extract(int fd, char* arName, int nNum, char** names) {
 	while ((num_read = read(fd, (char*) &cur_hdr, sizeof(struct ar_hdr))) == sizeof(struct ar_hdr)) {
 		/* Should we extract this file? */
 		if (memcmp(headers[extIndex].ar_name, cur_hdr.ar_name, 16) == 0) {   // TODO: Check that this works for partial matches.
+			/* Increment number of files extracted. NOTE: Do this before the
+			 * continue operation below! */
+			extIndex++;
+
 			/* Turn char array into string. */
 			char name[16];
 			sscanf(cur_hdr.ar_name, "%s", name);
@@ -190,10 +196,15 @@ void extract(int fd, char* arName, int nNum, char** names) {
 			/* If file already exists in destination directory, prompt user. */
 			if (access(name, F_OK) == 0) {
 				char res;
-				printf("File exists! Overwrite? (y/N) ");
-				scanf("%c", &res);
+				printf("%s exists! Overwrite? (y/N) ", name);
+				scanf("%c", &res);   // TODO: Sometimes, this is skipped. Why?
+
 				if (res != 'y' && res != 'Y') {
 					printf("Not extracting %s.\n", name);
+					/* Seek to next entry. Seek forward one more byte if
+					 * filesize is odd. (This maintains compatibility with the
+					 * UNIX ar.) */
+					lseek(fd, atoi(cur_hdr.ar_size) + (atoi(cur_hdr.ar_size)%2), SEEK_CUR);
 					continue;
 				}
 			}
@@ -222,13 +233,10 @@ void extract(int fd, char* arName, int nNum, char** names) {
 				out_num_to_write -= readSize;
 			}
 
-			/* Increment number of files extracted. */
-			extIndex++;
-
 			close(out_fd);
 		} else {
-			/* Seek to next entry. Seek forward one more byte if filesize is odd.
-			 * (This maintains compatibility with the UNIX ar.) */
+			/* Seek to next entry. Seek forward one more byte if filesize is
+			 * odd. (This maintains compatibility with the UNIX ar.) */
 			lseek(fd, atoi(cur_hdr.ar_size) + (atoi(cur_hdr.ar_size)%2), SEEK_CUR);
 		}
 	}
