@@ -17,6 +17,7 @@
 #define BLOCKSIZE 4096
 
 #define MIN(a, b)  (((a) < (b)) ? (a) : (b))
+#define MAX(a, b)  (((a) > (b)) ? (a) : (b))
 
 /** Turn an array of characters into a string.
  *  TODO: This is bad, dangerous, and just wrong, but it works for now.
@@ -129,7 +130,7 @@ int getHeaders(int fd, char* arName, int nNum, char** names, struct ar_hdr* head
 	while ((num_read = read(fd, (char*) &cur_hdr, sizeof(struct ar_hdr))) == sizeof(struct ar_hdr)) {
 		/* Loop through the list of requested file names and find first match. */
 		for (i=0; i<nNum; i++) {
-			int nameLen = MIN(16, strlen(names[i]));
+			int nameLen = MIN(16, MAX(strlen(stringify(16, cur_hdr.ar_name)), strlen(names[i])));
 			if (memcmp(cur_hdr.ar_name, names[i], nameLen) == 0) {
 				int dup = 0;
 				int j;
