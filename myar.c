@@ -191,7 +191,7 @@ void extract(int fd, char* arName, int nNum, char** names) {
 			/* Turn char array into string. */
 			char name[16];
 			sscanf(cur_hdr.ar_name, "%s", name);
-			name[strlen(name)-1] = '\0';
+			name[strlen(name)-1] = 0;
 
 			/* If file already exists in destination directory, prompt user. */
 			if (access(name, F_OK) == 0) {
