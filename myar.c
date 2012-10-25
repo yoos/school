@@ -268,7 +268,7 @@ void extract(int fd, char* arName, int nNum, char** names)
 	int num_read = 0;
 	int extIndex = 0;
 	struct ar_hdr cur_hdr;   // Store header for comparison.
-	while ((num_read = read(fd, (char*) &cur_hdr, sizeof(struct ar_hdr))) == sizeof(struct ar_hdr)) {
+	while ((num_read = read(fd, (char*) &cur_hdr, sizeof(struct ar_hdr))) == sizeof(struct ar_hdr) && extIndex < hNum) {
 		/* Should we extract this file? */
 		if (memcmp(headers[extIndex].ar_name, cur_hdr.ar_name, 16) == 0) {   // TODO: Check that this works for partial matches.
 			/* Increment number of files extracted. NOTE: Do this before the
