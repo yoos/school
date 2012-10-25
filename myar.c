@@ -166,7 +166,74 @@ int getHeaders(int fd, char* arName, int nNum, char** names, struct ar_hdr* head
  */
 void delete(int fd, char* arName, int nNum, char** names)
 {
+	/* Get headers of the files we are looking for, if they exist. */
+	struct ar_hdr headers[nNum];
+	int hNum = getHeaders(fd, arName, nNum, names, headers);
 
+	/* If no files were found, quit. */
+	if (hNum == 0) {
+		printf("None of the requested files were found! Exiting.\n");
+		exit(0);
+	}
+
+	/* Create new file. */
+	char newName[strlen(arName)+10];
+	sprintf(newName, "%s.tmp", arName);
+	int new_fd = creat(newName, 0666);
+	if (new_fd == -1) {
+		perror("Could not create temporary file!");
+		exit(-1);
+	}
+
+	/* Seek to first header in old archive. */
+	lseek(fd, SARMAG, SEEK_SET);
+
+	/* Write ARMAG to new archive. */
+	lseek(new_fd, 0, SEEK_SET);
+	writeToFile(new_fd, newName, ARMAG, SARMAG);
+
+	/* Copy all files not in the deletion list to new file. */
+	int num_read = 0;
+	int delIndex = 0;
+	struct ar_hdr cur_hdr;   // Store header for comparison.
+	while ((num_read = read(fd, (char*) &cur_hdr, sizeof(struct ar_hdr))) == sizeof(struct ar_hdr)) {
+		/* If names match, skip this file. */
+		if (memcmp(headers[delIndex].ar_name, cur_hdr.ar_name, 16) == 0) {   // TODO: Check that this works for partial matches.
+			/* Increment number of files deleted. Effectively, we no longer
+			 * check headers[delIndex] as a possible match, because we've just
+			 * found the first match. */
+			delIndex++;
+
+			/* Seek to next entry. */
+			lseek(fd, atoi(cur_hdr.ar_size) + (atoi(cur_hdr.ar_size)%2), SEEK_CUR);
+
+		/* Otherwise, copy it to new archive. */
+		} else {
+			/* Read octal mode. */
+			int mode;
+			sscanf(cur_hdr.ar_mode, "%o", &mode);
+
+			/* Read file from archive and copy to new file. */
+			int out_num_read = 0;
+			int out_num_to_write = atoi(cur_hdr.ar_size) + (atoi(cur_hdr.ar_size)%2);
+			int readSize = 0;
+			char buffer[16];
+			writeToFile(new_fd, newName, (char*) &cur_hdr, sizeof(struct ar_hdr));
+			while (out_num_to_write > 0) {
+				readSize = MIN(16, out_num_to_write);
+				out_num_read = read(fd, buffer, readSize);
+				writeToFile(new_fd, newName, buffer, out_num_read);
+				out_num_to_write -= readSize;
+			}
+		}
+	}
+
+	/* Replace old archive file with new archive file. */
+	unlink(arName);   /* Remove old archive file when this program dies. */
+	link(newName, arName);   /* Link new to old as hard link. */
+	unlink(newName);   /* Unlink new archive file. */
+
+	close(new_fd);
 }
 
 /** Extract file from archive.
