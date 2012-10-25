@@ -138,7 +138,6 @@ int getHeaders(int fd, char* arName, int nNum, char** names, struct ar_hdr* head
 				 * duplicates. If the header we are currently looking at is
 				 * a duplicate, it will be caught here. */
 				for (j=0; j<numFound; j++) {
-					printf("%d %d %d \n", i, j, numFound);
 					/* If the current header is a duplicate, mark it as such. */
 					if (memcmp(cur_hdr.ar_name, headers[j].ar_name, nameLen) == 0)
 						dup = 1;
