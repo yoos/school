@@ -71,8 +71,13 @@ void append(int fd, char* arName, int nNum, char** names)
 	/* Go to end of archive file. */
 	lseek(fd, 0*BLOCKSIZE, SEEK_END);
 
+	printf("names: %lu  &names: %lu  *names: %lu  &names[3+i]: %lu\n", names, &names, *names, &names[i]);
+
 	for (i=0; i<nNum; i++) {
 		/* Open file to append. */
+		printf("&names[3+i]: %lu\n", &names[i]);
+		printf("Index: %d\n", i);
+		printf("Opening: %lu\n\n", names[i]);
 		int in_fd = open(names[i], O_RDONLY);
 		if (in_fd == -1) {
 			perror("Cannot open input file.");
@@ -400,12 +405,15 @@ int main(int argc, char **argv)
 {
 	int fd, i;
 	char buffer[16];
-	DIR *dp;
-	struct dirent *ep;
+	DIR* dp;
+	struct dirent* ep;
 
 	/* Has the user provided enough arguments? */
 	if (argc < 3) {
-		printf("Too few arguments!\n\n");
+		printf("Too few arguments!\n");
+		usage();
+	} else if (strlen(argv[1]) > 1) {
+		printf("Too many keys!\n");
 		usage();
 	} else {
 		/* Set file mode creation mask to 0. */
@@ -442,6 +450,7 @@ int main(int argc, char **argv)
 			if (argc < 4) {
 				printf("Supply at least one file to append!\n");
 			} else {
+				printf("&argv: %lu, argv[3]: %lu, &argv[3]: %lu, *argv[3]: %lu\nargv[4]: %lu, argv[5]: %lu\n", &argv, argv[3], &argv[3], *argv[3], argv[4], argv[5]);
 				append(fd, argv[2], argc-3, argv+3);
 			}
 			break;
@@ -474,19 +483,39 @@ int main(int argc, char **argv)
 			}
 			break;
 
-		/* Quickly append all "regular" files in current directory, except the
+		/* Quickly append all regular files in current directory, except the
 		 * archive itself. */
 		case 'A':
 			dp = opendir ("./");
 
 			if (dp != NULL) {
-				while ((ep = readdir(dp)))
-					printf("%s\n", ep->d_name);
+				while ((ep = readdir(dp))) {
+					/* Skip certain file ep->d_name. */
+					if (strcmp(ep->d_name, ".") == 0 ||
+							strcmp(ep->d_name, "..") == 0 ||
+							strcmp(ep->d_name, argv[2]) == 0)
+						continue;
 
-				(void) closedir(dp);
+					/* Skip non-regular files. */
+					struct stat st;
+					if (stat(ep->d_name, &st) == 0) {
+						if (!S_ISREG(st.st_mode))
+							continue;
+					}
+
+					/* Append files. */
+					char* fname = &ep->d_name;
+					//sprintf(fname, "%s", "f1");
+					//printf("%lu\n", sizeof(ep->d_name));
+					printf("%20s  d_name has address %lu   and f at %lu points to %lu\n", ep->d_name, &ep->d_name, &fname, fname);
+					append(fd, argv[2], 1, &fname);
+				}
+
+				closedir(dp);
+			} else {
+				perror("Could not open directory.");
+				exit(-1);
 			}
-			else
-				perror ("Couldn't open the directory");
 			break;
 
 		/* For a given timeout, add all modified files to the archive. */
