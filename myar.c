@@ -20,6 +20,13 @@
 #define MIN(a, b)  (((a) < (b)) ? (a) : (b))
 #define MAX(a, b)  (((a) > (b)) ? (a) : (b))
 
+// General-purpose character buffer.
+// NOTE: Define this outside the functions or they may consistently segfault
+// for inexplicable combinations of different filename lengths and filesizes
+// and do other weird things that took me 20 hours to debug. Thanks to this,
+// I've become good friends with gdb and valgrind.
+char buffer[16];
+
 /** Turn an array of characters into a string.
  *  TODO: This is bad, dangerous, and just wrong, but it works for now.
  */
@@ -66,18 +73,22 @@ void writeToFile(int fd, char* fName, char* buffer, int bufSize)
 void append(int fd, char* arName, int nNum, char** names)
 {
 	int i;
-	char buffer[16];
 
 	/* Go to end of archive file. */
 	lseek(fd, 0*BLOCKSIZE, SEEK_END);
 
-	printf("names: %lu  &names: %lu  *names: %lu  &names[3+i]: %lu\n", names, &names, *names, &names[i]);
+	printf("names: %lu  &names: %lu  *names: %lu  &names[i]: %lu\n", names, &names, *names, &names[i]);
 
 	for (i=0; i<nNum; i++) {
 		/* Open file to append. */
-		printf("&names[3+i]: %lu\n", &names[i]);
+		//int j;
+		//printf("names[i]: ");
+		//for (j=0; j<10; j++) {
+		//	printf("%d ", names[i][j]);
+		//}
+		printf("  &names[i]: %lu\n", &names[i]);
 		printf("Index: %d\n", i);
-		printf("Opening: %lu\n\n", names[i]);
+		printf("Opening: %s\n\n", names[i]);
 		int in_fd = open(names[i], O_RDONLY);
 		if (in_fd == -1) {
 			perror("Cannot open input file.");
@@ -111,9 +122,10 @@ void append(int fd, char* arName, int nNum, char** names)
 		/* Add a single newline if input filesize is odd. (This maintains
 		 * compatibility with the UNIX ar.) */
 		if (st.st_size % 2) {
-			buffer[0] = '\n';
-			writeToFile(fd, arName, buffer, 1);
+			writeToFile(fd, arName, "\n", 1);
 		}
+
+		printf("Synced input file: %d\n", syncfs(in_fd));
 
 		close(in_fd);
 	}
@@ -223,7 +235,6 @@ void delete(int fd, char* arName, int nNum, char** names)
 			int out_num_read = 0;
 			int out_num_to_write = atoi(cur_hdr.ar_size) + (atoi(cur_hdr.ar_size)%2);
 			int readSize = 0;
-			char buffer[16];
 			writeToFile(new_fd, newName, (char*) &cur_hdr, sizeof(struct ar_hdr));
 			while (out_num_to_write > 0) {
 				readSize = MIN(16, out_num_to_write);
@@ -318,7 +329,6 @@ void extract(int fd, int nNum, char** names)
 			int out_num_read = 0;
 			int out_num_to_write = atoi(cur_hdr.ar_size);
 			int readSize = 0;
-			char buffer[16];
 			while (out_num_to_write > 0) {
 				readSize = MIN(BLOCKSIZE, out_num_to_write);
 				out_num_read = read(fd, buffer, readSize);
@@ -404,7 +414,6 @@ void usage()
 int main(int argc, char **argv)
 {
 	int fd, i;
-	char buffer[16];
 	DIR* dp;
 	struct dirent* ep;
 
@@ -526,6 +535,8 @@ int main(int argc, char **argv)
 		default:
 			usage();
 		}
+
+		printf("Synced archive: %d\n", syncfs(fd));
 
 		close(fd);
 	}
