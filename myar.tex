@@ -57,9 +57,23 @@ following options:
 		(except the archive itself)
 \end{itemize}
 
-Each option will be paired up with a function in the code, and each function may use smaller helper functions to find files in the archive as necessary. {\tt myar} will take only one option at a time, and a switch statement will run the appropriate function.
+Each option will be paired up with a function in the code, and each function
+may use smaller helper functions to find files in the archive as necessary.
+{\tt myar} will take only one option at a time, and a switch statement will run
+the appropriate function.
 
-Since deletion of a file from the archive will leave a gap in the archive, any delete operation will require the program to overwrite the old file with a new file without any gaps.
+Since deletion of a file from the archive will leave a gap in the archive, any
+delete operation will require the program to overwrite the old file with a new
+file without any gaps.
+
+Since file I/O is expensive, the number of passes through the archive file will
+be minimized by first determining which of the files requested for deletion
+actually exist in the archive, in order of appearance, then parsing through the
+archive file and appending each file to a new archive file if the file is not
+in the deletion list.
+
+Read/write operations are done 16 bytes at a time in order to keep memory usage
+low.
 
 
 \section*{Worklog}
