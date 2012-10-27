@@ -147,7 +147,7 @@ int getHeaders(int fd, int nNum, char** names, struct ar_hdr* headers) {
 	while ((num_read = read(fd, (char*) &cur_hdr, sizeof(struct ar_hdr))) == sizeof(struct ar_hdr)) {
 		/* Loop through the list of requested file names and find first match. */
 		for (i=0; i<nNum; i++) {
-			if (strncmp(cur_hdr.ar_name, names[i], 16) == 0) {
+			if (strncmp(cur_hdr.ar_name, names[i], MIN(16, strlen(names[i]))) == 0) {
 				int dup = 0;
 				int j;
 
@@ -271,7 +271,7 @@ void extract(int fd, int nNum, char** names)
 	//for (i=0; i<nNum; i++) {
 	//	int found = 0;
 	//	for (j=0; j<hNum; j++) {
-	//		if (strncmp(headers[j].ar_name, names[i], 16) == 0)
+	//		if (strncmp(headers[j].ar_name, names[i], MIN(16, strlen(names[i]))) == 0)
 	//			found = 1;
 	//		if (found == 0)
 	//			printf("Could not find %s\n", names[i]);
@@ -466,7 +466,7 @@ int main(int argc, char **argv)
 		/* Extract named files. */
 		case 'x':
 			if (argc < 4) {
-				printf("Supply at least one file to delete!\n");
+				printf("Supply at least one file to extract!\n");
 			} else {
 				extract(fd, argc-3, argv+3);
 			}
@@ -485,7 +485,7 @@ int main(int argc, char **argv)
 		/* Delete named files from archive. */
 		case 'd':
 			if (argc < 4) {
-				printf("Supply at least one file to append!\n");
+				printf("Supply at least one file to delete!\n");
 			} else {
 				delete(fd, argv[2], argc-3, argv+3);
 			}
