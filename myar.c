@@ -77,7 +77,7 @@ void append(int fd, char* arName, int nNum, char** names)
 	/* Go to end of archive file. */
 	lseek(fd, 0*BLOCKSIZE, SEEK_END);
 
-	printf("names: %lu  &names: %lu  *names: %lu  &names[i]: %lu\n", names, &names, *names, &names[i]);
+	//printf("names: %lu  &names: %lu  *names: %lu  &names[i]: %lu\n", names, &names, *names, &names[i]);
 
 	for (i=0; i<nNum; i++) {
 		/* Open file to append. */
@@ -458,7 +458,7 @@ int main(int argc, char **argv)
 			if (argc < 4) {
 				printf("Supply at least one file to append!\n");
 			} else {
-				printf("&argv: %lu, argv[3]: %lu, &argv[3]: %lu, *argv[3]: %lu\nargv[4]: %lu, argv[5]: %lu\n", &argv, argv[3], &argv[3], *argv[3], argv[4], argv[5]);
+				//printf("&argv: %lu, argv[3]: %lu, &argv[3]: %lu, *argv[3]: %lu\nargv[4]: %lu, argv[5]: %lu\n", &argv, argv[3], &argv[3], *argv[3], argv[4], argv[5]);
 				append(fd, argv[2], argc-3, argv+3);
 			}
 			break;
