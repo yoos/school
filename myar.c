@@ -86,9 +86,10 @@ void append(int fd, char* arName, int nNum, char** names)
 		//for (j=0; j<10; j++) {
 		//	printf("%d ", names[i][j]);
 		//}
-		printf("  &names[i]: %lu\n", &names[i]);
-		printf("Index: %d\n", i);
-		printf("Opening: %s\n\n", names[i]);
+		//printf("  &names[i]: %lu\n", &names[i]);
+		//printf("Index: %d\n", i);
+		//printf("Opening: %s\n\n", names[i]);
+
 		int in_fd = open(names[i], O_RDONLY);
 		if (in_fd == -1) {
 			perror("Cannot open input file.");
@@ -124,8 +125,6 @@ void append(int fd, char* arName, int nNum, char** names)
 		if (st.st_size % 2) {
 			writeToFile(fd, arName, "\n", 1);
 		}
-
-		printf("Synced input file: %d\n", syncfs(in_fd));
 
 		close(in_fd);
 	}
@@ -514,9 +513,7 @@ int main(int argc, char **argv)
 
 					/* Append files. */
 					char* fname = &ep->d_name;
-					//sprintf(fname, "%s", "f1");
-					//printf("%lu\n", sizeof(ep->d_name));
-					printf("%20s  d_name has address %lu   and f at %lu points to %lu\n", ep->d_name, &ep->d_name, &fname, fname);
+					//printf("%s d_name has address %lu and file at %lu points to %lu\n", ep->d_name, &ep->d_name, &fname, fname);
 					append(fd, argv[2], 1, &fname);
 				}
 
@@ -535,8 +532,6 @@ int main(int argc, char **argv)
 		default:
 			usage();
 		}
-
-		printf("Synced archive: %d\n", syncfs(fd));
 
 		close(fd);
 	}
