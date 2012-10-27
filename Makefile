@@ -1,6 +1,6 @@
 TARGET=myar
-CC = gcc
-CXX = g++
+CC = icc
+CXX = icpc
 CFLAGS = -Wall -std=c99 -openmp -O3 -g -I.
 CXXFLAGS = -Wall -openmp -O3 -g
 LDFLAGS = -lrt -lpthread 
