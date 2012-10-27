@@ -26,23 +26,22 @@
 // and do other weird things that took me 20 hours to debug. Thanks to this,
 // I've become good friends with gdb and valgrind.
 char buffer[16];
+char nameStr[17];
 
 /** Turn an array of characters into a string.
  *  TODO: This is bad, dangerous, and just wrong, but it works for now.
  */
 char* stringify(int len, char* array)
 {
-	char out[len+1];
-
-	sscanf(array, "%s", out);
+	sscanf(array, "%s", nameStr);
 
 	/* For ar_name. */
-	if (out[strlen(out)-1] == '/')
-	   out[strlen(out)-1] = 0;
+	if (nameStr[strlen(nameStr)-1] == '/')
+	   nameStr[strlen(nameStr)-1] = 0;
 	else
-		out[strlen(out)] = 0;
+		nameStr[strlen(nameStr)] = 0;
 
-	return out;
+	return nameStr;
 }
 
 /** Write buffer into file.
@@ -229,10 +228,6 @@ void delete(int fd, char* arName, int nNum, char** names)
 
 		/* Otherwise, copy it to new archive. */
 		} else {
-			/* Read octal mode. */
-			int mode;
-			sscanf(cur_hdr.ar_mode, "%o", &mode);
-
 			/* Read file from archive and copy to new file. */
 			int out_num_read = 0;
 			int out_num_to_write = atoi(cur_hdr.ar_size) + (atoi(cur_hdr.ar_size)%2);
@@ -293,12 +288,8 @@ void extract(int fd, int nNum, char** names)
 			extIndex++;
 
 			/* Turn char array into string. */
-			char name[16];
-			sscanf(cur_hdr.ar_name, "%s", name);
-			if (name[strlen(name)-1] == '/')
-				name[strlen(name)-1] = 0;
-			else
-				name[strlen(name)] = 0;
+			char name[17];
+			sprintf(name, "%s", stringify(16, cur_hdr.ar_name));
 
 			/* If file already exists in destination directory, prompt user. */
 			if (access(name, F_OK) == 0) {
@@ -387,17 +378,16 @@ void toc(int fd, int verbose)
 			timeinfo = localtime(&fileTime);
 			strftime(date, 30, "%b %d %R %Y", timeinfo);
 
-			printf("%s %s/%s %10.10s %s ", mode, stringify(6, cur_hdr.ar_uid), stringify(6, cur_hdr.ar_gid), stringify(10, cur_hdr.ar_size), date);
+			char str_uid[6], str_gid[6], str_size[11];
+			sprintf(str_uid, "%s", stringify(6, cur_hdr.ar_uid));
+			sprintf(str_gid, "%s", stringify(6, cur_hdr.ar_gid));
+			sprintf(str_size, "%s", stringify(10, cur_hdr.ar_size));
+
+			printf("%s %6s/%6s %10s %s ", mode, str_uid, str_gid, str_size, date);
 		}
 
 		/* Stringify name. */
-		char name[16];
-		sscanf(cur_hdr.ar_name, "%s", name);
-		if (name[strlen(name)-1] == '/')
-		   name[strlen(name)-1] = 0;
-		else
-			name[strlen(name)] = 0;
-		printf("%s\n", name);
+		printf("%s\n", stringify(16, cur_hdr.ar_name));
 
 		/* Seek to next header. */
 		lseek(fd, atoi(cur_hdr.ar_size) + (atoi(cur_hdr.ar_size)%2), SEEK_CUR);
