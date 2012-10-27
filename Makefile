@@ -9,7 +9,9 @@ INCLUDES =
 SOURCE = myar.c
 
 
-default: compile
+default: ${TARGET}
+
+all: ${TARGET} tex
 
 clean:
 	rm ${TARGET} ${TARGET}.aux ${TARGET}.log ${TARGET}.out ${TARGET}.pdf
@@ -17,7 +19,7 @@ clean:
 
 ### Program ###
 
-compile: ${SOURCE} ${INCLUDES}
+${TARGET}: ${SOURCE} ${INCLUDES}
 	${CC} ${CFLAGS} ${SOURCE} -o ${TARGET} ${LDFLAGS}
 
 debug: ${SOURCE} ${INCLUDES}
