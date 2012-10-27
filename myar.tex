@@ -48,12 +48,12 @@ UNIX command {\tt ar}. The program will be written in C and will support the
 following options:
 
 \begin{itemize}
-	\item -q: quickly append named files to archive
-	\item -x: extract named files
-	\item -t: print a concise table of contents of the archive
-	\item -v: print a verbose table of contents of the archive
-	\item -d: delete named files from archive
-	\item -A: quickly append all "regular" files in the current directory
+	\item q: quickly append named files to archive
+	\item x: extract named files
+	\item t: print a concise table of contents of the archive
+	\item v: print a verbose table of contents of the archive
+	\item d: delete named files from archive
+	\item A: quickly append all ``regular'' files in the current directory
 		(except the archive itself)
 \end{itemize}
 
@@ -75,15 +75,58 @@ in the deletion list.
 Read/write operations are done 16 bytes at a time in order to keep memory usage
 low.
 
+File extraction will check for the existence of a file in the target directory
+and prompt the user before overwriting.
+
+The q, x, and d operations can take multiple files as inputs.
+
 
 \section*{Worklog}
 
 
 \section*{Challenges}
 
+The functions were fairly straightforward to implement, but correctly passing
+pointers around proved to be a delicate task.
+
+I spent half of my time on this project debugging something that proved to be
+a nearly one-line fix. The buffer of size 16 used frequently in the functions
+in this program used to be defined within the function. This caused a segfault,
+depending a strange mix of conditions, including the length of filenames and
+the cumulative size of all input files.
+
+Eventually, I took note of the fact that valgrind reported some ``bad
+permissions for mapped region,'' and determined that as a function exited, the
+buffer it was using to read or write data may have been deallocated before the
+file I/O operation had finished, resulting in the segfault. Declaring the
+buffer in global scope solved this issue. (Funnily enough, syncfs() did not
+help.)
+
 
 \section*{Answers to questions}
 
+This assignment helped me familiarize myself with file I/O operations and
+string manipulation. The bug mentioned in the previous section made me
+reexamine how pointers work (particularly, double and triple pointers) and
+reminded me that I should be better friends with gdb and valgrind.
 
+The program was checked for correctness using various inputs files of varying
+sizes. For example:
+
+\begin{itemize}
+	\item {\tt ./myar q arfile f1}, where {\tt f1} is a small text file.
+	\item {\tt ./myar q arfile f1 f1 f1 f1 f1 f1}
+	\item {\tt ./myar q arfile myar}
+	\item {\tt ./myar q arfile f2}, where {\tt f2} is a large (1 MB) text file.
+	\item {\tt ./myar d arfile f1 f2}
+	\item {\tt ./myar A arfile}
+	\item {\tt ./myar x f1 f2 myar}
+\end{itemize}
+
+\dots and so on. The archive file itself was examined manually, in addition to
+being tested for compatibility with the standard UNIX ar command for q, d, x,
+t, and v.
+
+As stated, I learned how to use file I/O system calls, how to pass around double pointers such as {\tt argv}, and that scope is important.
 
 \end{document}
