@@ -69,6 +69,9 @@ void writeToFile(int fd, char* fName, char* buffer, int bufSize)
 }
 
 /** Append file to archive.
+ *  TODO: Check if user is trying to append the archive file to itself.
+ *  Currently, append will try and succeed in making the archive file grow
+ *  indefinitely in size.
  */
 void append(int fd, char* arName, int nNum, char** names)
 {
