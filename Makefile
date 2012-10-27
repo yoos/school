@@ -9,7 +9,7 @@ INCLUDES =
 SOURCE = myar.c
 
 
-default: compile tex
+default: compile
 
 clean:
 	rm ${TARGET} ${TARGET}.aux ${TARGET}.log ${TARGET}.out ${TARGET}.pdf
