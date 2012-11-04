@@ -12,7 +12,18 @@
 
 int main(int argc, char** argv)
 {
+	if (argc != 2) {
+		usage();
+	} else {
+		// Parse input
 
+		int i;
+		for (i=0; i<atoi(argv[1]); i++) {
+			// Fork off multiple sort processes
+		}
+
+		// Merge results and print
+	}
 
 	return 0;
 }
