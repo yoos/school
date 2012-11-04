@@ -14,17 +14,19 @@
 
 #define PAR_NUM 3   // Number of parallel sort processes
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
 	if (argc != 2) {
-		usage();
+		// usage();
 	} else {
-		// Parse input
-
 		int i;
 		for (i=0; i<atoi(argv[1]); i++) {
 			// Fork off multiple sort processes
+			printf("Fork %d\n", i);
 		}
+
+		// Parse input
+		printf("%lu", parse(stdin));   // TODO: This should eventually take fds of the sort processes.
 
 		// Merge results and print
 	}
