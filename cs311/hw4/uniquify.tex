@@ -43,6 +43,14 @@ Homework 4 \\
 
 \section*{Design}
 
+Parser reads stdin
+
+Use /bin/sort with no options -- number of parallel processes passed as command line argument. Use fdopen to attach the pipes and fclose to flush the streams.
+
+I/O should be done with fgets and fputs.
+
+Merger uniquifies and merges outputs from sort on the fly and prints to stdout.
+
 
 \section*{Worklog}
 
