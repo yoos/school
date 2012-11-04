@@ -22,16 +22,28 @@ int main(int argc, char **argv)
 		int parentPID = getpid();
 		int procNum = atoi(argv[1]);   // Number of sort processes to spawn.
 
-		FILE sort_fd[procNum];
+		// File descriptors for pipes.
+		int toSort[procNum][2];   // Parent writes to sort
+		int fmSort[procNum][2];   // Parent reads from sort
 
 		// Fork off sort processes.
 		int i=0;
 		while (getpid() == parentPID && i<procNum) {
+			// Create pipes between parent and child sort processes.
+			pipe(toSort[i]);
+			pipe(fmSort[i]);
+
 			if (fork()) {
-				// Do parent stuff
+				// Close unused ends of pipes.
+				close(toSort[i][0]);
+				close(fmSort[i][1]);
+
 				printf("Forked child %d\n", i);
 			} else {
-				// Do child stuff
+				// Close unused ends of pipes.
+				close(toSort[i][1]);
+				close(fmSort[i][0]);
+
 				printf("Child %d born!\n", i);
 			}
 
