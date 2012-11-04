@@ -8,8 +8,9 @@
 #include <errno.h>
 #include <string.h>
 
+#define PAR_NUM 3   // Number of parallel sort processes
 
-int main(int argc, int** argv)
+int main(int argc, char** argv)
 {
 
 
