@@ -43,11 +43,13 @@ Homework 4 \\
 
 \section*{Design}
 
-Parser reads stdin
+% Use /bin/sort with no options -- number of parallel processes passed as command line argument. Use fdopen to attach the pipes and fclose to flush the streams.
 
-Use /bin/sort with no options -- number of parallel processes passed as command line argument. Use fdopen to attach the pipes and fclose to flush the streams.
+Fork off multiple sort processes connected by pipes to main process.
 
-I/O should be done with fgets and fputs.
+Parser reads stdin and hands out entries to sort processes. Once it is done reading from stdin, it closes pipes, which signals the sort processes to sort.
+
+% I/O should be done with fgets and fputs.
 
 Merger uniquifies and merges outputs from sort on the fly and prints to stdout.
 
