@@ -5,5 +5,6 @@ set autoscale
 set term png
 set key left top
 set output "collatz.png"
-plot "collatz.t" using 1:2
+set pointsize 0.2
+plot "collatz.t" using 1:2 pt 3
 
