@@ -11,7 +11,7 @@ SOURCE = ${TARGET}.c
 
 default: ${TARGET}
 
-all: ${TARGET} tex
+all: ${TARGET} plot tex
 
 clean:
 	rm ${TARGET} ${TARGET}.aux ${TARGET}.log ${TARGET}.out ${TARGET}.pdf
@@ -24,6 +24,12 @@ ${TARGET}: ${SOURCE} ${INCLUDES}
 
 debug: ${SOURCE} ${INCLUDES}
 	${CC} ${CFLAGS} ${SOURCE} -o ${TARGET} ${LDFLAGS} -DDEBUG
+
+
+### Plot ###
+
+plot: plot/${TARGET}.gp plot/${TARGET}.t
+	cd plot; gnuplot ${TARGET}.gp
 
 
 ### TeX ###
