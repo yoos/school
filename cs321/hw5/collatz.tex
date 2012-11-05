@@ -10,6 +10,40 @@
 \usepackage[hang,bf,small]{caption}
 \usepackage{titlesec}
 \usepackage{amsmath,amssymb,amsthm}
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{ %
+  language=C,                % the language of the code
+  basicstyle=\sffamily\footnotesize,           % the size of the fonts that are used for the code
+  numbers=left,                   % where to put the line-numbers
+  numberstyle=\tiny\color{gray},  % the style that is used for the line-numbers
+  stepnumber=1,                   % the step between two line-numbers. If it's 1, each line
+                                  % will be numbered
+  numbersep=5pt,                  % how far the line-numbers are from the code
+  backgroundcolor=\color{white},      % choose the background color. You must add \usepackage{color}
+  showspaces=false,               % show spaces adding particular underscores
+  showstringspaces=false,         % underline spaces within strings
+  showtabs=false,                 % show tabs within strings adding particular underscores
+  frame=single,                   % adds a frame around the code
+  rulecolor=\color{black},        % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. commens (green here))
+  tabsize=2,                      % sets default tabsize to 2 spaces
+  captionpos=b,                   % sets the caption-position to bottom
+  breaklines=true,                % sets automatic line breaking
+  breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
+  title=\lstname,                   % show the filename of files included with \lstinputlisting;
+                                  % also try caption instead of title
+  keywordstyle=\color{blue},          % keyword style
+  commentstyle=\color{dkgreen},       % comment style
+  stringstyle=\color{mauve},         % string literal style
+  escapeinside={\%*}{*)},            % if you want to add LaTeX within your code
+  morekeywords={*,...}               % if you want to add more keywords to the set
+}
+
 
 \renewcommand{\headrulewidth}{0pt}
 \fancyfoot{}
@@ -41,8 +75,39 @@ Homework 5 \\
 5 November 2012
 
 \begin{enumerate}
-	\item $\text{while} (x \neq 1) \text{do} (x = f(x))$
+	\item The function \[w(x) = \text{while } (x \neq 1) \text{ do } (x = f(x)) \text{; return } x\] could be run on every natural number. If it terminates, the number is wondrous.
 
+	\item \lstinputlisting{collatz.c}
+
+	\newpage
+	\item The results of the program can be seen in Figure~\ref{fig:plot}.
+
+		\begin{figure}[!h]
+			\centering
+			\includegraphics[width=6in]{plot/collatz.png}
+			\caption{Number of iterations $n$ before $x=1$.}
+			\label{fig:plot}
+		\end{figure}
+
+		The value of $n$ jumps around for even the smaller values of $x$, but they exist in clumps of dots and dashes on the plot. These clumps form curves from the top left to the right and from the bottom left to the right (like that of a logarithmic function).
+
+		Many of the sequences formed by the Collatz function share a ``root'' sequence that decreases constantly. For example:
+
+		\[20 \rightarrow 10 \rightarrow 5 \rightarrow {\bf 16 \rightarrow 8 \rightarrow 4 \rightarrow 2 \rightarrow 1}\]
+		\[21 \rightarrow 64 \rightarrow 32 \rightarrow {\bf 16 \rightarrow 8 \rightarrow 4 \rightarrow 2 \rightarrow 1}\]
+
+		Perhaps this could explain the logarithmic curve? At least, $\log x$ forms the lower bound for $n$ given input $x$.
+
+
+	\item Since $f(x)$ allows us to increase or decrease $x$, we cannot know for sure when $x$ will actually reach $1$ and thus cannot determine an upper bound for the number of iterations. Due to the unboundedness, $g(x)$ cannot be a primitive recursive function.
+
+		(However, the plot {\it suggests} an upper bound, which might be related to the factors of $x$ and how $f(x)$ will eventually remove these factors until a decreasing sequence of powers of two is reached.)
+
+
+	\item The function $w(x)$ described in Question 1 above is an acceptor for $S$.
+
+		We would reject a number from $S$ if it never reaches $1$. However, we would have to iterate $f(x)$ infinitely, which means $w(x)$ will not terminate. Thus, $S$ has no rejector, so it does not have a recognizer.
 \end{enumerate}
 
 \end{document}
+
