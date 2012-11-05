@@ -33,7 +33,7 @@ int main(int argc, char **argv)
 			i++;
 		}
 
-		printf("%4d: %d\n", num, i);
+		printf("%d, %d\n", num, i);
 	}
 
 	return 0;
