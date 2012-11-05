@@ -14,7 +14,8 @@ default: ${TARGET}
 all: ${TARGET} plot tex
 
 clean:
-	rm ${TARGET} ${TARGET}.aux ${TARGET}.log ${TARGET}.out ${TARGET}.pdf
+	rm -f ${TARGET} ${TARGET}.aux ${TARGET}.log ${TARGET}.out ${TARGET}.pdf \
+		plot/${TARGET}.png plot/${TARGET}.t
 
 
 ### Program ###
@@ -28,13 +29,19 @@ debug: ${SOURCE} ${INCLUDES}
 
 ### Plot ###
 
-plot: plot/${TARGET}.gp plot/${TARGET}.t
+plot: ${TARGET} plot/${TARGET}.gp
+	if [ ! -f plot/${TARGET}.t ]; \
+		then ./${TARGET} 10000 > plot/${TARGET}.t; \
+	fi
 	cd plot; gnuplot ${TARGET}.gp
 
 
 ### TeX ###
 
-tex: ${TARGET}.tex 
+tex: plot ${TARGET}.tex
 	pdflatex ${TARGET}.tex
 	pdflatex $(TARGET).tex
+
+
+.PHONY: plot clean
 
