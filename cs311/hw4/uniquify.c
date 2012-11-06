@@ -92,28 +92,34 @@ int main(int argc, char **argv)
 			i++;
 		}
 
-		int j;
-		for (j=10; j>0; j--) {
-			sprintf(buf, "Hello from parent %d\n", j);
-			if (fputs(buf, stToSort[0][1]) == EOF) {
-				perror("Parent failed to write");
-				exit(-1);
-			}
-			fflush(stToSort[0][1]);
-		}
-		fclose(stToSort[0][1]);
+		//int j;
+		//for (j=10; j>0; j--) {
+		//	sprintf(buf, "Hello from parent %d\n", j);
+		//	if (fputs(buf, stToSort[0][1]) == EOF) {
+		//		perror("Parent failed to write");
+		//		exit(-1);
+		//	}
+		//	fflush(stToSort[0][1]);
+		//}
+		//fclose(stToSort[0][1]);
 
-		while (1) {
-			if (fgets(buf, 256, stFmSort[0][0]) == NULL) {
-				perror("Parent failed to read");
-				exit(-1);
-			}
-			printf("Parent read: %s\n", buf);
-		}
-		printf("Parent exiting.\n");
+		//while (1) {
+		//	if (fgets(buf, 256, stFmSort[0][0]) == NULL) {
+		//		perror("Parent failed to read");
+		//		exit(-1);
+		//	}
+		//	printf("Parent read: %s\n", buf);
+		//}
+		//printf("Parent exiting.\n");
 
 		// Parse input
-		//printf("%lu lines parsed.\n", parse(stdin, fdToSort, procNum));
+		printf("%lu lines parsed.\n", parse(stdin, stToSort, procNum));
+		for (i=0; i<procNum; i++) {
+			printf("Read from child %d:\n", i);
+			while (fgets(buf, 256, stFmSort[i][0]) != NULL) {
+				printf("%s\n", buf);
+			}
+		}
 
 		// Merge results and print
 		//merge(stdout, fromSort, procNum);
