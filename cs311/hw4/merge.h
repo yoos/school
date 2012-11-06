@@ -1,24 +1,16 @@
 #include <string.h>
 
-//int notDone(char* str[], int strNum)
-//{
-//	int i;
-//	for (i=0; i<strNum; i++) {
-//		if (str[i] > 0) {
-//			return 1;
-//		}
-//	}
-//	return 0;
-//}
-
+// Loop through array of strings and find the "least" string with strncmp().
 int findLeastStr(char* str[], int strNum)
 {
 	int i;
 	int idx = -1;   // Index of the "least" string.
 
 	for (i=0; i<strNum; i++) {
+		// Skip null pointers.
 		if (str[i] == NULL)
 			continue;
+
 		if (idx < 0) {
 			idx = i;   // Set index to that of first non-null string found.
 		} else {
@@ -29,18 +21,21 @@ int findLeastStr(char* str[], int strNum)
 	return idx;
 }
 
+// Merge outputs of sort processes and return number of strings printed.
 unsigned long merge(FILE *output, FILE *stFmSort[][2], int procNum)
 {
 	int i;
 	char *curStr[procNum];   // Keep track of the top elements of the sort results.
+
+	// Allocate memory for words and initialize.
 	for (i=0; i<procNum; i++) {
 		curStr[i] = (char*) malloc(256*sizeof(char));
 		fgets(curStr[i], 256, stFmSort[i][0]);
 	}
-	char lastStr[256];   // Last string printed.
+	char lastStr[256];   // Keep track of the last string printed.
 	int  lastIdx = 0;
 
-	unsigned long count = 0;
+	unsigned long count = 0;   // Count number of non-duplicate strings.
 
 	while ((lastIdx = findLeastStr(curStr, procNum)) >= 0) {
 		// Print word if not duplicate of the last.
@@ -57,6 +52,7 @@ unsigned long merge(FILE *output, FILE *stFmSort[][2], int procNum)
 		}
 	}
 
+	// Free memory.
 	for (i=0; i<procNum; i++) {
 		free(curStr[i]);
 	}
