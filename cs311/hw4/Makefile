@@ -14,7 +14,7 @@ default: ${TARGET}
 all: ${TARGET} tex
 
 clean:
-	rm -f ${TARGET} ${TARGET}.aux ${TARGET}.log ${TARGET}.out ${TARGET}.pdf
+	rm -rf ${TARGET} ${TARGET}.aux ${TARGET}.log ${TARGET}.out ${TARGET}.pdf lists
 
 
 ### Program ###
@@ -27,10 +27,12 @@ debug: ${SOURCE} ${INCLUDES}
 
 lists:
 	if [ ! -d lists ]; then mkdir lists; fi
-	python randgen.py 1 > lists/array1
-	python randgen.py 10 > lists/array10
-	python randgen.py 1000 > lists/array1000
-	python randgen.py 100000 > lists/array100000
+	python randgen.py u 1 > lists/arrayUniq1
+	python randgen.py u 10 > lists/arrayUniq10
+	python randgen.py u 1000 > lists/arrayUniq1000
+	python randgen.py u 100000 > lists/arrayUniq100000
+	python randgen.py d 1000 > lists/arrayDup1000
+
 
 
 ### TeX ###
