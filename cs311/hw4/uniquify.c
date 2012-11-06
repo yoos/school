@@ -17,7 +17,7 @@
 int main(int argc, char **argv)
 {
 	if (argc != 2) {
-		// usage();
+		usage();
 	} else {
 		int parentPID = getpid();
 		int procNum = atoi(argv[1]);   // Number of sort processes to spawn.
