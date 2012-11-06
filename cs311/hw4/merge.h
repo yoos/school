@@ -32,21 +32,26 @@ unsigned long merge(FILE *output, FILE *stFmSort[][2], int procNum)
 		curStr[i] = (char*) malloc(256*sizeof(char));
 		fgets(curStr[i], 256, stFmSort[i][0]);
 	}
+	int  lastIdx = findLeastStr(curStr, procNum);
 	char lastStr[256];   // Keep track of the last string printed.
-	int  lastIdx = 0;
+	sprintf(lastStr, "%s", curStr[lastIdx]);
+	int  wordFreq = 0;   // Count frequency of string.
 
-	unsigned long count = 0;   // Count number of non-duplicate strings.
+	unsigned long count = 0;   // Count number of unique strings.
 
 	while ((lastIdx = findLeastStr(curStr, procNum)) >= 0) {
-		// Print word if not duplicate of the last.
+		// Print word if unique.
 		if (strncmp(lastStr, curStr[lastIdx], 256) != 0) {
+			fprintf(output, "%d %s", wordFreq, lastStr);
 			sprintf(lastStr, "%s", curStr[lastIdx]);
-			fputs(lastStr, output);
 			fflush(output);
 			count++;
+			wordFreq = 1;   // Reset word frequency.
+		} else {
+			wordFreq++;
 		}
 
-		// Remove recently printed word from buffer.
+		// Remove recently examined word from buffer.
 		if (fgets(curStr[lastIdx], 256, stFmSort[lastIdx][0]) == NULL) {
 			curStr[lastIdx] = 0;
 		}
