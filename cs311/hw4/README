@@ -1,0 +1,9 @@
+
+To compile the code and the TeX document, run:
+
+	make all
+
+To generate lists of words with which to test the code, run:
+
+	make lists
+
