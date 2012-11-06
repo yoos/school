@@ -114,6 +114,12 @@ int main(int argc, char **argv)
 
 		// Parse input
 		printf("%lu lines parsed.\n", parse(stdin, stToSort, procNum));
+
+		// Close streams to sort
+		for (i=0; i<procNum; i++) {
+			fclose(stToSort[i][1]);
+		}
+
 		for (i=0; i<procNum; i++) {
 			printf("Read from child %d:\n", i);
 			while (fgets(buf, 256, stFmSort[i][0]) != NULL) {

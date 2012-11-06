@@ -5,6 +5,7 @@ unsigned long parse(FILE *input, FILE *stToSort[][2], int procNum)
 	unsigned long count = 0;
 	int proc = 0;   // Process number
 
+	// Hand out entries to sort processes, round-robin style.
 	while (fgets(str, 256, input) != NULL) {
 		if (fputs(str, stToSort[proc][1]) == EOF) {
 			perror("Failed to feed sort");
@@ -14,11 +15,6 @@ unsigned long parse(FILE *input, FILE *stToSort[][2], int procNum)
 
 		proc = (proc+1) % procNum;
 		count++;
-	}
-
-	// Close streams
-	for (proc=0; proc<procNum; proc++) {
-		fclose(stToSort[proc][1]);
 	}
 
 	return count;
