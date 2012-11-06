@@ -58,55 +58,58 @@ int main(int argc, char **argv)
 				close(fdFmSort[i][0]);
 
 				// Redirect stdin/stdout.
-				//if (dup2(fdToSort[i][0], STDIN_FILENO) == -1) {
-				//	perror("Failed to redirect stdin");
-				//}
-				//if (dup2(fdFmSort[i][1], STDOUT_FILENO) == -1) {
-				//	perror("Failed to redirect stdout");
-				//}
+				if (dup2(fdToSort[i][0], STDIN_FILENO) == -1) {
+					perror("Failed to redirect stdin");
+				}
+				if (dup2(fdFmSort[i][1], STDOUT_FILENO) == -1) {
+					perror("Failed to redirect stdout");
+				}
 
 				// Open read/write pipes.
 				stToSort[i][0] = fdopen(fdToSort[i][0], "r");
 				stFmSort[i][1] = fdopen(fdFmSort[i][1], "w");
 
-				while (1) {
-					sprintf(buf, "Hello from child %d\n", i);
-					if (fputs(buf, stFmSort[i][1]) == EOF) {
-						perror("Child failed to write");
-						exit(-1);
-					}
-					fflush(stFmSort[i][1]);
+				//while (1) {
+				//	sprintf(buf, "Hello from child %d\n", i);
+				//	if (fputs(buf, stFmSort[i][1]) == EOF) {
+				//		perror("Child failed to write");
+				//		exit(-1);
+				//	}
+				//	fflush(stFmSort[i][1]);
 
-					if (fgets(buf, 20, stToSort[i][0]) == NULL) {
-						perror("Child failed to read");
-						exit(-1);
-					}
-					printf("Child %d read: %s\n", i, buf);
-				}
-				fclose(stToSort[i][0]);
-				printf("Child exiting.\n");
+				//	if (fgets(buf, 20, stToSort[i][0]) == NULL) {
+				//		perror("Child failed to read");
+				//		exit(-1);
+				//	}
+				//	printf("Child %d read: %s\n", i, buf);
+				//}
+				//fclose(stToSort[i][0]);
+				//printf("Child exiting.\n");
 
-				//execlp("sort", "sort", NULL);
+				execlp("sort", "sort", NULL);
 			}
 
 			i++;
 		}
 
-		while (1) {
-			sprintf(buf, "Hello from parent\n");
+		int j;
+		for (j=10; j>0; j--) {
+			sprintf(buf, "Hello from parent %d\n", j);
 			if (fputs(buf, stToSort[0][1]) == EOF) {
 				perror("Parent failed to write");
 				exit(-1);
 			}
 			fflush(stToSort[0][1]);
+		}
+		fclose(stToSort[0][1]);
 
-			if (fgets(buf, 20, stFmSort[0][0]) == NULL) {
+		while (1) {
+			if (fgets(buf, 256, stFmSort[0][0]) == NULL) {
 				perror("Parent failed to read");
 				exit(-1);
 			}
 			printf("Parent read: %s\n", buf);
 		}
-		fclose(stToSort[0][1]);
 		printf("Parent exiting.\n");
 
 		// Parse input
