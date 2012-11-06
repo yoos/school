@@ -37,7 +37,7 @@ unsigned long merge(FILE *output, FILE *stFmSort[][2], int procNum)
 	sprintf(lastStr, "%s", curStr[lastIdx]);
 	int  wordFreq = 0;   // Count frequency of string.
 
-	unsigned long count = 0;   // Count number of unique strings.
+	unsigned long count = 1;   // Count number of unique strings.
 
 	while ((lastIdx = findLeastStr(curStr, procNum)) >= 0) {
 		// Print word if unique.
@@ -56,6 +56,10 @@ unsigned long merge(FILE *output, FILE *stFmSort[][2], int procNum)
 			curStr[lastIdx] = 0;
 		}
 	}
+
+	// Print last word stuck in buffer. TODO: Replace this hack.
+	fprintf(output, "%d %s", wordFreq, lastStr);
+	fflush(output);
 
 	// Free memory.
 	for (i=0; i<procNum; i++) {
