@@ -5,7 +5,7 @@ CFLAGS = -Wall -openmp -O3 -g -I.
 CXXFLAGS = -Wall -openmp -O3 -g
 LDFLAGS = -lrt -lpthread
 
-INCLUDES =
+INCLUDES = parse.h merge.h usage.h
 SOURCE = uniquify.c
 
 
@@ -25,6 +25,13 @@ ${TARGET}: ${SOURCE} ${INCLUDES}
 debug: ${SOURCE} ${INCLUDES}
 	${CC} ${CFLAGS} ${SOURCE} -o ${TARGET} ${LDFLAGS} -DDEBUG
 
+lists:
+	if [ ! -d lists ]; then mkdir lists; fi
+	python randgen.py 1 > lists/array1
+	python randgen.py 10 > lists/array10
+	python randgen.py 1000 > lists/array1000
+	python randgen.py 100000 > lists/array100000
+
 
 ### TeX ###
 
@@ -32,3 +39,5 @@ tex: ${TARGET}.tex
 	pdflatex ${TARGET}.tex
 	pdflatex $(TARGET).tex
 
+
+.PHONY: clean lists
