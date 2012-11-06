@@ -120,15 +120,15 @@ int main(int argc, char **argv)
 			fclose(stToSort[i][1]);
 		}
 
-		for (i=0; i<procNum; i++) {
-			printf("Read from child %d:\n", i);
-			while (fgets(buf, 256, stFmSort[i][0]) != NULL) {
-				printf("%s\n", buf);
-			}
-		}
+		//for (i=0; i<procNum; i++) {
+		//	printf("Read from child %d:\n", i);
+		//	while (fgets(buf, 256, stFmSort[i][0]) != NULL) {
+		//		printf("%s\n", buf);
+		//	}
+		//}
 
 		// Merge results and print
-		//merge(stdout, fromSort, procNum);
+		printf("%lu lines printed.\n", merge(stdout, stFmSort, procNum));
 	}
 
 	return 0;
