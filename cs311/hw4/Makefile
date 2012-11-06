@@ -3,9 +3,9 @@ CC = gcc
 CXX = g++
 CFLAGS = -Wall -std=c99 -openmp -O3 -g -I.
 CXXFLAGS = -Wall -openmp -O3 -g
-LDFLAGS = -lrt -lpthread 
+LDFLAGS = -lrt -lpthread
 
-INCLUDES = 
+INCLUDES =
 SOURCE = uniquify.c
 
 
@@ -14,7 +14,7 @@ default: ${TARGET}
 all: ${TARGET} tex
 
 clean:
-	rm ${TARGET} ${TARGET}.aux ${TARGET}.log ${TARGET}.out ${TARGET}.pdf
+	rm -f ${TARGET} ${TARGET}.aux ${TARGET}.log ${TARGET}.out ${TARGET}.pdf
 
 
 ### Program ###
