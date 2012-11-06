@@ -113,7 +113,7 @@ int main(int argc, char **argv)
 		//printf("Parent exiting.\n");
 
 		// Parse input
-		printf("%lu lines parsed.\n", parse(stdin, stToSort, procNum));
+		long unsigned int parseCount = parse(stdin, stToSort, procNum);
 
 		// Close streams to sort
 		for (i=0; i<procNum; i++) {
@@ -128,7 +128,11 @@ int main(int argc, char **argv)
 		//}
 
 		// Merge results and print
-		printf("%lu lines printed.\n", merge(stdout, stFmSort, procNum));
+		long unsigned int mergeCount = merge(stdout, stFmSort, procNum);
+
+		// Print results.
+		printf("\n\n%lu lines parsed.\n", parseCount);
+		printf("%lu lines printed.\n", mergeCount);
 	}
 
 	return 0;
