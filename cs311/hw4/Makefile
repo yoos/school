@@ -1,6 +1,6 @@
 TARGET=uniquify
-CC = gcc
-CXX = g++
+CC = icc
+CXX = icpc
 CFLAGS = -Wall -openmp -O3 -g -I.
 CXXFLAGS = -Wall -openmp -O3 -g
 LDFLAGS = -lrt -lpthread
