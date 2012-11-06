@@ -8,17 +8,19 @@ unsigned long parse(FILE *input, FILE *stToSort[][2], int procNum)
 	int proc = 0;   // Process number
 
 	while (fgets(str, 256, input) != NULL) {
-		// Feed word to sort process
-		if (fputs(str, stToSort[proc][1]) == EOF) {
-			perror("Failed to feed sort");
-			exit(-1);
+		if (strncmp(str, "\n", 1) != 0) {
+			// Feed word to sort process
+			if (fputs(str, stToSort[proc][1]) == EOF) {
+				perror("Failed to feed sort");
+				exit(-1);
+			}
+			fflush(stToSort[proc][1]);
+
+			// Calculate index of next process
+			proc = (proc+1) % procNum;
+
+			count++;
 		}
-		fflush(stToSort[proc][1]);
-
-		// Calculate index of next process
-		proc = (proc+1) % procNum;
-
-		count++;
 	}
 
 	return count;
