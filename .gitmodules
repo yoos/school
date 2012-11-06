@@ -1,0 +1,3 @@
+[submodule "cs325"]
+	path = cs325
+	url = git://github.com/vofp/CS325
