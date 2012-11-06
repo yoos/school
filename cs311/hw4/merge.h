@@ -43,13 +43,18 @@ unsigned long merge(FILE *output, FILE *stFmSort[][2], int procNum)
 	unsigned long count = 0;
 
 	while ((lastIdx = findLeastStr(curStr, procNum)) >= 0) {
-		sprintf(lastStr, "%s", curStr[lastIdx]);
-		fputs(lastStr, output);
-		fflush(output);
+		// Print word if not duplicate of the last.
+		if (strncmp(lastStr, curStr[lastIdx], 256) != 0) {
+			sprintf(lastStr, "%s", curStr[lastIdx]);
+			fputs(lastStr, output);
+			fflush(output);
+			count++;
+		}
+
+		// Remove recently printed word from buffer.
 		if (fgets(curStr[lastIdx], 256, stFmSort[lastIdx][0]) == NULL) {
 			curStr[lastIdx] = 0;
 		}
-		count++;
 	}
 
 	for (i=0; i<procNum; i++) {
