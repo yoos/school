@@ -5,7 +5,7 @@ CFLAGS = -Wall -openmp -O3 -g -I.
 CXXFLAGS = -Wall -openmp -O3 -g
 LDFLAGS = -lm -lrt -lpthread
 
-INCLUDES =
+INCLUDES = num_primes.h
 SOURCE = primes.c
 
 
