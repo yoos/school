@@ -1,0 +1,53 @@
+Homework 5: Finding Prime Numbers
+
+Due: Monday, 19 November 2012
+
+For this project, you will be required to find all prime numbers within the
+range of a 32 bit unsigned integer. There are some specific requirements for
+the purposes of this project:
+
+	* You are required to parallelize the code in 2 ways:
+		1. thread your program using the pthreads library (Boost.Threads is
+		   also allowed, if you prefer)
+		2. fork multiple processes and use shared memory
+	* You are required to make use of a bitmap, which will be used to store the
+	  results of your checks
+	* You CAN NOT brute force this algorithm. You must use a more sophisticated
+	  method for obtaining the list of prime numbers, such as used in the first
+	  assignment.
+
+If you are attached to a specific method, or are a mathematician with an
+interest in number theory, feel free to use advanced methods.
+
+Please provide timings based on the number of threads/processes. Also, for
+extra credit, also vary the max value you are considering. Keep in mind this
+will require some form of multi-dimensional plot. These timings should be
+plotted in a fashion that makes sense, and included in your writeup of the
+project.
+
+I also want you to consider the differences, benefits, or downsides of each
+method. Which has higher overhead, which runs faster, etc.
+
+Your writeup should include a program design and/or flow chart, a work log,
+timings, and a discussion of why you implemented the code in the fashion that
+you chose. Essentially, you will be providing a justification for design
+decisions, and a discussion of any interesting or frustrating aspects of the
+project, as well as any places where you had to deviate from your design. It is
+highly recommended that you document your design in a separate file that can be
+timestamped, or submit it to a repository. In other words, do the design
+apriori, rather than ex post facto. Don't forget to include documentation for
+both the code and the solution you are creating.
+
+To give you something to shoot for, I have serial code which generates all the
+primes requested in under 45 seconds. Beat this time, and receive extra credit.
+
+Things to turn in:
+
+	1. C/C++ source code for the solution to the posed problem.
+	2. A makefile to build your code
+	3. A writeup of your project, including work log, as described above.
+
+Please combine all of the above files into a bzipped tar ball prior to
+submission. There should be no directory hierarchy present in the tar ball, so
+that they extract to the current directory.
+
