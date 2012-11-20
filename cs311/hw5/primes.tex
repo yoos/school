@@ -42,6 +42,17 @@ CS311 -- Homework 5 \\
 
 \section*{Design}
 
+In order to run the Sieve of Eratosthenes in parallel, the main process will
+fork off two processes. In order to find the number of primes up to $n$, the
+first process will consider the first $\lceil\sqrt{n}\rceil$ numbers. The
+second process will use a number of threads (specified on the command line) to
+mark off composites that are passed from the first process.
+
+% NOTE: The first process could actually be divided further. In that case, the
+% very first process would behave the same, but the ``other'' first processes
+% would have to act like the old second process in that it would mark off
+% composites that they themselves did not find.
+
 
 \section*{Worklog}
 
