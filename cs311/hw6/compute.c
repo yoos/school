@@ -56,7 +56,7 @@ int main(int argc, char **argv)
 	// Get hostname
 	char hostname[256];
 	if (gethostname(hostname, sizeof(hostname)) == 0)
-		printf("Connecting to %s port %d.\n", hostname, ntohs(servaddr.sin_port));
+		printf("[C] Connecting to %s port %d.\n", hostname, ntohs(servaddr.sin_port));
 	else
 		perror("gethostname");
 	inet_pton(AF_INET, hostname, &servaddr.sin_addr);
@@ -64,15 +64,15 @@ int main(int argc, char **argv)
 	connect(sockfd, (struct sockaddr*) &servaddr, sizeof(servaddr));
 
 	// Write
-	for (i=0; i<100; i++) {
-		printf("Sending %dth hello.\n", i);
+	for (i=0; i<10; i++) {
+		printf("[C] Sending %dth hello.\n", i);
 		sprintf(sendline, "hello %d", i);
 		send(sockfd, sendline, strlen(sendline), 0);
-		bzero(recvline, MAX_LINE_LEN);
-		if(recv(sockfd, recvline, MAX_LINE_LEN, 0) == -1) {
-			perror("server terminated prematurely");
-			exit(-1);
-		}
+		//bzero(recvline, MAX_LINE_LEN);
+		//if(recv(sockfd, recvline, MAX_LINE_LEN, 0) == -1) {
+		//	perror("server terminated prematurely");
+		//	exit(-1);
+		//}
 	}
 
 	return 0;

@@ -5,7 +5,7 @@ import socket
 import select
 
 procList = []   # List of compute process PIDs
-result = []   # List of perfect numbers found so far.
+perfNums = []   # List of perfect numbers found so far.
 
 
 # Create server socket.
@@ -55,17 +55,47 @@ def computeCallback ():
 
 # If asked to die, stop spawning new compute processes and die.
 
+
+
 if __name__ == "__main__":
+
+	# Spawn compute processes.
+	for i in range(1):
+		procList.append(spawnCompute())
 
 	# Accept connections and dole out number ranges.
 	n = 0
-	(conn, addr) = ss.accept()
-	while 1:
-		mysend(conn, "arst")
-		print myreceive(conn, 10)
 
-		print "End of manage.py's ", n, "th loop"
-		n += 1
+	running = True
+	while running:
+		# Is ss ready to be read?
+		(sread, swrite, sexc) = select.select([ss], [], [])
+
+		for sock in sread:
+			if sock == ss:
+				print "[M] accepting.."
+				(conn, addr) = ss.accept()
+
+				conn.send("[M] hello "+str(i))
+
+				res = conn.recv(1024)
+				print "[M] I got:", res   #myreceive(conn, 10)
+				if res == '':
+					conn.close
+				else:
+					perfNums.append(res)
+
+				print "[M]", str(n)+"th loop"
+				n += 1
+
+
+	# Kill compute processes.
+	for i in range(4):
+		print "[M] Killing process", i
+		procList[i].wait()
+
+	conn.close()
+	ss.close()
 
 
 
