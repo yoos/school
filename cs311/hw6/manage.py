@@ -2,6 +2,7 @@
 
 import subprocess
 import socket
+import select
 
 procList = []   # List of compute process PIDs
 result = []   # List of perfect numbers found so far.
@@ -9,12 +10,13 @@ result = []   # List of perfect numbers found so far.
 
 # Create server socket.
 ss = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#ss.setblocking(0)
 ss.bind((socket.gethostname(), 50117))
 ss.listen(5)   # Queue up to 5 requests.
 
 
 # My send function
-def msend(sock, msg):
+def mysend(sock, msg):
 	totalsent = 0
 	while totalsent < len(msg):
 		sent = sock.send(msg[totalsent:])
@@ -23,7 +25,7 @@ def msend(sock, msg):
 		totalsent = totalsent + sent
 
 # My receive function
-def mreceive(sock, msglen):
+def myreceive(sock, msglen):
 	msg = ''
 	while len(msg) < msglen:
 		chunk = sock.recv(msglen-len(msg))
@@ -40,6 +42,7 @@ def spawnCompute ():
 
 # Receive performance info and range request from compute process
 def computeCallback ():
+	print "arst"
 
 
 # Send back range to compute process
@@ -55,11 +58,14 @@ def computeCallback ():
 if __name__ == "__main__":
 
 	# Accept connections and dole out number ranges.
+	n = 0
+	(conn, addr) = ss.accept()
 	while 1:
-		(cs, addr) = ss.accept()
-		#now do something with the clientsocket
-		#in this case, we'll pretend this is a threaded server
-		ct = client_thread(clientsocket)
-		ct.run()
+		mysend(conn, "arst")
+		print myreceive(conn, 10)
+
+		print "End of manage.py's ", n, "th loop"
+		n += 1
+
 
 

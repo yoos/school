@@ -1,4 +1,4 @@
-TARGET=sockets
+TARGET=compute
 CC = gcc
 CXX = g++
 CFLAGS = -Wall -openmp -O3 -g -I.
