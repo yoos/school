@@ -27,14 +27,14 @@ int main(void)
 
 	while (1) {
 		// Start moving forward
-		PORTB = 0b01100000;
+		PORTB = 0b11110000;
 		_delay_ms(1000);
 
 		// Right whisker hit
 		if (!(PIND & (1<<PD0))) {
-			PORTB=0b00000000;   // Reverse
+			PORTB=0b10010000;   // Reverse
 			_delay_ms(1000);
-			PORTB=0b00100000;   // Turn Left
+			PORTB=0b10110000;   // Turn Left
 			_delay_ms(500);
 		}
 
@@ -42,9 +42,9 @@ int main(void)
 
 		// Left whisker hit
 		if (!(PIND & (1<<PD1))) {
-			PORTB=0b00000000;   // Reverse
+			PORTB=0b10010000;   // Reverse
 			_delay_ms(1000);
-			PORTB=0b01000000;   // Turn Right
+			PORTB=0b11010000;   // Turn Right
 			_delay_ms(500);
 		}
 		// Continues Forward
