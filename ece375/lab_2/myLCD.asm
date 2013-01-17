@@ -1,96 +1,94 @@
 ;***********************************************************
 ;*
-;*	Enter Name of file here
+;*	myLCD.asm
 ;*
-;*	Enter the description of the program here
-;*
-;*	This is the skeleton file Lab 2 of ECE 375
+;*	Drives LCD.
 ;*
 ;***********************************************************
 ;*
-;*	 Author: Enter your name
-;*	   Date: Enter Date
+;*	 Author: Soo-Hyun Yoo
+;*	   Date: 1/16/13
 ;*
 ;***********************************************************
 
-.include "m128def.inc"			; Include definition file
+.include "m128def.inc"		; Include definition file
 
 ;***********************************************************
 ;*	Internal Register Definitions and Constants
 ;***********************************************************
-.def	mpr = r16				; Multipurpose register required for LCD Driver
-.def	ReadCnt = r23			; Counter used to read data from program memory
+.def	mpr = r16			; Multipurpose register required for LCD Driver
+.def	ReadCnt = r23		; Counter used to read data from program memory
 
 
 ;***********************************************************
 ;*	Start of Code Segment
 ;***********************************************************
-.cseg							; Beginning of code segment
+.cseg						; Beginning of code segment
 
 ;-----------------------------------------------------------
 ; Interrupt Vectors
 ;-----------------------------------------------------------
-.org	$0000					; Beginning of IVs
-		rjmp INIT				; Reset interrupt
+.org	$0000				; Beginning of IVs
+		rjmp INIT			; Reset interrupt
 
-.org	$0046					; End of Interrupt Vectors
+.org	$0046				; End of Interrupt Vectors
 
 ;-----------------------------------------------------------
 ; Program Initialization
 ;-----------------------------------------------------------
 INIT:							; The initialization routine
-		; Initialize Stack Pointer
-		ldi		mpr, HIGH(RAMEND)
-		out		SPH, mpr
-		ldi		mpr, LOW(RAMEND)
-		out		SPL, mpr
+	; Initialize Stack Pointer
+	ldi		mpr, HIGH(RAMEND)
+	out		SPH, mpr
+	ldi		mpr, LOW(RAMEND)
+	out		SPL, mpr
 
-		; Initialize LCD Display
-		rcall	LCDInit
+	; Initialize LCD Display
+	rcall	LCDInit
 
-		; Move strings from Program Memory to Data Memory
-		ldi		ReadCnt, LCDMaxCnt
+	; Move strings from Program Memory to Data Memory
+	ldi		ReadCnt, LCDMaxCnt
 INIT_LINE1:
-		; Following two lines are an example of indirect addressing.
-		lpm		mpr, Z+			; Load program memory and post-increment Z.
-		st		Y+, mpr			; Store into data memory and post-increment Y.
-		dec		ReadCnt			; Decrement counter
-		brne	INIT_LINE1		; Loop
+	; Following two lines are an example of indirect addressing.
+	lpm		mpr, Z+			; Load program memory and post-increment Z.
+	st		Y+, mpr			; Store into data memory and post-increment Y.
+	dec		ReadCnt			; Decrement counter
+	brne	INIT_LINE1		; Loop
 
 ;-----------------------------------------------------------
 ; Main Program
 ;-----------------------------------------------------------
 MAIN:							; The Main program
-		; Write first line
-		ldi		ZL,  low(TXT0<<1)
-		ldi		ZH, high(TXT0<<1)
-		ldi		YL,  low(LCDLn1Addr)
-		ldi		YH, high(LCDLn1Addr)
-		ldi		ReadCnt, LCDMaxCnt
+	; Write first line
+	ldi		ZL,  low(TXT0<<1)
+	ldi		ZH, high(TXT0<<1)
+	ldi		YL,  low(LCDLn1Addr)
+	ldi		YH, high(LCDLn1Addr)
+	ldi		ReadCnt, LCDMaxCnt
 PRINT_LINE_1:
-		lpm		mpr, Z+
-		st		Y+, mpr
-		dec		ReadCnt
-		brne	PRINT_LINE_1
-		rcall	LCDWrLn1
+	lpm		mpr, Z+
+	st		Y+, mpr
+	dec		ReadCnt
+	brne	PRINT_LINE_1
+	rcall	LCDWrLn1
 
-		; Write second line
-		ldi		ZL,  low(TXT1<<1)
-		ldi		ZH, high(TXT1<<1)
-		ldi		YL,  low(LCDLn2Addr)
-		ldi		YH, high(LCDLn2Addr)
-		ldi		ReadCnt, LCDMaxCnt
+	; Write second line
+	ldi		ZL,  low(TXT1<<1)
+	ldi		ZH, high(TXT1<<1)
+	ldi		YL,  low(LCDLn2Addr)
+	ldi		YH, high(LCDLn2Addr)
+	ldi		ReadCnt, LCDMaxCnt
 PRINT_LINE_2:
-		lpm		mpr, Z+
-		st		Y+, mpr
-		dec		ReadCnt
-		brne	PRINT_LINE_2
-		rcall	LCDWrLn2
+	lpm		mpr, Z+
+	st		Y+, mpr
+	dec		ReadCnt
+	brne	PRINT_LINE_2
+	rcall	LCDWrLn2
 
-		rjmp	MAIN			; jump back to main and create an infinite
-								; while loop.  Generally, every main program is an
-								; infinite while loop, never let the main program
-								; just run off
+	rjmp	MAIN			; jump back to main and create an infinite
+							; while loop.  Generally, every main program is an
+							; infinite while loop, never let the main program
+							; just run off
 
 
 ;***********************************************************
