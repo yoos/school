@@ -51,8 +51,9 @@ INIT:							; The initialization routine
 		; Move strings from Program Memory to Data Memory
 		ldi		ReadCnt, LCDMaxCnt
 INIT_LINE1:
-		lpm		mpr, Z+			; Read program memory
-		st		Y+, mpr			; Store into data memory
+		; Following two lines are an example of indirect addressing.
+		lpm		mpr, Z+			; Load program memory and post-increment Z.
+		st		Y+, mpr			; Store into data memory and post-increment Y.
 		dec		ReadCnt			; Decrement counter
 		brne	INIT_LINE1		; Loop
 
