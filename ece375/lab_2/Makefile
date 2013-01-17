@@ -13,7 +13,7 @@
 ######################################################################
 
 # Name of .asm file here
-PROG = ece375-LCD_Test
+PROG = myLCD
 
 # Assemble code
 all: $(PROG).asm
@@ -28,7 +28,7 @@ all: $(PROG).asm
 # you may need to change the connection port (-P)
 #
 flash: $(PROG).hex
-	sudo /home/yoos/devel/osuisp2/avrdude/avrdude -c osuisp2 -P usb -p m128 -e -U flash:w:$(PROG).hex -v
+	sudo /home/yoos/devel/osuisp2/avrdude/avrdude -C /home/yoos/devel/osuisp2/avrdude/avrdude.conf -c osuisp2 -P usb -p m128 -e -U flash:w:$(PROG).hex -v
 
 # Cleanup
 clean:
