@@ -14,6 +14,7 @@
 
 # Name of .asm file here
 PROG = myLCD
+TEX = writeup
 
 # Assemble code
 all: $(PROG).asm
@@ -29,6 +30,10 @@ all: $(PROG).asm
 #
 flash: $(PROG).hex
 	sudo /home/yoos/devel/osuisp2/avrdude/avrdude -C /home/yoos/devel/osuisp2/avrdude/avrdude.conf -c osuisp2 -P usb -p m128 -e -U flash:w:$(PROG).hex -v
+
+tex:
+	pdflatex ${TEX}.tex
+	pdflatex ${TEX}.tex
 
 # Cleanup
 clean:
