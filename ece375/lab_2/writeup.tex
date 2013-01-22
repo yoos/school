@@ -1,0 +1,62 @@
+% template created by: Russell Haering. arr. Joseph Crop
+\documentclass[12pt,letterpaper]{article}
+\usepackage{anysize}
+\marginsize{2cm}{2cm}{1cm}{1cm}
+
+\begin{document}
+
+\begin{titlepage}
+    \vspace*{4cm}
+    \begin{flushright}
+    {\huge
+        ECE 375 Lab 2\\[1cm]
+    }
+    {\large
+        Data Manipulation and the LCD
+    }
+    \end{flushright}
+    \begin{flushleft}
+    Lab Time: Wednesday 5-7
+    \end{flushleft}
+    \begin{flushright}
+    Soo-Hyun Yoo
+
+    \vfill
+    \rule{5in}{.5mm}\\
+    TA Signature
+    \end{flushright}
+
+\end{titlepage}
+
+\section{Pre-lab}
+
+\begin{itemize}
+	\item The stack pointer is two bytes long and points to the top of a LIFO
+		stack. SPL is the low byte and SPH is the high byte. Because stacks in
+		AVR grow from higher to lower address space in memory, the stack
+		pointer is initialized to the highest data address space available
+		(RAMEND) in the INIT function. Thus, its initialization looks something
+		like the following:
+
+		\begin{verbatim}
+1. SPH <- HIGH_BYTE(RAMEND)
+2. SPL <- LOW_BYTE(RAMEND)
+		\end{verbatim}
+
+	\item LPM stands for ``Load Program Memory'' and serves to load data from
+		the low byte of a Program Memory address (16-bit) into Data Memory
+		(8-bit). LPM will:
+
+		\begin{verbatim}
+1. Left-shift value by 1 bit to account for selecting low/high byte.
+2. Copy value
+		\end{verbatim}
+
+	\item m128def.inc is a machine-generated file. All I/O register and
+		register bit names that appear in the datasheet are specified here
+		(e.g., ADC, SPI, I2C, UART, interrupts, PIN, PORT). The file is
+		included with the line, `.include ``m128def.inc'' '.
+
+\end{itemize}
+
+\end{document}
