@@ -1,0 +1,47 @@
+% template created by: Russell Haering. arr. Joseph Crop
+\documentclass[12pt,letterpaper]{article}
+\usepackage{anysize}
+\marginsize{2cm}{2cm}{1cm}{1cm}
+
+\begin{document}
+
+\begin{titlepage}
+    \vspace*{4cm}
+    \begin{flushright}
+    {\huge
+        ECE 375 Lab 1\\[1cm]
+    }
+    {\large
+        Introduction to AVR Tools
+    }
+    \end{flushright}
+    \begin{flushleft}
+    Lab Time: Wednesday 5-7
+    \end{flushleft}
+    \begin{flushright}
+    Soo-Hyun Yoo
+
+    \vfill
+    \rule{5in}{.5mm}\\
+    TA Signature
+    \end{flushright}
+
+\end{titlepage}
+
+\begin{enumerate}
+	\item The template uses the \LaTeX default font, which is 12pt Computer
+		Modern. The source code is monospaced.
+	\item Writing code in a language that can be cross-compiled makes it
+		possible to run the same algorithms on different hardware platforms.
+		For example, the C code written for the AVR could be ported to operate
+		on the ARM architecture, on a PIC, and so on.
+
+		One problem with this is that sometimes, libraries for different
+		hardware architectures have different software components.
+		Functionalities available on one architecture may be named differently
+		or altogether unavailable on another. For example, floating point
+		operations written for an ARM board may need to be rewritten or
+		substituted for operation on an ATmega board with integer-only math.
+\end{enumerate}
+
+\end{document}
