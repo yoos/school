@@ -1,7 +1,19 @@
+# Vim files
 *.swp
 *.un~
 
+# Temporary TeX files
 *.aux
 *.out
 *.log
 *.pdf
+
+# Compilation
+*.cof
+*.eep
+*.elf
+*.hex
+*.map
+*.o
+*.obj
+
