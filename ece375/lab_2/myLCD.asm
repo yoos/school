@@ -1,14 +1,9 @@
 ;***********************************************************
-;*
 ;*	myLCD.asm
-;*
 ;*	Drives LCD.
-;*
 ;***********************************************************
-;*
-;*	 Author: Soo-Hyun Yoo
-;*	   Date: 1/16/13
-;*
+;*	Author: Soo-Hyun Yoo
+;*	Date: 1/16/13
 ;***********************************************************
 
 .include "m128def.inc"		; Include definition file
@@ -18,7 +13,6 @@
 ;***********************************************************
 .def	mpr = r16			; Multipurpose register required for LCD Driver
 .def	ReadCnt = r23		; Counter used to read data from program memory
-
 
 ;***********************************************************
 ;*	Start of Code Segment
@@ -90,7 +84,6 @@ PRINT_LINE_2:
 							; infinite while loop, never let the main program
 							; just run off
 
-
 ;***********************************************************
 ;*	Stored Program Data
 ;***********************************************************
@@ -108,3 +101,4 @@ TXT1:
 ;*	Additional Program Includes
 ;***********************************************************
 .include "LCDDriver.asm"		; Include the LCD Driver
+
