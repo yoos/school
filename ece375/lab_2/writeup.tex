@@ -2,6 +2,39 @@
 \documentclass[12pt,letterpaper]{article}
 \usepackage{anysize}
 \marginsize{2cm}{2cm}{1cm}{1cm}
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{
+	language={[x86masm]Assembler},
+	basicstyle=\footnotesize,           % the size of the fonts that are used for the code
+	numbers=left,                   % where to put the line-numbers
+	numberstyle=\tiny\color{gray},  % the style that is used for the line-numbers
+	stepnumber=1,                   % the step between two line-numbers. If it's 1, each line~
+	                                % will be numbered
+	numbersep=5pt,                  % how far the line-numbers are from the code
+	backgroundcolor=\color{white},      % choose the background color. You must add \usepackage{color}
+	showspaces=false,               % show spaces adding particular underscores
+	showstringspaces=false,         % underline spaces within strings
+	showtabs=false,                 % show tabs within strings adding particular underscores
+	frame=single,                   % adds a frame around the code
+	rulecolor=\color{black},        % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. commens (green here))
+	tabsize=2,                      % sets default tabsize to 2 spaces
+	captionpos=b,                   % sets the caption-position to bottom
+	breaklines=true,                % sets automatic line breaking
+	breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace  
+	title=\lstname,                   % show the filename of files included with \lstinputlisting;
+	                                % also try caption instead of title
+	keywordstyle=\color{blue},          % keyword style
+	commentstyle=\color{dkgreen},       % comment style
+	stringstyle=\color{mauve},         % string literal style
+	escapeinside={\%*}{*)},            % if you want to add LaTeX within your code
+	morekeywords={*,...}               % if you want to add more keywords to the set
+}
 
 \begin{document}
 
@@ -58,5 +91,37 @@
 		included with the line, `.include ``m128def.inc'' '.
 
 \end{itemize}
+
+
+\section{Writeup}
+
+\begin{enumerate}
+	\item The DEF directive is almost like a pointer in that it can be
+		redefined to refer to a different register and that a register can be
+		referred to by multiple symbols defined by DEF.
+
+		EQU, on the other hand, cannot be redefined and is thus much like
+		a C macro definition in usage.
+
+	\item The Program Memory is non-volatile, so this is where the program (and
+		constants) is stored. Because AVR instructions are 16 or 32 bits wide,
+		the AVR Program Memory is divided into 16-bit chunks.
+
+		The Data Memory is used to store variables and the addresses of
+		registers, I/O Memory, and the internal data SRAM.
+
+	\item When a function is called, the program stores its current location in
+		the memory stack and jumps to the location of the function. Once the
+		function is complete, the RET instruction brings the function back to
+		its previous location using the stored information in the stack. If the
+		stack pointer is not initialized, however, the program cannot do so.
+		
+		When the stack pointer initialization was removed from my code, the LCD
+		did not show anything, which indicates that the program got stuck
+		somewhere---most likely after the first RCALL of LCDInit.
+\end{enumerate}
+
+\newpage
+\lstinputlisting{myLCD.asm}
 
 \end{document}
