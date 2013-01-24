@@ -12,7 +12,7 @@
 ;*	Internal Register Definitions and Constants
 ;***********************************************************
 .def	mpr = r16			; Multipurpose register required for LCD Driver
-.def	ReadCnt = r23		; Counter used to read data from program memory
+.def	ReadCnt = r19		; Counter used to read data from program memory
 
 .def	rlo = r0			; Low byte of multiplication result
 .def	rhi = r1			; High byte of multiplication result
@@ -58,6 +58,10 @@ INIT:							; The initialization routine
 	; Set zero register to zero and don't load anything into it later.
 	clr		zero
 
+	; Values for A and B
+	ldi		addrA, $0001
+	ldi		addrB, $0002
+
 	; Move strings from Program Memory to Data Memory
 	ldi		ReadCnt, LCDMaxCnt
 INIT_LINE1:
@@ -72,7 +76,6 @@ INIT_LINE1:
 ;-----------------------------------------------------------
 MAIN:							; The Main program
 	; Set up add function
-	ADD A, B
 
 
 	; Write first line

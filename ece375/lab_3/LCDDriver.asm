@@ -35,12 +35,12 @@
 ;*			renamed outside of the LCD Driver functions. Doing
 ;*			so will damage the functionality of the LCD Driver
 ;***********************************************************
-.def	wait = r17				; Wait Loop Register
-.def	count = r18				; Character Counter
-.def	line = r19				; Line Select Register
-.def	type = r20				; LCD data type: Command or Text
-.def	q = r21					; Quotient for div10
-.def	r = r22					; Remander for div10
+.def	wait = r20				; Wait Loop Register
+.def	count = r21				; Character Counter
+.def	line = r22				; Line Select Register
+.def	type = r23				; LCD data type: Command or Text
+.def	q = r24					; Quotient for div10
+.def	r = r25					; Remander for div10
 
 .equ	LCDLine1 = $80			; LCD Line 1 select command
 .equ	LCDLine2 = $c0			; LCD Line 2 select command
