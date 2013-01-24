@@ -13,7 +13,7 @@
 ######################################################################
 
 # Name of .asm file here
-PROG = ece375-L3_skeleton
+PROG = mult
 TEX = writeup
 
 # Assemble code
