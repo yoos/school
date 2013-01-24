@@ -13,55 +13,55 @@
 ;*
 ;***********************************************************
 
-.include "m128def.inc"			; Include definition file
+;.include "m128def.inc"			; Include definition file
 
 ;***********************************************************
 ;*	Internal Register Definitions and Constants
 ;***********************************************************
-.def	mpr = r16				; Multipurpose register 
-.def	rlo = r0				; Low byte of MUL result
-.def	rhi = r1				; High byte of MUL result
-.def	zero = r2				; Zero register, set to zero in INIT, useful for calculations
-.def	A = r3					; An operand
-.def	B = r4					; Another operand
-
-.def	oloop = r17				; Outer Loop Counter
-.def	iloop = r18				; Inner Loop Counter
-
-.equ	addrA = $0100			; Beginning Address of Operand A data
-.equ	addrB = $0102			; Beginning Address of Operand B data
-.equ	LAddrP = $0104			; Beginning Address of Product Result
-.equ	HAddrP = $0109			; End Address of Product Result
+;.def	mpr = r16				; Multipurpose register 
+;.def	rlo = r0				; Low byte of MUL result
+;.def	rhi = r1				; High byte of MUL result
+;.def	zero = r2				; Zero register, set to zero in INIT, useful for calculations
+;.def	A = r3					; An operand
+;.def	B = r4					; Another operand
+;
+;.def	oloop = r17				; Outer Loop Counter
+;.def	iloop = r18				; Inner Loop Counter
+;
+;.equ	addrA = $0100			; Beginning Address of Operand A data
+;.equ	addrB = $0102			; Beginning Address of Operand B data
+;.equ	LAddrP = $0104			; Beginning Address of Product Result
+;.equ	HAddrP = $0109			; End Address of Product Result
 
 
 ;***********************************************************
 ;*	Start of Code Segment
 ;***********************************************************
-.cseg							; Beginning of code segment
+;.cseg							; Beginning of code segment
 
 ;-----------------------------------------------------------
 ; Interrupt Vectors
 ;-----------------------------------------------------------
-.org	$0000					; Beginning of IVs
-		rjmp 	INIT			; Reset interrupt
+;.org	$0000					; Beginning of IVs
+;		rjmp 	INIT			; Reset interrupt
 
-.org	$0046					; End of Interrupt Vectors
+;.org	$0046					; End of Interrupt Vectors
 
 ;-----------------------------------------------------------
 ; Program Initialization
 ;-----------------------------------------------------------
-INIT:							; The initialization routine
+;INIT:							; The initialization routine
 		; Initialize Stack Pointer
 		; TODO					; Init the 2 stack pointer registers
 
-		clr		zero			; Set the zero register to zero, maintain
+;		clr		zero			; Set the zero register to zero, maintain
 								; these semantics, meaning, don't load anything
 								; to it.
 
 ;-----------------------------------------------------------
 ; Main Program
 ;-----------------------------------------------------------
-MAIN:							; The Main program
+;MAIN:							; The Main program
 		; Setup the add funtion
 		; Add the two 16-bit numbers
 		;rcall	ADD16			; Call the add function
@@ -71,7 +71,7 @@ MAIN:							; The Main program
 		; Multiply two 24-bit numbers
 		;rcall	MUL24			; Call the multiply function
 
-DONE:	rjmp	DONE			; Create an infinite while loop to signify the 
+;DONE:	rjmp	DONE			; Create an infinite while loop to signify the 
 								; end of the program.
 
 ;***********************************************************
