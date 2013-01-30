@@ -29,8 +29,8 @@
 .equ	LAddrP = $0104		; Beginning address of result (6 bytes)
 .equ	HAddrP = $0109		; End address of result
 
-.equ	valA = 10
-.equ	valB = 20
+.equ	valA = 3
+.equ	valB = 4
 
 
 ;***********************************************************
@@ -107,21 +107,15 @@ MAIN:							; The Main program
 	rcall	MUL24
 
 	; Write first line
-	ldi		ZL,  low(TXT0<<1)
-	ldi		ZH, high(TXT0<<1)
-	ldi		YL,  low(LCDLn1Addr)
-	ldi		YH, high(LCDLn1Addr)
-	ldi		ReadCnt, LCDMaxCnt
-PRINT_LINE_1:
-	lpm		mpr, Z+
-	st		Y+, mpr
-	dec		ReadCnt
-	brne	PRINT_LINE_1
+	ldi		mpr, low(valA)
+	ldi		XL,  low(LCDLn1Addr)
+	ldi		XH, high(LCDLn1Addr)
+	rcall	Bin2ASCII
 	rcall	LCDWrLn1
 
 	; Write second line
-	ldi		ZL,  low(TXT1<<1)
-	ldi		ZH, high(TXT1<<1)
+	ldi		ZL,  low(TXT0<<1)
+	ldi		ZH, high(TXT0<<1)
 	ldi		YL,  low(LCDLn2Addr)
 	ldi		YH, high(LCDLn2Addr)
 	ldi		ReadCnt, LCDMaxCnt
@@ -172,8 +166,6 @@ DONE:	rjmp	DONE
 ; appending labels, these help to access the data
 ;----------------------------------------------------------
 TXT0:
-.DB		"Soo-Hyun Yoo    "		; Storing the string in Program Memory
-TXT1:
 .DB		"Hello world!    "
 
 ;***********************************************************
