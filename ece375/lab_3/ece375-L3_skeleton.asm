@@ -113,7 +113,7 @@ ADD16:
 		adc		A, B			; Add A and B with carry.
 		st		X, A			; Store final result in X high byte.
 
-		; Restore variable by popping them from the stack in reverse order\
+		; Restore variable by popping them from the stack in reverse order
 		pop		YH
 		pop		YL
 		pop		XH
