@@ -85,51 +85,39 @@
 ;		out bit.
 ;-----------------------------------------------------------
 ADD16:
-		; Save variable by pushing them to the stack
+		; Save variables
 		push	mpr
 		in		mpr, SREG
 		push	mpr
 		push 	A				; Save A register
 		push	B				; Save B register
-		push	rhi				; Save rhi register
-		push	rlo				; Save rlo register
-		push	zero			; Save zero register
-		push	XH				; Save X-ptr
 		push	XL
-		push	YH				; Save Y-ptr
-		push	YL				
-		push	ZH				; Save Z-ptr
-		push	ZL
+		push	XH
+		push	YL
+		push	YH
 
 		clr		zero			; Maintain zero semantics
 
-		; Set Y to beginning address of B
-		ldi		YL, low(addrA)	; Load low byte
-		ldi		YH, high(addrA)	; Load high byte
-
-		; Set Z to begginning address of resulting Product
-		ldi		ZL, low(addrB)	; Load low byte
-		ldi		ZH, high(addrB); Load high byte
-
+		ldi		XL, low(addrA)	; Load low byte of A
+		ldi		XH, high(addrA)	; Load high byte of A
+		ldi		YL, low(addrB)	; Load low byte of B
+		ldi		YH, high(addrB)	; Load high byte of B
 
 		; Execute the function here
-		ld		A, Y
-		ld		B, Z
-		add		A, B
-		;adc		
+		ld		A, X			; Load low byte of X into A.
+		ld		B, Y+			; Load low byte of Y into B and post-inc Y.
+		add		A, B			; Add A and B.
+		st		X+, A			; Store A (with addition result) in X and post-inc.
+		clr		A				; Zero A.
+		ld		B, Y			; Load high byte of Y into B.
+		adc		A, B			; Add A and B with carry.
+		st		X, A			; Store final result in X high byte.
 
 		; Restore variable by popping them from the stack in reverse order\
-		pop		iloop			; Restore all registers in reverves order
-		pop		oloop
-		pop		ZL				
-		pop		ZH
-		pop		YL
 		pop		YH
-		pop		XL
+		pop		YL
 		pop		XH
-		pop		zero
-		pop		rlo
-		pop		rhi
+		pop		XL
 		pop		B
 		pop		A
 		pop mpr
