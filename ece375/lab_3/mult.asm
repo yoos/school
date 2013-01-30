@@ -86,17 +86,17 @@ INIT_ZERO:
 	dec		oloop
 	brne	INIT_ZERO
 
-;	; Initialize LCD Display
-;	rcall	LCDInit
-;
-;	; Move strings from Program Memory to Data Memory
-;	ldi		ReadCnt, LCDMaxCnt
-;INIT_LINE1:
-;	; Following two lines are an example of indirect addressing.
-;	lpm		mpr, Z+			; Load program memory and post-increment Z.
-;	st		Y+, mpr			; Store into data memory and post-increment Y.
-;	dec		ReadCnt			; Decrement counter
-;	brne	INIT_LINE1		; Loop
+	; Initialize LCD Display
+	rcall	LCDInit
+
+	; Move strings from Program Memory to Data Memory
+	ldi		ReadCnt, LCDMaxCnt
+INIT_LCD:
+	; Following two lines are an example of indirect addressing.
+	lpm		mpr, Z+			; Load program memory and post-increment Z.
+	st		Y+, mpr			; Store into data memory and post-increment Y.
+	dec		ReadCnt			; Decrement counter
+	brne	INIT_LCD		; Loop
 
 ;-----------------------------------------------------------
 ; Main Program
