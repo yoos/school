@@ -143,7 +143,7 @@ MUL24:
 		push	ZH				; Save Z-ptr
 		push	ZL
 		push	oloop			; Save counters
-		push	iloop				
+		push	iloop
 
 		clr		zero			; Maintain zero semantics
 
@@ -156,15 +156,15 @@ MUL24:
 		ldi		ZH, high(LAddrP); Load high byte
 
 		; Begin outer for loop
-		ldi		oloop, 2		; Load counter
-MUL16_OLOOP:
+		ldi		oloop, 3		; Load counter
+MUL24_OLOOP:
 		; Set X to beginning address of A
 		ldi		XL, low(addrA)	; Load low byte
 		ldi		XH, high(addrA)	; Load high byte
 
 		; Begin inner for loop
-		ldi		iloop, 2		; Load counter
-MUL16_ILOOP:
+		ldi		iloop, 3		; Load counter
+MUL24_ILOOP:
 		ld		A, X+			; Get byte of A operand
 		ld		B, Y			; Get byte of B operand
 		mul		A,B				; Multiply A and B
@@ -177,7 +177,7 @@ MUL16_ILOOP:
 		st		Z, A			; Store third byte to memory
 		st		-Z, rhi			; Store second byte to memory
 		st		-Z, rlo			; Store third byte to memory
-		adiw	ZH:ZL, 1		; Z <= Z + 1			
+		adiw	ZH:ZL, 1		; Z <= Z + 1
 		dec		iloop			; Decrement counter
 		brne	MUL16_ILOOP		; Loop if iLoop != 0
 		; End inner for loop
@@ -187,10 +187,10 @@ MUL16_ILOOP:
 		dec		oloop			; Decrement counter
 		brne	MUL16_OLOOP		; Loop if oLoop != 0
 		; End outer for loop
-		 		
+
 		pop		iloop			; Restore all registers in reverves order
 		pop		oloop
-		pop		ZL				
+		pop		ZL
 		pop		ZH
 		pop		YL
 		pop		YH
