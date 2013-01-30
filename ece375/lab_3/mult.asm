@@ -102,8 +102,9 @@ INIT_LCD:
 ; Main Program
 ;-----------------------------------------------------------
 MAIN:							; The Main program
-	; Set up add function
-
+	; Add and multiply
+	rcall	ADD16
+	rcall	MUL24
 
 	; Write first line
 	ldi		ZL,  low(TXT0<<1)
