@@ -29,6 +29,10 @@
 .equ	LAddrP = $0104		; Beginning address of result (6 bytes)
 .equ	HAddrP = $0109		; End address of result
 
+.equ	valA = 10
+.equ	valB = 20
+
+
 ;***********************************************************
 ;*	Start of Code Segment
 ;***********************************************************
@@ -52,24 +56,47 @@ INIT:							; The initialization routine
 	ldi		mpr, LOW(RAMEND)
 	out		SPL, mpr
 
-	; Initialize LCD Display
-	rcall	LCDInit
+	; Initialize A
+	ldi		ZL, low(addrA)	; Point Z to addrA.
+	ldi		ZH, high(addrA)
+	ldi		mpr, low(valA)	; Load low byte of valA.
+	st		Z+, mpr			; Store byte at addrA and post increment Z.
+	ldi		mpr, high(valA)	; Load high byte of valA.
+	st		Z, mpr			; Store byte at high of addrA.
+
+	; Initialize B
+	ldi		ZL, low(addrB)	; Point Z to addrA.
+	ldi		ZH, high(addrB)
+	ldi		mpr, low(valB)	; Load low byte of valA.
+	st		Z+, mpr			; Store byte at addrA and post increment Z.
+	ldi		mpr, high(valB)	; Load high byte of valA.
+	st		Z, mpr			; Store byte at high of addrA.
+
+	; Point Z to product result
+	ldi		ZL, low(LAddrP)
+	ldi		ZH, high(LAddrP)
 
 	; Set zero register to zero and don't load anything into it later.
 	clr		zero
 
-	; Values for A and B
-	ldi		addrA, $0001
-	ldi		addrB, $0002
+	; Initialize loop counter
+	ldi		oloop, 6
+INIT_ZERO:
+	st		Z+, zero
+	dec		oloop
+	brne	INIT_ZERO
 
-	; Move strings from Program Memory to Data Memory
-	ldi		ReadCnt, LCDMaxCnt
-INIT_LINE1:
-	; Following two lines are an example of indirect addressing.
-	lpm		mpr, Z+			; Load program memory and post-increment Z.
-	st		Y+, mpr			; Store into data memory and post-increment Y.
-	dec		ReadCnt			; Decrement counter
-	brne	INIT_LINE1		; Loop
+;	; Initialize LCD Display
+;	rcall	LCDInit
+;
+;	; Move strings from Program Memory to Data Memory
+;	ldi		ReadCnt, LCDMaxCnt
+;INIT_LINE1:
+;	; Following two lines are an example of indirect addressing.
+;	lpm		mpr, Z+			; Load program memory and post-increment Z.
+;	st		Y+, mpr			; Store into data memory and post-increment Y.
+;	dec		ReadCnt			; Decrement counter
+;	brne	INIT_LINE1		; Loop
 
 ;-----------------------------------------------------------
 ; Main Program
