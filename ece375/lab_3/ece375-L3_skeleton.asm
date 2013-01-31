@@ -179,13 +179,13 @@ MUL24_ILOOP:
 		st		-Z, rlo			; Store third byte to memory
 		adiw	ZH:ZL, 1		; Z <= Z + 1
 		dec		iloop			; Decrement counter
-		brne	MUL16_ILOOP		; Loop if iLoop != 0
+		brne	MUL24_ILOOP		; Loop if iLoop != 0
 		; End inner for loop
 
 		sbiw	ZH:ZL, 1		; Z <= Z - 1
 		adiw	YH:YL, 1		; Y <= Y + 1
 		dec		oloop			; Decrement counter
-		brne	MUL16_OLOOP		; Loop if oLoop != 0
+		brne	MUL24_OLOOP		; Loop if oLoop != 0
 		; End outer for loop
 
 		pop		iloop			; Restore all registers in reverves order
