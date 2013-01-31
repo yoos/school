@@ -182,7 +182,7 @@ MUL24_ILOOP:
 		brne	MUL24_ILOOP		; Loop if iLoop != 0
 		; End inner for loop
 
-		sbiw	ZH:ZL, 1		; Z <= Z - 1
+		sbiw	ZH:ZL, 2		; Z <= Z - 1
 		adiw	YH:YL, 1		; Y <= Y + 1
 		dec		oloop			; Decrement counter
 		brne	MUL24_OLOOP		; Loop if oLoop != 0
