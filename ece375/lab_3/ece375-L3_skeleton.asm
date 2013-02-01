@@ -167,7 +167,7 @@ MUL24_OLOOP:
 MUL24_ILOOP:
 		ld		A, X+			; Get byte of A operand
 		ld		B, Y			; Get byte of B operand
-		mul		A,B				; Multiply A and B
+		mul		A, B			; Multiply A and B
 		ld		A, Z+			; Get a result byte from memory
 		ld		B, Z+			; Get the next result byte from memory
 		add		rlo, A			; rlo <= rlo + A
