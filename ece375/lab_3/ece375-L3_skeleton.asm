@@ -147,9 +147,9 @@ MUL24:
 
 		clr		zero			; Maintain zero semantics
 
-		; Set Y to beginning address of B
-		ldi		YL, low(addrB)	; Load low byte
-		ldi		YH, high(addrB)	; Load high byte
+		; Set Y to beginning address of A
+		ldi		YL, low(addrA)	; Load low byte
+		ldi		YH, high(addrA)	; Load high byte
 
 		; Set Z to begginning address of resulting Product
 		ldi		ZL, low(LAddrP)	; Load low byte
