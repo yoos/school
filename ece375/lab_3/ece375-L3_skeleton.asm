@@ -89,7 +89,7 @@ ADD16:
 		push	mpr
 		in		mpr, SREG
 		push	mpr
-		push 	A				; Save A register
+		push	A				; Save A register
 		push	B				; Save B register
 		push	XL
 		push	XH
@@ -102,16 +102,23 @@ ADD16:
 		ldi		XH, high(addrA)	; Load high byte of A
 		ldi		YL, low(addrB)	; Load low byte of B
 		ldi		YH, high(addrB)	; Load high byte of B
+		ldi		ZL, low(addrS)	; Point Z to sum address.
+		ldi		ZH, high(addrS)
 
 		; Execute the function here
-		ld		A, X			; Load low byte of X into A.
-		ld		B, Y+			; Load low byte of Y into B and post-inc Y.
+		ld		A, X+			; Load first byte of X into A.
+		ld		B, Y+			; Load low byte of Y into B.
 		add		A, B			; Add A and B.
-		st		X+, A			; Store A (with addition result) in X and post-inc.
-		clr		A				; Zero A.
+		st		Z+, A			; Store in first byte.
+
+		ld		A, X			; Load second byte
 		ld		B, Y			; Load high byte of Y into B.
-		adc		A, B			; Add A and B with carry.
-		st		X, A			; Store final result in X high byte.
+		adc		A, B			; Add A and B.
+		st		Z+, A			; Store in second byte.
+
+		clr		A				; Clear A
+		adc		A, zero			; Add carry
+		st		Z, A			; Store in third byte.
 
 		; Restore variable by popping them from the stack in reverse order
 		pop		YH
@@ -120,9 +127,10 @@ ADD16:
 		pop		XL
 		pop		B
 		pop		A
-		pop mpr
+		pop		mpr
 		out		SREG, mpr
-		pop mpr
+		pop		mpr
+
 		ret						; End a function with RET
 
 ;-----------------------------------------------------------
@@ -148,8 +156,8 @@ MUL24:
 		clr		zero			; Maintain zero semantics
 
 		; Set Y to beginning address of A
-		ldi		YL, low(addrA)	; Load low byte
-		ldi		YH, high(addrA)	; Load high byte
+		ldi		YL, low(addrS)	; Load low byte
+		ldi		YH, high(addrS)	; Load high byte
 
 		; Set Z to begginning address of resulting Product
 		ldi		ZL, low(LAddrP)	; Load low byte
@@ -159,8 +167,8 @@ MUL24:
 		ldi		oloop, 3		; Load counter
 MUL24_OLOOP:
 		; Set X to beginning address of A
-		ldi		XL, low(addrA)	; Load low byte
-		ldi		XH, high(addrA)	; Load high byte
+		ldi		XL, low(addrS)	; Load low byte
+		ldi		XH, high(addrS)	; Load high byte
 
 		; Begin inner for loop
 		ldi		iloop, 3		; Load counter
