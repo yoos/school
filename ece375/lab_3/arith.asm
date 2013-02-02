@@ -67,7 +67,7 @@ MUL24:
 		push	XH				; Save X-ptr
 		push	XL
 		push	YH				; Save Y-ptr
-		push	YL				
+		push	YL
 		push	ZH				; Save Z-ptr
 		push	ZL
 		push	oloop			; Save counters
@@ -152,11 +152,11 @@ MUL16:
 		push	XH				; Save X-ptr
 		push	XL
 		push	YH				; Save Y-ptr
-		push	YL				
+		push	YL
 		push	ZH				; Save Z-ptr
 		push	ZL
 		push	oloop			; Save counters
-		push	iloop				
+		push	iloop
 
 		clr		zero			; Maintain zero semantics
 
@@ -203,7 +203,7 @@ MUL16_ILOOP:
 		 		
 		pop		iloop			; Restore all registers in reverves order
 		pop		oloop
-		pop		ZL				
+		pop		ZL
 		pop		ZH
 		pop		YL
 		pop		YH
