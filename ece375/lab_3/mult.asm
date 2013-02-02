@@ -130,34 +130,6 @@ PRINT_LINE_2:
 
 DONE:	rjmp	DONE
 
-;	rjmp	MAIN			; jump back to main and create an infinite
-							; while loop.  Generally, every main program is an
-							; infinite while loop, never let the main program
-							; just run off
-
-
-;-----------------------------------------------------------
-; Function to add two 16-bit numbers
-;-----------------------------------------------------------
-
-;ADD16:
-;	push	mpr				; Save state of machine
-;	in		mpr, SREG		; Save SREG
-;	push	mpr
-;
-;	ADC A, B
-;
-;	; Restore and return
-;	pop mpr
-;	out SREG, mpr
-;	pop mpr
-;	ret
-
-;-----------------------------------------------------------
-; Function to multiply two 24-bit numbers
-;-----------------------------------------------------------
-
-
 
 ;***********************************************************
 ;*	Stored Program Data

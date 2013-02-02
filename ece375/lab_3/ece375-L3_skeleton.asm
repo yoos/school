@@ -1,83 +1,3 @@
-;***********************************************************
-;*
-;*	Enter Name of file here
-;*
-;*	Enter the description of the program here
-;*
-;*	This is the skeleton file Lab 3 of ECE 375
-;*
-;***********************************************************
-;*
-;*	 Author: Enter your name
-;*	   Date: Enter Date
-;*
-;***********************************************************
-
-;.include "m128def.inc"			; Include definition file
-
-;***********************************************************
-;*	Internal Register Definitions and Constants
-;***********************************************************
-;.def	mpr = r16				; Multipurpose register 
-;.def	rlo = r0				; Low byte of MUL result
-;.def	rhi = r1				; High byte of MUL result
-;.def	zero = r2				; Zero register, set to zero in INIT, useful for calculations
-;.def	A = r3					; An operand
-;.def	B = r4					; Another operand
-;
-;.def	oloop = r17				; Outer Loop Counter
-;.def	iloop = r18				; Inner Loop Counter
-;
-;.equ	addrA = $0100			; Beginning Address of Operand A data
-;.equ	addrB = $0102			; Beginning Address of Operand B data
-;.equ	LAddrP = $0104			; Beginning Address of Product Result
-;.equ	HAddrP = $0109			; End Address of Product Result
-
-
-;***********************************************************
-;*	Start of Code Segment
-;***********************************************************
-;.cseg							; Beginning of code segment
-
-;-----------------------------------------------------------
-; Interrupt Vectors
-;-----------------------------------------------------------
-;.org	$0000					; Beginning of IVs
-;		rjmp 	INIT			; Reset interrupt
-
-;.org	$0046					; End of Interrupt Vectors
-
-;-----------------------------------------------------------
-; Program Initialization
-;-----------------------------------------------------------
-;INIT:							; The initialization routine
-		; Initialize Stack Pointer
-		; TODO					; Init the 2 stack pointer registers
-
-;		clr		zero			; Set the zero register to zero, maintain
-								; these semantics, meaning, don't load anything
-								; to it.
-
-;-----------------------------------------------------------
-; Main Program
-;-----------------------------------------------------------
-;MAIN:							; The Main program
-		; Setup the add funtion
-		; Add the two 16-bit numbers
-		;rcall	ADD16			; Call the add function
-
-		; Setup the multiply function
-
-		; Multiply two 24-bit numbers
-		;rcall	MUL24			; Call the multiply function
-
-;DONE:	rjmp	DONE			; Create an infinite while loop to signify the 
-								; end of the program.
-
-;***********************************************************
-;*	Functions and Subroutines
-;***********************************************************
-
 ;-----------------------------------------------------------
 ; Func: ADD16
 ; Desc: Adds two 16-bit numbers and generates a 24-bit number
@@ -190,7 +110,7 @@ MUL24_ILOOP:
 		brne	MUL24_ILOOP		; Loop if iLoop != 0
 		; End inner for loop
 
-		sbiw	ZH:ZL, 2		; Z <= Z - 1
+		sbiw	ZH:ZL, 2		; Z <= Z - 2
 		adiw	YH:YL, 1		; Y <= Y + 1
 		dec		oloop			; Decrement counter
 		brne	MUL24_OLOOP		; Loop if oLoop != 0
@@ -209,6 +129,7 @@ MUL24_ILOOP:
 		pop		rhi
 		pop		B
 		pop		A
+
 		ret						; End a function with RET
 
 
@@ -259,7 +180,7 @@ MUL16_OLOOP:
 MUL16_ILOOP:
 		ld		A, X+			; Get byte of A operand
 		ld		B, Y			; Get byte of B operand
-		mul		A,B				; Multiply A and B
+		mul		A, B			; Multiply A and B
 		ld		A, Z+			; Get a result byte from memory
 		ld		B, Z+			; Get the next result byte from memory
 		add		rlo, A			; rlo <= rlo + A
@@ -295,27 +216,3 @@ MUL16_ILOOP:
 		pop		A
 		ret						; End a function with RET
 
-;-----------------------------------------------------------
-; Func: Template function header
-; Desc: Cut and paste this and fill in the info at the 
-;		beginning of your functions
-;-----------------------------------------------------------
-FUNC:							; Begin a function with a label
-		; Save variable by pushing them to the stack
-
-		; Execute the function here
-		
-		; Restore variable by popping them from the stack in reverse order\
-		ret						; End a function with RET
-
-
-;***********************************************************
-;*	Stored Program Data
-;***********************************************************
-
-; Enter any stored data you might need here
-
-;***********************************************************
-;*	Additional Program Includes
-;***********************************************************
-; There are no additional file includes for this program
