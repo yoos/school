@@ -146,5 +146,5 @@ TXT0:
 ;*	Additional Program Includes
 ;***********************************************************
 .include "LCDDriver.asm"		; Include the LCD Driver
-.include "ece375-L3_skeleton.asm"
+.include "arith.asm"
 
