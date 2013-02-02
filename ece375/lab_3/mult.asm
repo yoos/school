@@ -29,8 +29,10 @@
 .equ	LAddrP = $0104		; Beginning address of result (6 bytes)
 .equ	HAddrP = $0109		; End address of result
 
-.equ	valA = 3
-.equ	valB = 4
+.equ	addrS = $010a		; Beginning address of sum (3 bytes)
+
+.equ	valA = $ffff
+.equ	valB = $ffff
 
 
 ;***********************************************************
@@ -80,7 +82,7 @@ INIT:							; The initialization routine
 	clr		zero
 
 	; Initialize loop counter
-	ldi		oloop, 6
+	ldi		oloop, 9
 INIT_ZERO:
 	st		Z+, zero
 	dec		oloop
