@@ -77,17 +77,30 @@ INIT:	; The initialization routine
 		out		SPL, mpr
 
 		; Initialize Port B for output
+		ldi		mpr, (1<<EngEnL)|(1<<EngEnR)|(1<<EngDirR)|(1<<EngDirL)
+		out		DDRB, mpr		; Set DDR register for PORTB
+		ldi		mpr, $00
+		out		PORTB, mpr		; Set default output for PORTB
 
 		; Initialize Port D for input
+		ldi		mpr, (0<<WskrL)|(0<<WskrR)
+		out		DDRD, mpr		; Set DDR register for PORTD
+		ldi		mpr, (1<<WskrL)|(1<<WskrR)
+		out		PORTD, mpr		; Set PORTE to input with hi-z
 
 		; Initialize external interrupts
 		; Set the Interrupt Sense Control to low level 
-		; NOTE: must initialize both EICRA and EICRB
+		ldi		mpr, (0<<ISC41)|(0<<ISC40)|(0<<ISC51)|(0<<ISC50)
+		out		EICRB, mpr		; Set INT4 and INT5 to trigger on low level
+		ldi		mpr, $00
+		sts		EICRA, mpr		; Use sts, EICRA in extended I/O space
 
 		; Set the External Interrupt Mask
+		ldi		mpr, (1<<INT4)|(1<<INT5)
+		out		EIMSK, mpr
 
 		; Turn on interrupts
-		; NOTE: This must be the last thing to do in the INIT function
+		sei
 
 ;-----------------------------------------------------------
 ; Main Program
