@@ -99,6 +99,10 @@ INIT:	; The initialization routine
 		ldi		mpr, (1<<INT4)|(1<<INT5)
 		out		EIMSK, mpr
 
+		; Move forward
+		ldi		mpr, MovFwd		; Start moving forward
+		out		PORTB, mpr		; Send command to motors
+
 		; Turn on interrupts
 		sei
 
