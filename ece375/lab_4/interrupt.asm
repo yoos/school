@@ -43,6 +43,13 @@
 ;.org	$002E					; Analog Comparator IV
 ;		rcall	HandleAC		; Function to handle Interupt request
 ;		reti					; Return from interrupt
+.org	$000a					; PIN4, PORTE
+rcall	HitRight				; Call HitRight function
+reti							; Return from interrupt
+
+.org	$000c
+rcall	HitLeft
+reti
 
 .org	$0046					; End of Interrupt Vectors
 
@@ -51,6 +58,10 @@
 ;-----------------------------------------------------------
 INIT:	; The initialization routine
 		; Initialize Stack Pointer
+		ldi		mpr, high(RAMEND)
+		out		SPH, mpr
+		ldi		mpr, low(RAMEND)
+		out		SPL, mpr
 
 		; Initialize Port B for output
 
