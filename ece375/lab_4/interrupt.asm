@@ -91,9 +91,9 @@ INIT:	; The initialization routine
 		; Initialize external interrupts
 		; Set the Interrupt Sense Control to low level 
 		ldi		mpr, (0<<ISC01)|(0<<ISC00)|(0<<ISC11)|(0<<ISC10)
-		out		EICRB, mpr		; Set INT4 and INT5 to trigger on low level
+		sts		EICRA, mpr		; Set INT0 and INT1 to trigger on low level
 		ldi		mpr, $00
-		sts		EICRA, mpr		; Use sts, EICRA in extended I/O space
+		out		EICRB, mpr		; Zero EICRB.
 
 		; Set the External Interrupt Mask
 		ldi		mpr, (1<<INT0)|(1<<INT1)
