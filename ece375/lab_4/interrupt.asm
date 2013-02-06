@@ -26,8 +26,8 @@
 
 ; Constants
 .equ	WTime = 100
-.equ	WskrR = 0				; Right Whisker Input Bit
-.equ	WskrL = 1				; Left Whisker Input Bit
+.equ	WskrR = 4				; Right Whisker Input Bit
+.equ	WskrL = 5				; Left Whisker Input Bit
 
 .equ	EngEnR = 4				; Right engine enable bit
 .equ	EngEnL = 7				; Left engine enable bit
@@ -56,11 +56,11 @@
 ;.org	$002E					; Analog Comparator IV
 ;		rcall	HandleAC		; Function to handle Interupt request
 ;		reti					; Return from interrupt
-.org	$000a					; PIN4, PORTE
+.org	$0002					; PIN0, PORTE
 rcall	HitRight				; Call HitRight function
 reti							; Return from interrupt
 
-.org	$000c
+.org	$0004					; PIN1, PORTE
 rcall	HitLeft
 reti
 
@@ -86,17 +86,17 @@ INIT:	; The initialization routine
 		ldi		mpr, (0<<WskrL)|(0<<WskrR)
 		out		DDRD, mpr		; Set DDR register for PORTD
 		ldi		mpr, (1<<WskrL)|(1<<WskrR)
-		out		PORTD, mpr		; Set PORTE to input with hi-z
+		out		PORTD, mpr		; Set PORTD to input with hi-z
 
 		; Initialize external interrupts
 		; Set the Interrupt Sense Control to low level 
-		ldi		mpr, (0<<ISC41)|(0<<ISC40)|(0<<ISC51)|(0<<ISC50)
+		ldi		mpr, (0<<ISC01)|(0<<ISC00)|(0<<ISC11)|(0<<ISC10)
 		out		EICRB, mpr		; Set INT4 and INT5 to trigger on low level
 		ldi		mpr, $00
 		sts		EICRA, mpr		; Use sts, EICRA in extended I/O space
 
 		; Set the External Interrupt Mask
-		ldi		mpr, (1<<INT4)|(1<<INT5)
+		ldi		mpr, (1<<INT0)|(1<<INT1)
 		out		EIMSK, mpr
 
 		; Move forward
