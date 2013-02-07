@@ -61,8 +61,24 @@
 
 \end{titlepage}
 
+\section*{Study Questions}
+
 \begin{enumerate}
-	\item 
+	\item Monitoring external inputs using interrupts uses clock cycles more
+		efficiently and therefore is a good option for simple devices designed
+		for long-term operation on limited power. However, since interrupts
+		require context switching to service, they may not be a good option for
+		programs with many external events to process.
+
+		C is often preferable for larger projects where the abstraction it
+		provides helps the programmer more easily see the bigger picture. It is
+		also faster to produce effective, understandable code in C, albeit
+		possibly at the cost of efficiency compared to assembly.
+
+	\item The wait function could use a timer that triggers a software
+		interrupt, which would bring the robot out of wait. If this interrupt
+		is placed lower on the interrupt vector list, it can be called from
+		within one of the external interrupts.
 \end{enumerate}
 
 \end{document}
