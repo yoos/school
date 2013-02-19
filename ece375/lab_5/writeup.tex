@@ -42,7 +42,7 @@
     \vspace*{4cm}
     \begin{flushright}
     {\huge
-        ECE 375 Pre-Lab 5\\[1cm]
+        ECE 375 Lab 5\\[1cm]
     }
     {\large
         Remotely Operated Vehicle
@@ -61,26 +61,29 @@
 
 \end{titlepage}
 
-\section*{Pre-Lab}
+\section*{Introduction}
 
-\begin{enumerate}
-	\item A small toy helicopter of mine is controlled via an IR link. It has
-		three axes of control: throttle, forward/backward movement, and yaw.
+% Introduction: purpose of lab
 
-		As usual, the stack pointer will be initialized. A fer interrupts and
-		input/output ports will also need to be initialized.
+\section*{Program Overview}
 
-		There will be a function (triggered by an interrupt) for processing any
-		commands received through an input port. Depending on the command, it
-		will run one of three functions. Each of the three functions update
-		a register (one for each function) with a value for the three motors
-		that control the helicopter's movement. The registers are updated every
-		time the appropriate command is received.
+% Program Overview: detailed description of assembly program
 
-		A final function, run at a constant frequency in the main function,
-		will combine the values in the three registers to generate and apply
-		the final motor values via output ports.
-\end{enumerate}
+\section*{Additional Questions}
+
+% Additional Questions: answers to questions in lab handout
+
+\section*{Difficulties}
+
+% Difficulties: (optional but recommended) a description of any difficulties encountered
+
+\section*{Conclusion}
+
+% Conclusion: summary of lab with a personal thought
+
+\section*{Source Code}
+
+% Source Code: assembly code MUST be included in your report and be well-documented.
 
 \end{document}
 
