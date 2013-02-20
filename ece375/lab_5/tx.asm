@@ -24,8 +24,6 @@
 
 
 ; Constants
-.equ	WTime = 100
-
 .equ	EngEnR = 4				; Right engine enable bit
 .equ	EngEnL = 7				; Left engine enable bit
 .equ	EngDirR = 5				; Right engine direction bit
@@ -33,9 +31,9 @@
 
 .equ	FwdBtn = 0
 .equ	BckBtn = 1
-.equ	TurnRBtn = 2
-.equ	TurnLBtn = 3
-.equ	HaltBtn = 4
+.equ	TurnRBtn = 6
+.equ	TurnLBtn = 7
+.equ	HaltBtn = 2
 .equ	FrzBtn = 5
 
 .equ	DevID = $01010110
@@ -120,7 +118,11 @@ INIT:
 ; Main Program
 ;-----------------------------------------------------------
 MAIN:
-		in		mpr, PIND;
+		ldi		mpr, 0			; Reset LEDs.
+		out		PORTB, mpr
+
+		in		mpr, PIND		; Read pins
+		com		mpr				; Take complement
 		andi	mpr, (1<<FwdBtn)|(1<<BckBtn)|(1<<TurnRBtn)|(1<<TurnLBtn)|(1<<HaltBtn)|(1<<FrzBtn)
 
 		; Check for forward button press
@@ -220,13 +222,13 @@ WAIT:
 		push	ilcnt			; Save ilcnt register
 		push	olcnt			; Save olcnt register
 
-Loop:	ldi		olcnt, 224		; load olcnt register
-OLoop:	ldi		ilcnt, 237		; load ilcnt register
+Loop:	ldi		olcnt, 80		; load olcnt register
+OLoop:	ldi		ilcnt, 80		; load ilcnt register
 ILoop:	dec		ilcnt			; decrement ilcnt
 		brne	ILoop			; Continue Inner Loop
-		dec		olcnt		; decrement olcnt
+		dec		olcnt			; decrement olcnt
 		brne	OLoop			; Continue Outer Loop
-		dec		waitcnt		; Decrement wait 
+		dec		waitcnt			; Decrement wait 
 		brne	Loop			; Continue Wait loop	
 
 		pop		olcnt		; Restore olcnt register
