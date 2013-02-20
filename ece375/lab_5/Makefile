@@ -13,7 +13,7 @@
 ######################################################################
 
 # Name of .asm file here
-PROG = rov
+PROG = tx
 TEX = writeup
 
 # Assemble code
