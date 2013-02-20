@@ -38,6 +38,8 @@
 .equ	HaltBtn = 4
 .equ	FrzBtn = 5
 
+.equ	DevID = $01010110
+
 ; Use these commands between the remote and TekBot
 ; MSB = 1 thus:
 ; commands are shifted right by one and ORed with 0b10000000 = $80
@@ -78,6 +80,12 @@ INIT:
 		out		DDRD, mpr
 		ldi		mpr, (1<<FwdBtn)|(1<<BckBtn)|(1<<TurnRBtn)|(1<<TurnLBtn)|(1<<HaltBtn)|(1<<FrzBtn)
 		out		PORTD, mpr
+
+		; Initialize Port B for output for LED debugging of signals sent.
+		ldi		mpr, $00
+		out		PORTB, mpr
+		ldi		mpr, $FF
+		out		DDRB, mpr
 
 	;USART1
 		;Set baudrate at 2400bps. See page 193 of datasheet.
@@ -167,14 +175,64 @@ TX:
 		in		mpr, SREG		; Save program state
 		push	mpr
 
-		; INSERT UART CODE HERE
+		; Send device ID
+		ldi		ZL,  low(UDR1)
+		ldi		ZH, high(UDR1)
+		ldi		mpr, DevID
+		sts		UDR1, mpr
 
 		pop		mpr
 		out		SREG, mpr
 		pop		waitcnt
 		pop		mpr
 
+		; Send action code
+		rcall	TXPUSH
+		sts		UDR1, mpr
+		out		PORTB, mpr
+		rcall	WAIT
+
 		ret
+
+TXPUSH:
+		push	mpr
+		ldi		ZL,  low(UCSR1A)
+		ldi		ZH, high(UCSR1A)
+		ld		mpr, Z
+		andi	mpr, (1<<UDRE1)
+		cpi		mpr, (1<<UDRE1)
+		brne	TXPUSH
+		ldi		mpr, (1<<UDRE1)
+		st		Z, mpr
+		pop		mpr
+		ret
+
+;----------------------------------------------------------------
+; Sub:	Wait
+; Desc:	A wait loop that is 16 + 159975*waitcnt cycles or roughly 
+;		waitcnt*10ms.  Just initialize wait for the specific amount 
+;		of time in 10ms intervals. Here is the general eqaution
+;		for the number of clock cycles in the wait loop:
+;			((3 * ilcnt + 3) * olcnt + 3) * waitcnt + 13 + call
+;----------------------------------------------------------------
+WAIT:
+		push	waitcnt			; Save wait register
+		push	ilcnt			; Save ilcnt register
+		push	olcnt			; Save olcnt register
+
+Loop:	ldi		olcnt, 224		; load olcnt register
+OLoop:	ldi		ilcnt, 237		; load ilcnt register
+ILoop:	dec		ilcnt			; decrement ilcnt
+		brne	ILoop			; Continue Inner Loop
+		dec		olcnt		; decrement olcnt
+		brne	OLoop			; Continue Outer Loop
+		dec		waitcnt		; Decrement wait 
+		brne	Loop			; Continue Wait loop	
+
+		pop		olcnt		; Restore olcnt register
+		pop		ilcnt		; Restore ilcnt register
+		pop		waitcnt		; Restore wait register
+		ret				; Return from subroutine
 
 
 ;***********************************************************
