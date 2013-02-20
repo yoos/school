@@ -18,6 +18,25 @@
 ;***********************************************************
 .def	mpr = r16				; Multi-Purpose Register
 
+.def	waitcnt = r17			; Wait loop counter
+.def	ilcnt = r18				; Inner loop counter
+.def	olcnt = r19				; Outer loop counter
+
+
+; Constants
+.equ	WTime = 100
+
+.equ	EngEnR = 4				; Right engine enable bit
+.equ	EngEnL = 7				; Left engine enable bit
+.equ	EngDirR = 5				; Right engine direction bit
+.equ	EngDirL = 6				; Left engine direction bit
+
+.equ	FwdBtn = 0
+.equ	BckBtn = 1
+.equ	TurnRBtn = 2
+.equ	TurnLBtn = 3
+.equ	HaltBtn = 4
+.equ	FrzBtn = 5
 
 ; Use these commands between the remote and TekBot
 ; MSB = 1 thus:
