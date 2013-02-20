@@ -1,15 +1,13 @@
 ;***********************************************************
 ;*
-;*	Enter Name of file here
+;*	tx.asm
 ;*
-;*	Enter the description of the program here
-;*
-;*	This is the TRANSMIT skeleton file for Lab 5 of ECE 375
+;*	Transmit code for Lab 5 of ECE 375
 ;*
 ;***********************************************************
 ;*
-;*	 Author: Enter your name
-;*	   Date: Enter Date
+;*	 Author: Soo-Hyun Yoo
+;*	   Date: 20 February 2013
 ;*
 ;***********************************************************
 
