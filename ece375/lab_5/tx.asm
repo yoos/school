@@ -59,10 +59,6 @@
 .org	$0000					; Beginning of IVs
 		rjmp 	INIT			; Reset interrupt
 
-.org	$0002
-		rjmp	TX
-		reti
-
 .org	$0046					; End of Interrupt Vectors
 
 ;-----------------------------------------------------------
@@ -83,26 +79,12 @@ INIT:
 		ldi		mpr, (1<<FwdBtn)|(1<<BckBtn)|(1<<TurnRBtn)|(1<<TurnLBtn)|(1<<HaltBtn)|(1<<FrzBtn)
 		out		PORTD, mpr
 
-		; Initialize external interrupts
-		; Set the Interrupt Sense Control to low level
-		ldi		mpr, (0<<ISC01)|(0<<ISC00)|(0<<ISC11)|(0<<ISC10)
-		sts		EICRA, mpr		; Set INT0 and INT1 to trigger on low level
-		ldi		mpr, $00
-		out		EICRB, mpr		; Zero EICRB.
-
-		; Set external interrupt mask
-		ldi		mpr, (1<<INT0)|(1<<INT1)
-		out		EIMSK, mpr
-
 	;USART1
 		;Set baudrate at 2400bps
 		;Enable transmitter
 		;Set frame format: 8data, 2 stop bit
 
 	;Other
-
-		; Turn on interrupts
-		sei
 
 ;-----------------------------------------------------------
 ; Main Program
