@@ -80,9 +80,31 @@ INIT:
 		out		PORTD, mpr
 
 	;USART1
-		;Set baudrate at 2400bps
-		;Enable transmitter
+		;Set baudrate at 2400bps. See page 193 of datasheet.
+		ldi		ZL,  low(UBRR1L)
+		ldi		ZH, high(UBRR1L)
+		ldi		mpr, low(416)
+		st		Z, mpr
+		ldi		ZL,  low(UBRR1H)
+		ldi		ZH, high(UBRR1H)
+		ldi		mpr, high(416)
+		st		Z, mpr
+
+		;Enable transmitter. See page 189 of datasheet.
+		ldi		ZL,  low(UCSR1A)
+		ldi		ZH, high(UCSR1A)
+		ldi		mpr, 0
+		st		Z, mpr
+		ldi		ZL,  low(UCSR1B)
+		ldi		ZH, high(UCSR1B)
+		ldi		mpr, (1<<TXEN1)
+		st		Z, mpr
+
 		;Set frame format: 8data, 2 stop bit
+		ldi		ZL,  low(UCSR1C)
+		ldi		ZH, high(UCSR1C)
+		ldi		mpr, (1<<USBS1)|(1<<UCSZ11)|(1<<UCSZ10)
+		st		Z, mpr
 
 	;Other
 
