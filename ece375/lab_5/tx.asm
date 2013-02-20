@@ -66,7 +66,30 @@
 ;-----------------------------------------------------------
 INIT:
 	;Stack Pointer (VERY IMPORTANT!!!!)
+		ldi		mpr, low(RAMEND)
+		out		SPL, mpr
+		ldi		mpr, high(RAMEND)
+		out		SPH, mpr
+
 	;I/O Ports
+
+		; Initialize Port D for input
+		ldi		mpr, (0<<FwdBtn)|(0<<BckBtn)|(0<<TurnRBtn)|(0<<TurnLBtn)|(0<<HaltBtn)|(0<<FrzBtn)
+		out		DDRD, mpr
+		ldi		mpr, (1<<FwdBtn)|(1<<BckBtn)|(1<<TurnRBtn)|(1<<TurnLBtn)|(1<<HaltBtn)|(1<<FrzBtn)
+		out		PORTD, mpr
+
+		; Initialize external interrupts
+		; Set the Interrupt Sense Control to low level
+		ldi		mpr, (0<<ISC01)|(0<<ISC00)|(0<<ISC11)|(0<<ISC10)
+		sts		EICRA, mpr		; Set INT0 and INT1 to trigger on low level
+		ldi		mpr, $00
+		out		EICRB, mpr		; Zero EICRB.
+
+		; Set external interrupt mask
+		ldi		mpr, (1<<INT0)|(1<<INT1)
+		out		EIMSK, mpr
+
 	;USART1
 		;Set baudrate at 2400bps
 		;Enable transmitter
@@ -74,6 +97,8 @@ INIT:
 
 	;Other
 
+		; Turn on interrupts
+		sei
 
 ;-----------------------------------------------------------
 ; Main Program
