@@ -42,6 +42,7 @@
 .def	olcnt = r19				; Outer Loop Counter
 
 .equ	WTime = 100				; Time to wait in wait loop
+.equ	FrzCnt = 100
 
 .equ	WskrR = 0				; Right Whisker Input Bit
 .equ	WskrL = 1				; Left Whisker Input Bit
@@ -50,15 +51,27 @@
 .equ	EngDirR = 5				; Right Engine Direction Bit
 .equ	EngDirL = 6				; Left Engine Direction Bit
 
+.equ	DevID = $01010110
+
+; Use these commands between the remote and TekBot
+; MSB = 1 thus:
+; commands are shifted right by one and ORed with 0b10000000 = $80
+.equ	MovFwdCmd = ($80|1<<(EngDirR-1)|1<<(EngDirL-1))		;0b10110000 Move Forwards Command
+.equ	MovBckCmd = ($80|$00)								;0b10000000 Move Backwards Command
+.equ	TurnRCmd  = ($80|1<<(EngDirL-1))					;0b10100000 Turn Right Command
+.equ	TurnLCmd  = ($80|1<<(EngDirR-1))					;0b10010000 Turn Left Command
+.equ	HaltCmd   = ($80|1<<(EngEnR-1)|1<<(EngEnL-1))		;0b11001000 Halt Command
+.equ	FrzCmd    = ($80|$F8)
+
 ;/////////////////////////////////////////////////////////////
 ;These macros are the values to make the TekBot Move.
 ;/////////////////////////////////////////////////////////////
 
-.equ	MovFwd = (1<<EngDirR|1<<EngDirL)	; Move Forwards Command
-.equ	MovBck = $00				; Move Backwards Command
-.equ	TurnR = (1<<EngDirL)			; Turn Right Command
-.equ	TurnL = (1<<EngDirR)			; Turn Left Command
-.equ	Halt = (1<<EngEnR|1<<EngEnL)		; Halt Command
+.equ	MovFwdVal = (1<<EngDirR|1<<EngDirL)	; Move Forwards Command
+.equ	MovBckVal = $00				; Move Backwards Command
+.equ	TurnRVal = (1<<EngDirL)			; Turn Right Command
+.equ	TurnLVal = (1<<EngDirR)			; Turn Left Command
+.equ	HaltVal = (1<<EngEnR|1<<EngEnL)		; Halt Command
 
 ;============================================================
 ; NOTE: Let me explain what the macros above are doing.  
@@ -118,7 +131,7 @@ INIT:
 		out		DDRD, mpr		; for inputs
 
 		; Initialize TekBot Foward Movement
-		ldi		mpr, MovFwd		; Load Move Foward Command
+		ldi		mpr, MovFwdVal	; Load Move Foward Command
 		out		PORTB, mpr		; Send command to motors
 
 ;---------------------------------------------------------------
@@ -152,19 +165,19 @@ HitRight:
 		push	mpr			;
 
 		; Move Backwards for a second
-		ldi		mpr, MovBck	; Load Move Backwards command
+		ldi		mpr, MovBckVal	; Load Move Backwards command
 		out		PORTB, mpr	; Send command to port
 		ldi		waitcnt, WTime	; Wait for 1 second
 		rcall	Wait			; Call wait function
 
 		; Turn left for a second
-		ldi		mpr, TurnL	; Load Turn Left Command
+		ldi		mpr, TurnLVal	; Load Turn Left Command
 		out		PORTB, mpr	; Send command to port
 		ldi		waitcnt, WTime	; Wait for 1 second
 		rcall	Wait			; Call wait function
 
 		; Move Forward again	
-		ldi		mpr, MovFwd	; Load Move Forwards command
+		ldi		mpr, MovFwdVal	; Load Move Forwards command
 		out		PORTB, mpr	; Send command to port
 
 		pop		mpr		; Restore program state
@@ -185,19 +198,19 @@ HitLeft:
 		push	mpr			;
 
 		; Move Backwards for a second
-		ldi		mpr, MovBck	; Load Move Backwards command
+		ldi		mpr, MovBckVal	; Load Move Backwards command
 		out		PORTB, mpr	; Send command to port
 		ldi		waitcnt, WTime	; Wait for 1 second
 		rcall	Wait			; Call wait function
 
 		; Turn right for a second
-		ldi		mpr, TurnR	; Load Turn Left Command
+		ldi		mpr, TurnRVal	; Load Turn Left Command
 		out		PORTB, mpr	; Send command to port
 		ldi		waitcnt, WTime	; Wait for 1 second
 		rcall	Wait			; Call wait function
 
 		; Move Forward again	
-		ldi		mpr, MovFwd	; Load Move Forwards command
+		ldi		mpr, MovFwdVal	; Load Move Forwards command
 		out		PORTB, mpr	; Send command to port
 
 		pop		mpr		; Restore program state
@@ -205,6 +218,94 @@ HitLeft:
 		pop		waitcnt		; Restore wait register
 		pop		mpr		; Restore mpr
 		ret				; Return from subroutine
+
+
+;----------------------------------------------------------------
+; Sub:	RX
+;----------------------------------------------------------------
+RX:
+		push	mpr
+
+		lds		mpr, UDR1
+		cpi		mpr, FrzCmd		; Did I get the freeze command?
+		brne	MOVE
+		ldi		mpr, Halt
+		out		PORTB, mpr
+		ldi		ZL,  low(FrzCnt)
+		ldi		ZH, high(FrzCnt)
+		ld		mpr, Z
+		inc		mpr				; Count number of times frozen
+		st		Z, mpr
+		cpi		mpr, 3			; Have I been frozen 3 times?
+		brne	FRZTMP
+FRZPRM:							; Freeze permanently
+		rjmp	FRZPRM
+FRZTMP:							; Freeze temporarily
+		ldi		ilcnt, 6		; ..for 5 seconds
+FRZWAIT:
+		rcall	Wait
+		dec		ilcnt
+		brne	FRZWAIT
+
+		pop		mpr
+		out		PORTB, mpr
+
+		rjmp	ENDRX
+
+MOVE:
+		cpi		mpr, DevID
+		brne	ENDRX
+MOVEWAIT:						; Wait for command
+		lds		mpr, UCSR1A
+		andi	mpr, (1<<RXC1)	; Receive complete?
+		cpi		mpr, (1<<RXC1)
+		brne	MOVEWAIT
+		lds		mpr, UDR1
+		out		PORTB, mpr
+
+		; Check for forward command
+		cpi		mpr, MovFwdCmd
+		brne	BCK
+		ldi		mpr, MovFwdVal
+		out		PORTB, mpr
+		rjmp	ENDRX
+
+BCK:
+		; Check for back command
+		cpi		mpr, MovBckCmd
+		brne	TURNR
+		ldi		mpr, MovBckVal
+		out		PORTB, mpr
+		rjmp	ENDRX
+
+TURNR:
+		; Check for turn right command
+		cpi		mpr, TurnRCmd
+		brne	TURNL
+		ldi		mpr, TurnRVal
+		out		PORTB, mpr
+		rjmp	ENDRX
+
+TURNL:
+		; Check for turn left command
+		cpi		mpr, TurnLCmd
+		brne	HALT
+		ldi		mpr, TurnLVal
+		out		PORTB, mpr
+		rjmp	ENDRX
+
+HALT:
+		; Check for halt tcommand
+		cpi		mpr, HaltCmd
+		brne	ENDRX
+		ldi		mpr, HaltVal
+		out		PORTB, mpr
+		rjmp	ENDRX
+
+ENDRX:
+		sei
+		ret
+
 
 ;----------------------------------------------------------------
 ; Sub:	Wait
