@@ -1,33 +1,13 @@
 ;***********************************************************
 ;*
-;*	BasicBumpBot.asm	-	V2.0
+;*	rx.asm
 ;*
-;*	This program contains the neccessary code to enable the 
-;*	the TekBot to behave in the traditional BumpBot fashion.
-;*      It is written to work with the latest TekBots platform.
-;*	If you have an earlier version you may need to modify
-;* 	your code appropriately.
-;*
-;*	The behavior is very simple.  Get the TekBot moving
-;*	forward and poll for whisker inputs.  If the right 
-;*	whisker is activated, the TekBot backs up for a second,
-;*	turns left for a second, and then moves forward again.
-;*	If the left whisker is activated, the TekBot backs up 
-;*	for a second, turns right for a second, and then
-;*	continues forward.	
+;*	Receive code for Lab 5 of ECE 375
 ;*
 ;***********************************************************
 ;*
-;*	 Author: David Zier and Mohammed Sinky (modification Jan 8, 2009)
-;*	   Date: January 8, 2009
-;*	Company: TekBots(TM), Oregon State University - EECS
-;*	Version: 2.0
-;*
-;***********************************************************
-;*	Rev	Date	Name		Description
-;*----------------------------------------------------------
-;*	-	3/29/02	Zier		Initial Creation of Version 1.0
-;*	-	1/08/09 Sinky		Version 2.0 modifictions
+;*	 Author: Soo-Hyun Yoo
+;*	   Date: 20 February 2013
 ;*
 ;***********************************************************
 
@@ -107,6 +87,21 @@
 .org	$0000				; Reset and Power On Interrupt
 		rjmp	INIT		; Jump to program initialization
 
+; Right whisker hit
+.org	$0002
+		rjmp	HitRight
+		reti
+
+; Left whisker hit
+.org	$0004
+		rjmp	HitLeft
+		reti
+
+; USART
+.org	$003C
+		rjmp	RX
+		reti
+
 .org	$0046				; End of Interrupt Vectors
 ;--------------------------------------------------------------
 ; Program Initialization
@@ -130,23 +125,52 @@ INIT:
 		ldi		mpr, $00		; Set Port D Directional Register
 		out		DDRD, mpr		; for inputs
 
-		; Initialize TekBot Foward Movement
-		ldi		mpr, MovFwdVal	; Load Move Foward Command
-		out		PORTB, mpr		; Send command to motors
+		; USART1 setup
+		;Set baudrate at 2400bps. See page 193 of datasheet.
+		ldi		ZL,  low(UBRR1L)
+		ldi		ZH, high(UBRR1L)
+		ldi		mpr, low(416)
+		st		Z, mpr
+		ldi		ZL,  low(UBRR1H)
+		ldi		ZH, high(UBRR1H)
+		ldi		mpr, high(416)
+		st		Z, mpr
+
+		;Enable receiver. See page 189 of datasheet.
+		ldi		ZL,  low(UCSR1A)
+		ldi		ZH, high(UCSR1A)
+		ldi		mpr, 0
+		st		Z, mpr
+		ldi		ZL,  low(UCSR1B)
+		ldi		ZH, high(UCSR1B)
+		ldi		mpr, (1<<RXEN1)
+		st		Z, mpr
+
+		;Set frame format: 8data, 2 stop bit
+		ldi		ZL,  low(UCSR1C)
+		ldi		ZH, high(UCSR1C)
+		ldi		mpr, (1<<USBS1)|(1<<UCSZ11)|(1<<UCSZ10)
+		st		Z, mpr
+
+		; External interrupts
+		ldi		mpr, 0x0f		; Rising edge detect
+		sts		EICRA, mpr
+		ldi		mpr, (1<<INT0)|(1<<INT1)
+		out		EIMSK, mpr
+
+		; Freeze count is zero
+		ldi		mpr, 0
+		ldi		ZL,  low(FrzCnt)
+		ldi		ZH, high(FrzCnt)
+		st		Z, mpr
+
+		; Set external interrupts.
+		sei
 
 ;---------------------------------------------------------------
 ; Main Program
 ;---------------------------------------------------------------
 MAIN:
-		in		mpr, PIND		; Get whisker input from Port D
-		andi	mpr, (1<<WskrR|1<<WskrL)
-		cpi		mpr, (1<<WskrL)	; Check for Right Whisker input (Recall Active Low)
-		brne	NEXT			; Continue with next check
-		rcall	HitRight		; Call the subroutine HitRight
-		rjmp	MAIN			; Continue with program
-NEXT:	cpi		mpr, (1<<WskrR)	; Check for Left Whisker input (Recall Active)
-		brne	MAIN			; No Whisker input, continue program
-		rcall	HitLeft			; Call subroutine HitLeft
 		rjmp	MAIN			; Continue through main
 
 ;****************************************************************
@@ -159,6 +183,8 @@ NEXT:	cpi		mpr, (1<<WskrR)	; Check for Left Whisker input (Recall Active)
 ;		is triggered.
 ;----------------------------------------------------------------
 HitRight:
+		cli					; Disable interrupts
+
 		push	mpr			; Save mpr register
 		push	waitcnt			; Save wait register
 		in		mpr, SREG	; Save program state
@@ -184,6 +210,9 @@ HitRight:
 		out		SREG, mpr	;
 		pop		waitcnt		; Restore wait register
 		pop		mpr		; Restore mpr
+
+		sei					; Reenable interrupts
+
 		ret				; Return from subroutine
 
 ;----------------------------------------------------------------
@@ -192,6 +221,8 @@ HitRight:
 ;		is triggered.
 ;----------------------------------------------------------------
 HitLeft:
+		cli					; Disable interrupts
+
 		push	mpr			; Save mpr register
 		push	waitcnt			; Save wait register
 		in		mpr, SREG	; Save program state
@@ -217,6 +248,9 @@ HitLeft:
 		out		SREG, mpr	;
 		pop		waitcnt		; Restore wait register
 		pop		mpr		; Restore mpr
+
+		sei					; Reenable interrupts
+
 		ret				; Return from subroutine
 
 
@@ -224,6 +258,7 @@ HitLeft:
 ; Sub:	RX
 ;----------------------------------------------------------------
 RX:
+		cli
 		push	mpr
 
 		lds		mpr, UDR1
@@ -241,7 +276,7 @@ RX:
 FRZPRM:							; Freeze permanently
 		rjmp	FRZPRM
 FRZTMP:							; Freeze temporarily
-		ldi		ilcnt, 6		; ..for 5 seconds
+		ldi		ilcnt, 5		; ..for 5 seconds
 FRZWAIT:
 		rcall	Wait
 		dec		ilcnt
