@@ -68,22 +68,35 @@
 \section*{Program Overview}
 
 % Program Overview: detailed description of assembly program
+In the two assembly files, tx.asm and rx.asm, USART1's transmit and receive capabilities (respectively) are enabled by setting TXEN1 and RXEN1 high in UBSR1B.
+
+The TX code checks for button presses by polling all buttons in the main functions and matching them (with a lot of brne's and rjmp's) to the known button configurations. If any one of the buttons are pressed, a transmit function is called, which first transmits the device ID and the action code. There is a wait function at the end of the transmit function to avoid spamming the receiver with too many commands. For debugging purposes, the commands sent are also displayed using the red LEDs.
+
+The RX code relies on interrupts for detecting whisker hits and for the USART receive. Upon receiving, an RX function first disables interrupts and checks whether it was the freeze command. If so, it freezes and increments a freeze counter. If the freeze counter is 3, it freezes permanently. Otherwise, it times out after 5 seconds.
+
+If the command is not a freeze command, it checks if it matches the device ID. If so, it waits until the next byte is received and matches it against the known commands. At the end, the function reenables external interrupts.
+
 
 \section*{Additional Questions}
 
 % Additional Questions: answers to questions in lab handout
+No additional questions asked.
 
 \section*{Difficulties}
 
 % Difficulties: (optional but recommended) a description of any difficulties encountered
+Due to absence, I was unable to work with a partner and implemented both TX and RX code using a second TekBots board (not a TekBot).
 
 \section*{Conclusion}
 
 % Conclusion: summary of lab with a personal thought
+Implementing USART RX/TX was simple once I found the appropriate pages in the datasheet.
 
 \section*{Source Code}
 
 % Source Code: assembly code MUST be included in your report and be well-documented.
+\lstinputlisting{tx.asm}
+\lstinputlisting{rx.asm}
 
 \end{document}
 
