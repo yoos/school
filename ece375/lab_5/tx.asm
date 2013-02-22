@@ -29,12 +29,13 @@
 .equ	EngDirR = 5				; Right engine direction bit
 .equ	EngDirL = 6				; Left engine direction bit
 
-.equ	FwdBtn = 0
-.equ	BckBtn = 1
-.equ	TurnRBtn = 6
-.equ	TurnLBtn = 7
-.equ	HaltBtn = 2
-.equ	FrzBtn = 5
+.equ	FwdBtn    = 0			; Command forward movement
+.equ	BckBtn    = 1			; Command backward movement
+.equ	TurnRBtn  = 6			; Command right turn
+.equ	TurnLBtn  = 7			; Command left turn
+.equ	HaltBtn   = 2			; Command halt
+.equ	FrzBtn    = 5			; Command freeze signal emit
+.equ	FrzSimBtn = 4			; Simulate freeze signal emitted for debug
 
 .equ	DevID = 0b01010110
 
@@ -46,7 +47,8 @@
 .equ	TurnRCmd  = ($80|1<<(EngDirL-1))					;0b10100000 Turn Right Command
 .equ	TurnLCmd  = ($80|1<<(EngDirR-1))					;0b10010000 Turn Left Command
 .equ	HaltCmd   = ($80|1<<(EngEnR-1)|1<<(EngEnL-1))		;0b11001000 Halt Command
-.equ	FrzCmd    = ($80|$F8)
+.equ	FrzCmd    = ($80|$F8)								; Freeze command
+.equ	FrzSig    = ($80|$FD)								; Freeze signal
 
 ;***********************************************************
 ;*	Start of Code Segment
@@ -123,7 +125,7 @@ MAIN:
 
 		in		mpr, PIND		; Read pins
 		com		mpr				; Take complement
-		andi	mpr, (1<<FwdBtn)|(1<<BckBtn)|(1<<TurnRBtn)|(1<<TurnLBtn)|(1<<HaltBtn)|(1<<FrzBtn)
+		andi	mpr, (1<<FwdBtn)|(1<<BckBtn)|(1<<TurnRBtn)|(1<<TurnLBtn)|(1<<HaltBtn)|(1<<FrzBtn)|(1<<FrzSimBtn)
 
 		; Check for forward button press
 		cpi		mpr, (1<<FwdBtn)
@@ -162,8 +164,15 @@ HALT:	; Check for halt button press
 
 FRZ:	; Check for freeze button press
 		cpi		mpr, (1<<FrzBtn)
-		brne	MAIN
+		brne	FRZSIM
 		ldi		mpr, FrzCmd
+		rcall	TX
+		rjmp	MAIN
+
+FRZSIM:	; Check for freeze sim button press
+		cpi		mpr, (1<<FrzSimBtn)
+		brne	MAIN
+		ldi		mpr, FrzSig
 		rcall	TX
 		rjmp	MAIN
 
