@@ -144,7 +144,7 @@ INIT:
 		st		Z, mpr
 		ldi		ZL,  low(UCSR1B)
 		ldi		ZH, high(UCSR1B)
-		ldi		mpr, (1<<TXEN1)|(1<<RXEN1)|(1<<RXCIE1)	; Enable RX and interrupt
+		ldi		mpr, (1<<TXEN1)|(1<<RXEN1)|(1<<RXCIE1)	; Enable RX, TX, and interrupt
 		st		Z, mpr
 
 		;Set frame format: 8data, 2 stop bit
