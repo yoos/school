@@ -267,7 +267,7 @@ FRZPRM:							; Otherwise, freeze permanently.
 FRZTMP:							; Freeze temporarily
 		ldi		mpr, FrzSig
 		out		PORTB, mpr
-		ldi		ilcnt, 1		; ..for 5 seconds
+		ldi		ilcnt, 5		; ..for 5 seconds
 FRZWAIT:
 		rcall	Wait
 		dec		ilcnt
