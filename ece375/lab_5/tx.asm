@@ -222,8 +222,8 @@ WAIT:
 		push	ilcnt			; Save ilcnt register
 		push	olcnt			; Save olcnt register
 
-Loop:	ldi		olcnt, 80		; load olcnt register
-OLoop:	ldi		ilcnt, 80		; load ilcnt register
+Loop:	ldi		olcnt, 40		; load olcnt register
+OLoop:	ldi		ilcnt, 40		; load ilcnt register
 ILoop:	dec		ilcnt			; decrement ilcnt
 		brne	ILoop			; Continue Inner Loop
 		dec		olcnt			; decrement olcnt
