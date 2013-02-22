@@ -159,12 +159,9 @@ INIT:
 		ldi		mpr, (1<<INT0)|(1<<INT1)
 		out		EIMSK, mpr
 
-		; Freeze count is zero
-		ldi		frzcnt, 0
-
-		; Start halted
-		ldi		mpr, HaltVal
-		out		PORTB, mpr
+		; Freeze count starts at four and decrements -- for some reason, the RX
+		; interrupt seems to trigger at the beginning of every program cycle?
+		ldi		frzcnt, 4
 
 		; Set external interrupts.
 		sei
@@ -173,6 +170,10 @@ INIT:
 ; Main Program
 ;---------------------------------------------------------------
 MAIN:
+		; Halt by default
+		ldi		mpr, HaltVal
+		out		PORTB, mpr
+
 		rjmp	MAIN			; Continue through main
 
 ;****************************************************************
@@ -247,7 +248,6 @@ HitLeft:
 
 		ret				; Return from subroutine
 
-
 ;----------------------------------------------------------------
 ; Sub:	RX
 ;----------------------------------------------------------------
@@ -260,12 +260,9 @@ RX:
 		brne	MOVE			; If not, move.
 		ldi		mpr, HaltVal	; Otherwise, stop.
 		out		PORTB, mpr
-		inc		frzcnt			; Count number of times frozen
-		cpi		frzcnt, 3		; Have I been frozen 3 times?
+		dec		frzcnt			; Count number of times frozen
 		brne	FRZTMP			; If not, freeze temporarily.
 FRZPRM:							; Otherwise, freeze permanently.
-		ldi		mpr, $FF
-		out		PORTB, mpr
 		rjmp	FRZPRM
 FRZTMP:							; Freeze temporarily
 		ldi		mpr, FrzSig
@@ -276,21 +273,17 @@ FRZWAIT:
 		dec		ilcnt
 		brne	FRZWAIT
 
-		pop		mpr
-		out		PORTB, mpr
-
 		rjmp	ENDRX
 
 MOVE:
-		cpi		mpr, DevID
+		cpi		mpr, DevID		; Talking to me?
 		brne	ENDRX
 MOVEWAIT:						; Wait for command
 		lds		mpr, UCSR1A
 		andi	mpr, (1<<RXC1)	; Receive complete?
 		cpi		mpr, (1<<RXC1)
 		brne	MOVEWAIT
-		lds		mpr, UDR1
-		out		PORTB, mpr
+		lds		mpr, UDR1		; Read command
 
 		; Check for forward command
 		cpi		mpr, MovFwdCmd
@@ -340,31 +333,23 @@ FRZ:
 		; Check for freeze command
 		cpi		mpr, FrzCmd
 		brne	ENDRX
-		ldi		mpr, TurnRCmd;FrzSig
-		out		PORTB, mpr
+		ldi		mpr, FrzSig
 		rcall	TXFRZ					; Emit freeze signal
 		rcall	WaitShort
 		rjmp	ENDRX
 
 ENDRX:
+		pop		mpr
+		out		PORTB, mpr
+
 		sei
 		ret
-
 
 ;----------------------------------------------------------------
 ; Sub:	TXFRZ
 ; Desc:	Emit freeze signal
 ;----------------------------------------------------------------
 TXFRZ:
-		; Send action code
-		rcall	TXPUSH
-		sts		UDR1, mpr
-		out		PORTB, mpr
-		rcall	Wait
-
-		ret
-
-TXPUSH:
 		push	mpr
 		ldi		ZL,  low(UCSR1A)
 		ldi		ZH, high(UCSR1A)
@@ -373,11 +358,11 @@ TXPUSHLOOP:
 		andi	mpr, (1<<UDRE1)
 		cpi		mpr, (1<<UDRE1)
 		brne	TXPUSHLOOP
-		ldi		mpr, (1<<UDRE1)
-		st		Z, mpr
+		ldi		mpr, FrzSig
+		sts		UDR1, mpr
 		pop		mpr
-		ret
 
+		ret
 
 ;----------------------------------------------------------------
 ; Sub:	Wait
