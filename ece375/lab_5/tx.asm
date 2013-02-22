@@ -36,7 +36,7 @@
 .equ	HaltBtn = 2
 .equ	FrzBtn = 5
 
-.equ	DevID = $01010110
+.equ	DevID = 0b01010110
 
 ; Use these commands between the remote and TekBot
 ; MSB = 1 thus:
