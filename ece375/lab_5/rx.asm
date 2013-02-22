@@ -154,7 +154,7 @@ INIT:
 		st		Z, mpr
 
 		; External interrupts
-		ldi		mpr, 0x0f		; Rising edge detect
+		ldi		mpr, (1<<ISC11)|(0<<ISC10)		; Rising edge detect
 		sts		EICRA, mpr
 		ldi		mpr, (1<<INT0)|(1<<INT1)
 		out		EIMSK, mpr
