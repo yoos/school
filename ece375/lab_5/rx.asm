@@ -31,7 +31,7 @@
 .equ	EngDirR = 5				; Right Engine Direction Bit
 .equ	EngDirL = 6				; Left Engine Direction Bit
 
-.equ	DevID = $01010110
+.equ	DevID = 0b01010110
 
 ; Use these commands between the remote and TekBot
 ; MSB = 1 thus:
@@ -114,16 +114,16 @@ INIT:
 		out		SPH, mpr		; Load SPH with high byte of RAMEND
 
 		; Initialize Port B for output
-		ldi		mpr, $00		; Initialize Port B for outputs
-		out		PORTB, mpr		; Port B outputs low
-		ldi		mpr, $FF		; Set Port B Directional Register
+		ldi		mpr, (1<<EngEnL)|(1<<EngEnR)|(1<<EngDirR)|(1<<EngDirL)		; Initialize Port B for outputs
 		out		DDRB, mpr		; for output
+		ldi		mpr, $00		; Set Port B Directional Register
+		out		PORTB, mpr		; Port B outputs low
 
 		; Initialize Port D for inputs
-		ldi		mpr, $FF		; Initialize Port D for inputs
-		out		PORTD, mpr		; with Tri-State
-		ldi		mpr, $00		; Set Port D Directional Register
+		ldi		mpr, (0<<WskrL)|(0<<WskrR)		; Set Port D Directional Register
 		out		DDRD, mpr		; for inputs
+		ldi		mpr, (1<<WskrL)|(1<<WskrR)		; Initialize Port D for inputs
+		out		PORTD, mpr		; with Tri-State
 
 		; USART1 setup
 		;Set baudrate at 2400bps. See page 193 of datasheet.
@@ -143,7 +143,7 @@ INIT:
 		st		Z, mpr
 		ldi		ZL,  low(UCSR1B)
 		ldi		ZH, high(UCSR1B)
-		ldi		mpr, (1<<RXEN1)
+		ldi		mpr, (1<<RXEN1)|(1<<RXCIE1)	; Enable RX and interrupt
 		st		Z, mpr
 
 		;Set frame format: 8data, 2 stop bit
@@ -202,10 +202,6 @@ HitRight:
 		ldi		waitcnt, WTime	; Wait for 1 second
 		rcall	Wait			; Call wait function
 
-		; Move Forward again	
-		ldi		mpr, MovFwdVal	; Load Move Forwards command
-		out		PORTB, mpr	; Send command to port
-
 		pop		mpr		; Restore program state
 		out		SREG, mpr	;
 		pop		waitcnt		; Restore wait register
@@ -240,10 +236,6 @@ HitLeft:
 		ldi		waitcnt, WTime	; Wait for 1 second
 		rcall	Wait			; Call wait function
 
-		; Move Forward again	
-		ldi		mpr, MovFwdVal	; Load Move Forwards command
-		out		PORTB, mpr	; Send command to port
-
 		pop		mpr		; Restore program state
 		out		SREG, mpr	;
 		pop		waitcnt		; Restore wait register
@@ -274,8 +266,12 @@ RX:
 		cpi		mpr, 3			; Have I been frozen 3 times?
 		brne	FRZTMP
 FRZPRM:							; Freeze permanently
+		ldi		mpr, $FF
+		out		PORTB, mpr
 		rjmp	FRZPRM
 FRZTMP:							; Freeze temporarily
+		ldi		mpr, 0b10101010
+		out		PORTB, mpr
 		ldi		ilcnt, 5		; ..for 5 seconds
 FRZWAIT:
 		rcall	Wait
@@ -303,6 +299,7 @@ MOVEWAIT:						; Wait for command
 		brne	BCK
 		ldi		mpr, MovFwdVal
 		out		PORTB, mpr
+		rcall	WaitShort
 		rjmp	ENDRX
 
 BCK:
@@ -311,6 +308,7 @@ BCK:
 		brne	TURNR
 		ldi		mpr, MovBckVal
 		out		PORTB, mpr
+		rcall	WaitShort
 		rjmp	ENDRX
 
 TURNR:
@@ -319,6 +317,7 @@ TURNR:
 		brne	TURNL
 		ldi		mpr, TurnRVal
 		out		PORTB, mpr
+		rcall	WaitShort
 		rjmp	ENDRX
 
 TURNL:
@@ -327,6 +326,7 @@ TURNL:
 		brne	HALT
 		ldi		mpr, TurnLVal
 		out		PORTB, mpr
+		rcall	WaitShort
 		rjmp	ENDRX
 
 HALT:
@@ -335,6 +335,7 @@ HALT:
 		brne	ENDRX
 		ldi		mpr, HaltVal
 		out		PORTB, mpr
+		rcall	WaitShort
 		rjmp	ENDRX
 
 ENDRX:
@@ -368,3 +369,24 @@ ILoop:	dec		ilcnt			; decrement ilcnt
 		pop		ilcnt		; Restore ilcnt register
 		pop		waitcnt		; Restore wait register
 		ret				; Return from subroutine
+
+;----------------------------------------------------------------
+; Sub:	WaitShort
+; Desc:	A short wait loop
+;----------------------------------------------------------------
+WaitShort:
+		push	waitcnt
+		push	olcnt
+		push	ilcnt
+SWLoop:	ldi		olcnt, 80
+SWOLoop:ldi		ilcnt, 80
+SWILoop:dec		ilcnt
+		brne	SWILoop
+		dec		olcnt
+		brne	SWOLoop
+		dec		waitcnt
+		brne	SWLoop
+		pop		ilcnt
+		pop		olcnt
+		pop		waitcnt
+
