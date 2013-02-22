@@ -173,7 +173,12 @@ FRZSIM:	; Check for freeze sim button press
 		cpi		mpr, (1<<FrzSimBtn)
 		brne	MAIN
 		ldi		mpr, FrzSig
-		rcall	TX
+
+		rcall	TXPUSH
+		sts		UDR1, mpr
+		out		PORTB, mpr
+		rcall	WAIT
+
 		rjmp	MAIN
 
 
@@ -187,8 +192,6 @@ TX:
 		push	mpr
 
 		; Send device ID
-		ldi		ZL,  low(UDR1)
-		ldi		ZH, high(UDR1)
 		ldi		mpr, DevID
 		sts		UDR1, mpr
 
@@ -210,9 +213,10 @@ TXPUSH:
 		ldi		ZL,  low(UCSR1A)
 		ldi		ZH, high(UCSR1A)
 		ld		mpr, Z
+TXPUSHLOOP:
 		andi	mpr, (1<<UDRE1)
 		cpi		mpr, (1<<UDRE1)
-		brne	TXPUSH
+		brne	TXPUSHLOOP
 		ldi		mpr, (1<<UDRE1)
 		st		Z, mpr
 		pop		mpr
