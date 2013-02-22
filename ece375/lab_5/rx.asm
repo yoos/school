@@ -20,9 +20,9 @@
 .def	waitcnt = r17				; Wait Loop Counter
 .def	ilcnt = r18				; Inner Loop Counter
 .def	olcnt = r19				; Outer Loop Counter
+.def	frzcnt = r20			; Freeze number counter
 
 .equ	WTime = 100				; Time to wait in wait loop
-.equ	FrzCnt = 100
 
 .equ	WskrR = 0				; Right Whisker Input Bit
 .equ	WskrL = 1				; Left Whisker Input Bit
@@ -41,7 +41,8 @@
 .equ	TurnRCmd  = ($80|1<<(EngDirL-1))					;0b10100000 Turn Right Command
 .equ	TurnLCmd  = ($80|1<<(EngDirR-1))					;0b10010000 Turn Left Command
 .equ	HaltCmd   = ($80|1<<(EngEnR-1)|1<<(EngEnL-1))		;0b11001000 Halt Command
-.equ	FrzCmd    = ($80|$F8)
+.equ	FrzCmd    = ($80|$F8)								; Freeze command
+.equ	FrzSig    = ($80|$FD)								; Freeze signal
 
 ;/////////////////////////////////////////////////////////////
 ;These macros are the values to make the TekBot Move.
@@ -136,14 +137,14 @@ INIT:
 		ldi		mpr, high(416)
 		st		Z, mpr
 
-		;Enable receiver. See page 189 of datasheet.
+		;Enable receiver and transmitter. See page 189 of datasheet.
 		ldi		ZL,  low(UCSR1A)
 		ldi		ZH, high(UCSR1A)
 		ldi		mpr, 0
 		st		Z, mpr
 		ldi		ZL,  low(UCSR1B)
 		ldi		ZH, high(UCSR1B)
-		ldi		mpr, (1<<RXEN1)|(1<<RXCIE1)	; Enable RX and interrupt
+		ldi		mpr, (1<<TXEN1)|(1<<RXEN1)|(1<<RXCIE1)	; Enable RX and interrupt
 		st		Z, mpr
 
 		;Set frame format: 8data, 2 stop bit
@@ -159,10 +160,11 @@ INIT:
 		out		EIMSK, mpr
 
 		; Freeze count is zero
-		ldi		mpr, 0
-		ldi		ZL,  low(FrzCnt)
-		ldi		ZH, high(FrzCnt)
-		st		Z, mpr
+		ldi		frzcnt, 0
+
+		; Start halted
+		ldi		mpr, HaltVal
+		out		PORTB, mpr
 
 		; Set external interrupts.
 		sei
@@ -254,25 +256,21 @@ RX:
 		push	mpr
 
 		lds		mpr, UDR1
-		cpi		mpr, FrzCmd		; Did I get the freeze command?
-		brne	MOVE
-		ldi		mpr, Halt
+		cpi		mpr, FrzSig		; Did I get the freeze signal?
+		brne	MOVE			; If not, move.
+		ldi		mpr, HaltVal	; Otherwise, stop.
 		out		PORTB, mpr
-		ldi		ZL,  low(FrzCnt)
-		ldi		ZH, high(FrzCnt)
-		ld		mpr, Z
-		inc		mpr				; Count number of times frozen
-		st		Z, mpr
-		cpi		mpr, 3			; Have I been frozen 3 times?
-		brne	FRZTMP
-FRZPRM:							; Freeze permanently
+		inc		frzcnt			; Count number of times frozen
+		cpi		frzcnt, 3		; Have I been frozen 3 times?
+		brne	FRZTMP			; If not, freeze temporarily.
+FRZPRM:							; Otherwise, freeze permanently.
 		ldi		mpr, $FF
 		out		PORTB, mpr
 		rjmp	FRZPRM
 FRZTMP:							; Freeze temporarily
-		ldi		mpr, 0b10101010
+		ldi		mpr, FrzSig
 		out		PORTB, mpr
-		ldi		ilcnt, 5		; ..for 5 seconds
+		ldi		ilcnt, 1		; ..for 5 seconds
 FRZWAIT:
 		rcall	Wait
 		dec		ilcnt
@@ -330,16 +328,54 @@ TURNL:
 		rjmp	ENDRX
 
 HALT:
-		; Check for halt tcommand
+		; Check for halt command
 		cpi		mpr, HaltCmd
-		brne	ENDRX
+		brne	FRZ
 		ldi		mpr, HaltVal
 		out		PORTB, mpr
 		rcall	WaitShort
 		rjmp	ENDRX
 
+FRZ:
+		; Check for freeze command
+		cpi		mpr, FrzCmd
+		brne	ENDRX
+		ldi		mpr, TurnRCmd;FrzSig
+		out		PORTB, mpr
+		rcall	TXFRZ					; Emit freeze signal
+		rcall	WaitShort
+		rjmp	ENDRX
+
 ENDRX:
 		sei
+		ret
+
+
+;----------------------------------------------------------------
+; Sub:	TXFRZ
+; Desc:	Emit freeze signal
+;----------------------------------------------------------------
+TXFRZ:
+		; Send action code
+		rcall	TXPUSH
+		sts		UDR1, mpr
+		out		PORTB, mpr
+		rcall	Wait
+
+		ret
+
+TXPUSH:
+		push	mpr
+		ldi		ZL,  low(UCSR1A)
+		ldi		ZH, high(UCSR1A)
+		ld		mpr, Z
+TXPUSHLOOP:
+		andi	mpr, (1<<UDRE1)
+		cpi		mpr, (1<<UDRE1)
+		brne	TXPUSHLOOP
+		ldi		mpr, (1<<UDRE1)
+		st		Z, mpr
+		pop		mpr
 		ret
 
 
