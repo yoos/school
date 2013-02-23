@@ -177,7 +177,10 @@ FRZSIM:	; Check for freeze sim button press
 		rcall	TXPUSH
 		sts		UDR1, mpr
 		out		PORTB, mpr
-		rcall	WAIT
+		ldi		ilcnt, 10		; load ilcnt register
+FSLoop:	rcall	WAIT
+		dec		ilcnt			; decrement ilcnt
+		brne	FSLoop			; Continue Inner Loop
 
 		rjmp	MAIN
 
@@ -193,7 +196,7 @@ TX:
 
 		; Send device ID
 		ldi		mpr, DevID
-		sts		UDR1, mpr
+		rcall	TXPUSH
 
 		pop		mpr
 		out		SREG, mpr
@@ -202,8 +205,6 @@ TX:
 
 		; Send action code
 		rcall	TXPUSH
-		sts		UDR1, mpr
-		out		PORTB, mpr
 		rcall	WAIT
 
 		ret
@@ -217,9 +218,9 @@ TXPUSHLOOP:
 		andi	mpr, (1<<UDRE1)
 		cpi		mpr, (1<<UDRE1)
 		brne	TXPUSHLOOP
-		ldi		mpr, (1<<UDRE1)
-		st		Z, mpr
 		pop		mpr
+		sts		UDR1, mpr
+		out		PORTB, mpr
 		ret
 
 ;----------------------------------------------------------------
