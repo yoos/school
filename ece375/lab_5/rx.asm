@@ -161,7 +161,7 @@ INIT:
 
 		; Freeze count starts at four and decrements -- for some reason, the RX
 		; interrupt seems to trigger at the beginning of every program cycle?
-		ldi		frzcnt, 4
+		ldi		frzcnt, 8
 
 		; Set external interrupts.
 		sei
@@ -254,7 +254,14 @@ HitLeft:
 RX:
 		cli
 		push	mpr
+		in		mpr, SREG
+		push	mpr
 
+RXWAIT:							; Wait for command
+		lds		mpr, UCSR1A
+		andi	mpr, (1<<RXC1)	; Receive complete?
+		cpi		mpr, (1<<RXC1)
+		brne	RXWAIT
 		lds		mpr, UDR1
 		cpi		mpr, FrzSig		; Did I get the freeze signal?
 		brne	MOVE			; If not, move.
@@ -267,7 +274,7 @@ FRZPRM:							; Otherwise, freeze permanently.
 FRZTMP:							; Freeze temporarily
 		ldi		mpr, FrzSig
 		out		PORTB, mpr
-		ldi		ilcnt, 5		; ..for 5 seconds
+		ldi		ilcnt, 2		; ..for 5 seconds
 FRZWAIT:
 		rcall	Wait
 		dec		ilcnt
@@ -340,8 +347,8 @@ FRZ:
 
 ENDRX:
 		pop		mpr
-		out		PORTB, mpr
-
+		out		SREG, mpr
+		pop		mpr
 		sei
 		ret
 
@@ -358,9 +365,9 @@ TXPUSHLOOP:
 		andi	mpr, (1<<UDRE1)
 		cpi		mpr, (1<<UDRE1)
 		brne	TXPUSHLOOP
-		ldi		mpr, FrzSig
-		sts		UDR1, mpr
 		pop		mpr
+
+		sts		UDR1, mpr
 
 		ret
 
