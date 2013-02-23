@@ -161,7 +161,7 @@ INIT:
 
 		; Freeze count starts at four and decrements -- for some reason, the RX
 		; interrupt seems to trigger at the beginning of every program cycle?
-		ldi		frzcnt, 8
+		ldi		frzcnt, 7
 
 		; Set external interrupts.
 		sei
