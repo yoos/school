@@ -51,11 +51,11 @@ void openfile()
         //if it returns with error (-1) exit with status 1\
 
     // Initialize white nunchuck
-    if(i2c_smbus_write_byte(file, 0xf0) == -1) {
+    if(i2c_smbus_write_byte(file, 0x40) == -1) {
         printf("error..., something is wrong  gvcn jhbv %s\n", strerror(errno));
         exit(1);
     }
-    if(i2c_smbus_write_byte(file, 0x40) == -1) {
+    if(i2c_smbus_write_byte(file, 0x00) == -1) {
         printf("error..., something is wrong %s\n", strerror(errno));
         exit(1);
     }
