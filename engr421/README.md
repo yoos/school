@@ -3,3 +3,10 @@
 This directory houses all code related to the Applied Robotics class taken
 Spring term 2013.
 
+
+## Thoughts and todo's
+
+Use a permanent magnet to pull BBs faster into firing chamber? The magnet
+should be weak enough that once the BB is grabbed by the wheel, it should
+easily break away.
+
