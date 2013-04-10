@@ -12,7 +12,13 @@
 ## 04/04
   * Review data contruction.
 
+## 04/09
+  * Quiz: Note that
+        head :: [a] -> a
+        tail :: [a] -> [a]
+
 <!--
 vim: syntax=markdown
+vim: expandtab
 -->
 

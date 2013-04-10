@@ -51,3 +51,23 @@ find i (Node j l r) | i==j      = True
 --find i (Node j l r) = i==j ||| find i l || find i r   -- Alternative solution
 
 
+
+plus :: Int -> Int -> Int   -- If I don't specify this type, Haskell will infer the function type.
+plus x y = x+y
+
+ones = 1:ones
+tenones = take 10 ones
+
+nats = 1:map succ nats   -- To understand how this works, try expanding the recursion.
+
+evens = map (*2) nats
+evens' = 2:map (+2) evens'
+evens'' = filter even nats
+
+
+
+
+
+
+
+
