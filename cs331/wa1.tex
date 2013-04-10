@@ -1,0 +1,81 @@
+\documentclass[10pt,letterpaper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{fancyhdr}
+\usepackage[utf8]{inputenc}
+\usepackage{palatino}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage[hang,bf,small]{caption}
+\usepackage{amsmath,amssymb,amsthm}
+
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{1em}
+
+\hypersetup{colorlinks,
+	linkcolor = black,
+	citecolor = black,
+	urlcolor  = black}
+\urlstyle{same}
+
+\begin{document}
+
+\begin{titlepage}
+	\vspace*{4cm}
+	\begin{flushright}
+	{\huge
+		Written Assignment \#1 \\ [3cm]
+	}
+	{\large
+		CS 331
+	}
+	\end{flushright}
+
+	\begin{flushright}
+	Soo-Hyun Yoo
+	\end{flushright}
+\end{titlepage}
+
+\section*{Written Assignment \#1}
+
+\begin{enumerate}
+	\item
+		\begin{enumerate}
+			\item
+				\begin{itemize}
+					\item Performance Measure: Cheapest, usable condition, fast
+						shipping, good customer service
+					\item Environment: Vendors, other buyers
+					\item Actuators: Capability of crawling the web
+					\item Sensors: Capability of parsing web pages
+				\end{itemize}
+			\item
+				\begin{itemize}
+					\item Partially observable (cannot see all of the Internet
+						at once)
+					\item Strategic (other buyers are making purchases at
+						unknown times)
+					\item Sequential (a decision to reconsider a listing later
+						may result in the item being sold to another buyer)
+					\item Dynamic (the Internet is always changing)
+					\item Continuous (purchases can be made at any time)
+					\item Single agent (although there are other buyers, we are
+						dealing with only a single agent we can control)
+				\end{itemize}
+			\item A utility-based agent would be most appropriate here.
+				A simple reflex agent will be unable to compare all available
+				deals. A model-based reflex agent may be able to find available
+				deals but be unable to pick out the best. A goal-based agent is
+				not useful in determining the best deal (it may be useful in
+				finding the deals, but that is not the focus here).
+				A utility-based agent will be able to weigh the different
+				performance measures and decide on the best deal, which may or
+				may not maximize any one of the performance measures but result
+				in an overall ``happiest'' state.
+		\end{enumerate}
+	\item 
+
+\end{enumerate}
+
+\end{document}
+
