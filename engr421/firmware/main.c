@@ -1,6 +1,14 @@
 #include <ch.h>
 #include <hal.h>
 
+#include <chsprintf.h>
+
+#include <cb_adc.h>
+#include <cb_pid.h>
+#include <cb_comm.h>
+#include <cb_motor.h>
+#include <cb_config.h>
+
 /*
  * Blue LED blinker thread, times are in milliseconds.
  */
