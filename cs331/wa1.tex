@@ -73,8 +73,40 @@
 				may not maximize any one of the performance measures but result
 				in an overall ``happiest'' state.
 		\end{enumerate}
-	\item 
 
+	\item
+		\begin{enumerate}
+			\item Yes. A lookup table is one way with which to map a percept
+				sequence to action. On the other hand, a function may be able
+				to do the same without the need for a table stored in memory.
+			\item Yes. No agent program can implement the agent function of
+				breaking out of an enclosed maze, or calculating the last digit
+				of $\sqrt{2}$.
+			\item Yes. If the agent program does not change, its function
+				cannot change.
+			\item $2^n$ agent programs.
+			\item It depends. If the agent program implements a wait function
+				that depends on the number of processor cycles as its timer,
+				the agent function will change. On the other hand, if the agent
+				function sat and did nothing, no change to the machine would
+				change the agent function.
+		\end{enumerate}
+
+	\item
+		\begin{enumerate}
+			\item Yes. An agent function that cleans the square if it is dirty
+				and moves on otherwise could allow the robot to eventually
+				cover the entire environment, regardless of extent, boundaries,
+				or obstacles.
+			\item Yes. A deterministic agent function may become stuck in
+				a loop and consequently miss parts of the environment.
+				A randomized agent function has at least a chance of covering
+				the entire environment.
+			\item Yes. An agent with state can distinguish between two global
+				states with the same percepts but which are actually different
+				situations. This can further help the agent avoid infinite
+				loops.
+		\end{enumerate}
 \end{enumerate}
 
 \end{document}
