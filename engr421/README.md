@@ -15,3 +15,7 @@ chamber.
 
 Get some magnet wire from Rugh's.
 
+Capture some videos of BBs traveling at 10 ft/s with PS3Eye cameras.
+
+SIFT, then use a matcher like FLANN.
+
