@@ -1,0 +1,14 @@
+<package>
+  <description brief="cb_vision">
+
+     cb_vision
+
+  </description>
+  <author>osuar</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/cb_vision</url>
+
+</package>
+
+
