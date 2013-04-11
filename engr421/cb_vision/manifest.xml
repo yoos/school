@@ -9,6 +9,8 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/cb_vision</url>
 
+  <depend package="gscam"/>
+
 </package>
 
 
