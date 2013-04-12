@@ -1,7 +1,12 @@
 <launch>
 	<include file="$(find cb_vision)/launch/gscam.launch"/>
+	<param name="/cmvision/color_file" value="$(find cb_vision)/cmvision_colors.txt"/>
+	<param name="/cmvision/mean_shift_on" value="false"/>
+	<param name="/cmvision/debug_on" value="true"/>
+	<param name="/cmvision/spatial_radius_pix" value="0"/>
+	<param name="/cmvision/color_radius_pix" value="0"/>
 
-	<node name="cb_colorgui" pkg="cmvision" type="colorgui" respawn="false" output="screen">
+	<node name="cb_cmvision" pkg="cmvision" type="cmvision" respawn="false" output="screen">
 		<remap from="image" to="/gscam/image_raw"/>
 	</node>
 </launch>
