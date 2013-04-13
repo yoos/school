@@ -74,7 +74,7 @@ CSRC = $(PORTSRC) \
        $(HALSRC) \
        $(PLATFORMSRC) \
        $(BOARDSRC) \
-       main.c
+       main.c chsprintf.c
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
@@ -118,7 +118,7 @@ INCDIR = $(PORTINC) $(KERNINC) \
 MCU  = cortex-m0
 
 #TRGT = arm-elf-
-TRGT = arm-eabi-
+TRGT = arm-linux-gnueabi-
 CC   = $(TRGT)gcc
 CPPC = $(TRGT)g++
 # Enable loading with g++ only if you need C++ runtime support.
