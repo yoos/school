@@ -74,7 +74,7 @@ CSRC = $(PORTSRC) \
        $(HALSRC) \
        $(PLATFORMSRC) \
        $(BOARDSRC) \
-       main.c chsprintf.c
+       main.c cb_adc.c chsprintf.c
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
