@@ -23,22 +23,32 @@ static msg_t Thread1(void *arg) {
 		palSetPad(GPIOC, GPIOC_LED4);
 		chThdSleepMilliseconds(500);
 	}
+
+	return 0;
 }
 
 /*
  * Green LED blinker thread, times are in milliseconds.
  */
-static WORKING_AREA(waThread2, 128);
+static WORKING_AREA(waThread2, 500);
 static msg_t Thread2(void *arg) {
 
 	(void)arg;
 	chRegSetThreadName("blinker2");
+
+	uint8_t txbuf[100];
+
 	while (TRUE) {
 		palClearPad(GPIOC, GPIOC_LED3);
 		chThdSleepMilliseconds(250);
 		palSetPad(GPIOC, GPIOC_LED3);
 		chThdSleepMilliseconds(250);
+
+		chsprintf(txbuf, "Hello world!\r\n");
+		uartStartSend(&UARTD1, sizeof(txbuf), txbuf);
 	}
+
+	return 0;
 }
 
 /*
@@ -55,6 +65,8 @@ int main(void) {
 	 */
 	halInit();
 	chSysInit();
+
+	setup_comm();
 
 	/*
 	 * Creates the blinker threads.
