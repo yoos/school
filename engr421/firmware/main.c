@@ -11,33 +11,6 @@
 
 
 /*
- * Blink orange LED.
- */
-static WORKING_AREA(wa_led_thread, 128);
-static msg_t led_thread(void *arg)
-{
-	(void) arg;
-	chRegSetThreadName("blinker");
-	systime_t time = chTimeNow();
-
-	while (TRUE) {
-		time += MS2ST(1000);   // Next deadline in 1 second.
-
-		palSetPad(GPIOD, GPIOD_LED3);
-		chThdSleepMilliseconds(50);
-		palClearPad(GPIOD, GPIOD_LED3);
-		chThdSleepMilliseconds(100);
-		palSetPad(GPIOD, GPIOD_LED3);
-		chThdSleepMilliseconds(50);
-		palClearPad(GPIOD, GPIOD_LED3);
-
-		chThdSleepUntil(time);
-	}
-
-	return 0;
-}
-
-/*
  * Communications loop
  */
 static WORKING_AREA(wa_comm_thread, 1280);
@@ -144,26 +117,41 @@ static msg_t control_thread(void *arg)
 {
 	(void) arg;
 	chRegSetThreadName("control");
-
-	setup_motors();
-
 	systime_t time = chTimeNow();
+
 	float i = 0;
-	uint8_t j;
-	float dir = 0.2;
+	uint16_t j;
+	uint16_t k = 0;
+	float dir = 0.0001;
 	float dc[8];
 
 	while (TRUE) {
-		time += MS2ST(1);   // Next deadline in 1 ms.   TODO: Any sooner than this, and I2C stops working.
+		time += MS2ST(CONTROL_LOOP_DT);   // Next deadline in 1 ms.   TODO: Any sooner than this, and I2C stops working.
 		i += dir;
-		if (i > 1000.0) dir = -0.2;
-		if (i < 0.0) dir = 0.2;
+		if (i > 1.0) dir = -0.0001;
+		if (i < 0.0) dir = 0.0001;
 
 		for (j=0; j<8; j++) {
 			dc[j] = i;
 		}
 
 		update_motors(dc);
+
+		/* Blink status LED. */
+		if (k < MS2ST(50)) {
+			palSetPad(GPIOD, GPIOD_LED3);
+		}
+		else if (k < MS2ST(150)) {
+			palClearPad(GPIOD, GPIOD_LED3);
+		}
+		else if (k < MS2ST(200)) {
+			palSetPad(GPIOD, GPIOD_LED3);
+		}
+		else {
+			palClearPad(GPIOD, GPIOD_LED3);
+		}
+
+		k = (k++) % MS2ST(1000);
 
 		chThdSleepUntil(time);
 	}
@@ -191,15 +179,12 @@ int main(void)
 
 	setup_adc();
 
+	setup_motors();
+
 	/*
 	 * Short delay to let the various setup functions finish.
 	 */
 	chThdSleepMilliseconds(1);
-
-	/*
-	 * Create the LED thread.
-	 */
-	chThdCreateStatic(wa_led_thread, sizeof(wa_led_thread), NORMALPRIO, led_thread, NULL);
 
 	/*
 	 * Create the communications thread.
