@@ -123,7 +123,7 @@ static msg_t control_thread(void *arg)
 	uint16_t j;
 	uint16_t k = 0;
 	float dir = 0.0001;
-	float dc[8];
+	float dc[12];
 
 	while (TRUE) {
 		time += MS2ST(CONTROL_LOOP_DT);   // Next deadline in 1 ms.   TODO: Any sooner than this, and I2C stops working.
@@ -131,7 +131,7 @@ static msg_t control_thread(void *arg)
 		if (i > 1.0) dir = -0.0001;
 		if (i < 0.0) dir = 0.0001;
 
-		for (j=0; j<8; j++) {
+		for (j=0; j<12; j++) {
 			dc[j] = i;
 		}
 
