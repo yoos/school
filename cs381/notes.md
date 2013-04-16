@@ -17,6 +17,12 @@
         head :: [a] -> a
         tail :: [a] -> [a]
 
+# 04/16
+  * Abstract vs concrete syntaxes.
+  * Pretty printer (and parser, which is pretty print in reverse) using abstract syntax?
+  * When writing grammars, consider features of the metalanguage and how they can help me.
+
+
 <!--
 vim: syntax=markdown
 vim: expandtab
