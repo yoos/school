@@ -3,16 +3,17 @@
 void setup_motors()
 {
 	pwmStart(&PWMD1, &pwm1cfg);
-	pwmStart(&PWMD8, &pwm8cfg);
 
 	palSetPadMode(GPIOA, 8,  PAL_MODE_ALTERNATE(1));
-	palSetPadMode(GPIOA, 9,  PAL_MODE_ALTERNATE(1));
 	palSetPadMode(GPIOA, 10, PAL_MODE_ALTERNATE(1));
 	palSetPadMode(GPIOA, 11, PAL_MODE_ALTERNATE(1));
-	palSetPadMode(GPIOC, 6,  PAL_MODE_ALTERNATE(1));
-	palSetPadMode(GPIOC, 7,  PAL_MODE_ALTERNATE(1));
-	palSetPadMode(GPIOC, 8,  PAL_MODE_ALTERNATE(1));
-	palSetPadMode(GPIOC, 9,  PAL_MODE_ALTERNATE(1));
+
+	pwmStart(&PWMD8, &pwm8cfg);
+
+	palSetPadMode(GPIOC, 6,  PAL_MODE_ALTERNATE(3));
+	palSetPadMode(GPIOC, 7,  PAL_MODE_ALTERNATE(3));
+	palSetPadMode(GPIOC, 8,  PAL_MODE_ALTERNATE(3));
+	palSetPadMode(GPIOC, 9,  PAL_MODE_ALTERNATE(3));
 }
 
 void update_motors(float *dc)
