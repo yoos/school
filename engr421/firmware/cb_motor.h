@@ -43,10 +43,10 @@ static const PWMConfig pwm1cfg = {
 };
 
 /**
- * @brief PWM configuration structure for channels 1, 2, 3, 4 (PA0, PA1, PA2,
+ * @brief PWM configuration structure for channels 1, 2, 3, 4 (PA5, PA1, PA2,
  * PA3) of TIM2.
  */
-static const PWMConfig pwm2cfg = {
+/*static const PWMConfig pwm2cfg = {
 	200000,   // 200 kHz PWM clock frequency.
 	1000,     // PWM period 5 ms.
 	NULL,     // No callback.
@@ -57,7 +57,7 @@ static const PWMConfig pwm2cfg = {
 		{PWM_OUTPUT_ACTIVE_HIGH, NULL}
 	},
 	0   // HW dependent
-};
+};*/
 
 /**
  * @brief PWM configuration structure for channels 1, 2, 3, 4 (PC6, PC7, PC8,
