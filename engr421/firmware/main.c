@@ -31,14 +31,14 @@ static msg_t comm_thread(void *arg)
 	}
 
 	while (TRUE) {
-		time += MS2ST(234);
+		time += MS2ST(50);
 		counter++;
 
-		chsprintf(txbuf, "ICU: %d %d %d %d\r\n", get_icu(2), get_icu(3), get_icu(4), get_icu(5));
+		chsprintf(txbuf, "ICU: %d %d %d %d\r\n", (int) (get_icu(2)*1000), (int) (get_icu(3)*1000), (int) (get_icu(4)*1000), (int) (get_icu(5)*1000));
 		uartStartSend(&UARTD3, sizeof(txbuf), txbuf);
 
 		palSetPad(GPIOD, 12);
-		chThdSleepMilliseconds(50);
+		chThdSleepMilliseconds(10);
 		palClearPad(GPIOD, 12);
 
 		chThdSleepUntil(time);
