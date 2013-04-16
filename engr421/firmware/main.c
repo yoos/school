@@ -22,7 +22,7 @@ static msg_t comm_thread(void *arg)
 	systime_t time = chTimeNow();
 	int counter = 0;
 
-	uint8_t txbuf[50];
+	uint8_t txbuf[200];
 
 	/* Zero out buffer. */
 	uint8_t i;
@@ -34,7 +34,7 @@ static msg_t comm_thread(void *arg)
 		time += MS2ST(234);
 		counter++;
 
-		chsprintf(txbuf, "Je vis! %d %d %d %d\r\n", 1, 2, 3, 4);
+		chsprintf(txbuf, "ICU: %d %d %d %d\r\n", get_icu(2), get_icu(3), get_icu(4), get_icu(5));
 		uartStartSend(&UARTD3, sizeof(txbuf), txbuf);
 
 		palSetPad(GPIOD, 12);
