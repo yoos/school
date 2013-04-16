@@ -36,9 +36,9 @@ static msg_t comm_thread(void *arg)
 		chsprintf(txbuf, "Hello world!");
 		uartStartSend(&UARTD1, sizeof(txbuf), txbuf);
 
-		palSetPad(GPIOD, GPIOD_LED4);
+		palSetPad(GPIOD, 12);
 		chThdSleepMilliseconds(50);
-		palClearPad(GPIOD, GPIOD_LED4);
+		palClearPad(GPIOD, 12);
 
 		chThdSleepUntil(time);
 	}
@@ -72,9 +72,9 @@ static msg_t comm_thread_2(void *arg)
 		chsprintf(txbuf, "Je vis! %d %d %d %d\r\n", 1, 2, 3, 4);
 		uartStartSend(&UARTD3, sizeof(txbuf), txbuf);
 
-		palSetPad(GPIOD, GPIOD_LED5);
+		palSetPad(GPIOD, 14);
 		chThdSleepMilliseconds(50);
-		palClearPad(GPIOD, GPIOD_LED5);
+		palClearPad(GPIOD, 14);
 
 		chThdSleepUntil(time);
 	}
@@ -139,16 +139,16 @@ static msg_t control_thread(void *arg)
 
 		/* Blink status LED. */
 		if (k < MS2ST(50)) {
-			palSetPad(GPIOD, GPIOD_LED3);
+			palSetPad(GPIOD, 13);
 		}
 		else if (k < MS2ST(150)) {
-			palClearPad(GPIOD, GPIOD_LED3);
+			palClearPad(GPIOD, 13);
 		}
 		else if (k < MS2ST(200)) {
-			palSetPad(GPIOD, GPIOD_LED3);
+			palSetPad(GPIOD, 13);
 		}
 		else {
-			palClearPad(GPIOD, GPIOD_LED3);
+			palClearPad(GPIOD, 13);
 		}
 
 		k = (k++) % MS2ST(1000);
