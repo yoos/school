@@ -34,7 +34,7 @@ static msg_t comm_thread(void *arg)
 			txbuf[i] = 0;
 		}
 
-		chsprintf(txbuf, "ICU: %d %d %d %d\r\n", (int) (get_icu(2)*1000), (int) (get_icu(3)*1000), (int) (get_icu(4)*1000), (int) (get_icu(5)*1000));
+		chsprintf(txbuf, "ICU: %6d %6d %6d %6d\r\n", (int) (icu_get_period(2)*1000000), (int) (icu_get_period(3)*1000000), (int) (icu_get_period(4)*1000000), (int) (icu_get_period(5)*1000000));
 		uartStartSend(&UARTD3, sizeof(txbuf), txbuf);
 
 		palSetPad(GPIOD, 12);
