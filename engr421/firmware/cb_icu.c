@@ -5,6 +5,45 @@ icucnt_t icu3_last_width, icu3_last_period;
 icucnt_t icu4_last_width, icu4_last_period;
 icucnt_t icu5_last_width, icu5_last_period;
 
+void setup_icu(void)
+{
+	icuStart(&ICUD2, &icu2cfg);
+	palSetPadMode(GPIOA, 5, PAL_MODE_ALTERNATE(1));   /* This needs to be 1, not 2? WTF. */
+	icuEnable(&ICUD2);
+
+	icuStart(&ICUD3, &icu3cfg);
+	palSetPadMode(GPIOB, 4, PAL_MODE_ALTERNATE(2));
+	icuEnable(&ICUD3);
+
+	icuStart(&ICUD4, &icu4cfg);
+	palSetPadMode(GPIOB, 6, PAL_MODE_ALTERNATE(2));
+	icuEnable(&ICUD4);
+
+	icuStart(&ICUD5, &icu5cfg);
+	palSetPadMode(GPIOA, 0, PAL_MODE_ALTERNATE(2));
+	icuEnable(&ICUD5);
+}
+
+float get_icu(uint8_t icu_num)
+{
+	switch (icu_num) {
+	case 2:
+		return ((float) icu2_last_width) / ((float) icu2_last_width + (float) icu2_last_period);
+		break;
+	case 3:
+		return ((float) icu3_last_width) / ((float) icu3_last_width + (float) icu3_last_period);
+		break;
+	case 4:
+		return ((float) icu4_last_width) / ((float) icu4_last_width + (float) icu4_last_period);
+		break;
+	case 5:
+		return ((float) icu5_last_width) / ((float) icu5_last_width + (float) icu5_last_period);
+		break;
+	default:
+		return 0;
+	}
+}
+
 void icu2widthcb(ICUDriver *icup)
 {
 	palSetPad(GPIOD, 15);
@@ -51,24 +90,5 @@ void icu5periodcb(ICUDriver *icup)
 {
 	palClearPad(GPIOD, 15);
 	icu5_last_period = icuGetPeriod(icup);
-}
-
-void setup_icu(void)
-{
-	icuStart(&ICUD2, &icu2cfg);
-	palSetPadMode(GPIOA, 5, PAL_MODE_ALTERNATE(1));   /* This needs to be 1, not 2? WTF. */
-	icuEnable(&ICUD2);
-
-	icuStart(&ICUD3, &icu3cfg);
-	palSetPadMode(GPIOB, 4, PAL_MODE_ALTERNATE(2));
-	icuEnable(&ICUD3);
-
-	icuStart(&ICUD4, &icu4cfg);
-	palSetPadMode(GPIOB, 6, PAL_MODE_ALTERNATE(2));
-	icuEnable(&ICUD4);
-
-	icuStart(&ICUD5, &icu5cfg);
-	palSetPadMode(GPIOA, 0, PAL_MODE_ALTERNATE(2));
-	icuEnable(&ICUD5);
 }
 
