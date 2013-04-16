@@ -24,15 +24,15 @@ static msg_t comm_thread(void *arg)
 
 	uint8_t txbuf[200];
 
-	/* Zero out buffer. */
-	uint8_t i;
-	for (i=0; i<sizeof(txbuf); i++) {
-		txbuf[i] = 0;
-	}
-
 	while (TRUE) {
 		time += MS2ST(50);
 		counter++;
+
+		/* Zero out buffer. */
+		uint8_t i;
+		for (i=0; i<sizeof(txbuf); i++) {
+			txbuf[i] = 0;
+		}
 
 		chsprintf(txbuf, "ICU: %d %d %d %d\r\n", (int) (get_icu(2)*1000), (int) (get_icu(3)*1000), (int) (get_icu(4)*1000), (int) (get_icu(5)*1000));
 		uartStartSend(&UARTD3, sizeof(txbuf), txbuf);
