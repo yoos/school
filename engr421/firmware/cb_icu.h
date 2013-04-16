@@ -13,8 +13,19 @@ void setup_icu(void);
  * @brief Get ICU capture duty cycle.
  *
  * @param icu_num The number of the ICU whose duty cycle we wish to fetch.
+ *
+ * @output Duty cycle in seconds.
  */
-float get_icu(uint8_t icu_num);
+float icu_get_duty_cycle(uint8_t icu_num);
+
+/**
+ * @brief Get ICU capture period.
+ *
+ * @param icu_num The number of the ICU whose period we wish to fetch.
+ *
+ * @output Period in seconds.
+ */
+float icu_get_period(uint8_t icu_num);
 
 /**
  * @brief Callback at end of ICU2 active period.

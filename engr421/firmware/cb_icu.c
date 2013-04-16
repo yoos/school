@@ -24,7 +24,7 @@ void setup_icu(void)
 	icuEnable(&ICUD5);
 }
 
-float get_icu(uint8_t icu_num)
+float icu_get_duty_cycle(uint8_t icu_num)
 {
 	float output;
 
@@ -40,6 +40,30 @@ float get_icu(uint8_t icu_num)
 		break;
 	case 5:
 		output = ((float) icu5_last_width) / ((float) icu5_last_period);
+		break;
+	default:
+		output = 0;
+	}
+
+	return output;
+}
+
+float icu_get_period(uint8_t icu_num)
+{
+	float output;
+
+	switch (icu_num) {
+	case 2:
+		output = (float) icu2_last_period;
+		break;
+	case 3:
+		output = (float) icu3_last_period;
+		break;
+	case 4:
+		output = (float) icu4_last_period;
+		break;
+	case 5:
+		output = (float) icu5_last_period;
 		break;
 	default:
 		output = 0;
