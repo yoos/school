@@ -10,42 +10,49 @@
 void setup_icu(void);
 
 /**
- * @brief Callback at beginning of ICU2 active period.
+ * @brief Get ICU capture duty cycle.
+ *
+ * @param icu_num The number of the ICU whose duty cycle we wish to fetch.
+ */
+float get_icu(uint8_t icu_num);
+
+/**
+ * @brief Callback at end of ICU2 active period.
  */
 void icu2widthcb(ICUDriver *icup);
 
 /**
- * @brief Callback at beginning of ICU2 inactive period.
+ * @brief Callback at end of ICU2 inactive period.
  */
 void icu2periodcb(ICUDriver *icup);
 
 /**
- * @brief Callback at beginning of ICU3 active period.
+ * @brief Callback at end of ICU3 active period.
  */
 void icu3widthcb(ICUDriver *icup);
 
 /**
- * @brief Callback at beginning of ICU3 inactive period.
+ * @brief Callback at end of ICU3 inactive period.
  */
 void icu3periodcb(ICUDriver *icup);
 
 /**
- * @brief Callback at beginning of ICU4 active period.
+ * @brief Callback at end of ICU4 active period.
  */
 void icu4widthcb(ICUDriver *icup);
 
 /**
- * @brief Callback at beginning of ICU4 inactive period.
+ * @brief Callback at end of ICU4 inactive period.
  */
 void icu4periodcb(ICUDriver *icup);
 
 /**
- * @brief Callback at beginning of ICU5 active period.
+ * @brief Callback at end of ICU5 active period.
  */
 void icu5widthcb(ICUDriver *icup);
 
 /**
- * @brief Callback at beginning of ICU5 inactive period.
+ * @brief Callback at end of ICU5 inactive period.
  */
 void icu5periodcb(ICUDriver *icup);
 
