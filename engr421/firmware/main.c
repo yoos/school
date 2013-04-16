@@ -6,6 +6,7 @@
 #include <cb_adc.h>   // ADC code
 #include <cb_pid.h>   // PID function definition
 #include <cb_comm.h>   // Communications code
+#include <cb_icu.h>   // ICU code
 #include <cb_motor.h>   // Motor control
 #include <cb_config.h>   // General configuration
 
@@ -15,42 +16,6 @@
  */
 static WORKING_AREA(wa_comm_thread, 1280);
 static msg_t comm_thread(void *arg)
-{
-	(void) arg;
-	chRegSetThreadName("communications");
-	systime_t time = chTimeNow();
-	int counter = 0;
-
-	uint8_t txbuf[200];
-
-	while (TRUE) {
-		time += MS2ST(100);
-		counter++;
-
-		/* Zero out buffer. */
-		uint8_t i;
-		for (i=0; i<sizeof(txbuf); i++) {
-			txbuf[i] = 0;
-		}
-
-		chsprintf(txbuf, "Hello world!");
-		uartStartSend(&UARTD1, sizeof(txbuf), txbuf);
-
-		palSetPad(GPIOD, 12);
-		chThdSleepMilliseconds(50);
-		palClearPad(GPIOD, 12);
-
-		chThdSleepUntil(time);
-	}
-
-	return 0;
-}
-
-/*
- * Second communications loop
- */
-static WORKING_AREA(wa_comm_thread_2, 1280);
-static msg_t comm_thread_2(void *arg)
 {
 	(void) arg;
 	chRegSetThreadName("communications 2");
@@ -72,9 +37,9 @@ static msg_t comm_thread_2(void *arg)
 		chsprintf(txbuf, "Je vis! %d %d %d %d\r\n", 1, 2, 3, 4);
 		uartStartSend(&UARTD3, sizeof(txbuf), txbuf);
 
-		palSetPad(GPIOD, 14);
+		palSetPad(GPIOD, 12);
 		chThdSleepMilliseconds(50);
-		palClearPad(GPIOD, 14);
+		palClearPad(GPIOD, 12);
 
 		chThdSleepUntil(time);
 	}
@@ -99,9 +64,9 @@ static msg_t adc_thread(void *arg)
 
 		uint16_t dutyCycle = avg_ch[3] * 500/4096 + 1;   // TODO: The +1 at the end makes this work. Why?
 
-		palSetPad(GPIOD, 15);
+		palSetPad(GPIOD, 14);
 		chThdSleepMilliseconds(dutyCycle);
-		palClearPad(GPIOD, 15);
+		palClearPad(GPIOD, 14);
 
 		chThdSleepUntil(time);
 	}
@@ -123,7 +88,7 @@ static msg_t control_thread(void *arg)
 	uint16_t j;
 	uint16_t k = 0;
 	float dir = 0.0001;
-	float dc[12];
+	float dc[8];
 
 	while (TRUE) {
 		time += MS2ST(CONTROL_LOOP_DT);   // Next deadline in 1 ms.   TODO: Any sooner than this, and I2C stops working.
@@ -179,6 +144,8 @@ int main(void)
 
 	setup_adc();
 
+	setup_icu();
+
 	setup_motors();
 
 	/*
@@ -187,14 +154,9 @@ int main(void)
 	chThdSleepMilliseconds(1);
 
 	/*
-	 * Create the communications thread.
-	 */
-	chThdCreateStatic(wa_comm_thread, sizeof(wa_comm_thread), NORMALPRIO, comm_thread, NULL);
-
-	/*
 	 * Create the second communications thread.
 	 */
-	chThdCreateStatic(wa_comm_thread_2, sizeof(wa_comm_thread_2), NORMALPRIO, comm_thread_2, NULL);
+	chThdCreateStatic(wa_comm_thread, sizeof(wa_comm_thread), NORMALPRIO, comm_thread, NULL);
 
 	/*
 	 * Create the ADC thread.
