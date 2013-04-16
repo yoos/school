@@ -5,7 +5,7 @@
 #include <hal.h>
 
 /* Total number of channels to be sampled by a single ADC operation.*/
-#define ADC_NUM_CHANNELS   6
+#define ADC_NUM_CHANNELS   4
 
 /* Depth of the conversion buffer, channels are sampled four times each.*/
 #define ADC_GRP1_BUF_DEPTH      4
@@ -47,15 +47,12 @@ static const ADCConversionGroup adcgrpcfg = {
 	ADC_SMPR1_SMP_AN12(ADC_SAMPLE_56) |
 	ADC_SMPR1_SMP_AN11(ADC_SAMPLE_56) |
 	ADC_SMPR1_SMP_AN10(ADC_SAMPLE_56) ,   // SMPR1 initialization data
-	ADC_SMPR2_SMP_AN5(ADC_SAMPLE_56)  |
-	ADC_SMPR2_SMP_AN4(ADC_SAMPLE_56)  ,   // SMPR2 initialization data
+	0,                                    // SMPR2 initialization data
 	ADC_SQR1_NUM_CH(ADC_NUM_CHANNELS) ,   // SQR1 initialization data
 	ADC_SQR2_SQ7_N(ADC_CHANNEL_IN13)  ,   // SQR2 initialization data
 	ADC_SQR3_SQ5_N(ADC_CHANNEL_IN12)  |
 	ADC_SQR3_SQ4_N(ADC_CHANNEL_IN11)  |
-	ADC_SQR3_SQ3_N(ADC_CHANNEL_IN10)  |
-	ADC_SQR3_SQ2_N(ADC_CHANNEL_IN5)   |
-	ADC_SQR3_SQ1_N(ADC_CHANNEL_IN4)       // SQR3 initialization data
+	ADC_SQR3_SQ3_N(ADC_CHANNEL_IN10)      // SQR3 initialization data
 };
 
 #endif // OSUAR_ADC_H
