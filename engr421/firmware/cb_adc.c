@@ -40,7 +40,7 @@ void adccb(ADCDriver *adcp, adcsample_t *buffer, size_t n) {
 	if (adcp->state == ADC_COMPLETE) {
 		int i=0;
 		for (i=0; i<4; i++) {
-			avg_ch[i] = (samples[i] + samples[i+1] + samples[i+2] + samples[i+3]) / 4;
+			avg_ch[i] = (samples[i] + samples[i+1*ADC_NUM_CHANNELS] + samples[i+2*ADC_NUM_CHANNELS] + samples[i+3*ADC_NUM_CHANNELS]) / 4;
 		}
 	}
 }
