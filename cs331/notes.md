@@ -31,6 +31,9 @@ Four types:
 # Local Search in Continuous State Space (04/15)
   * Gradient Descent -- find gradient and move that way. Learning rate 'a' can be either set to decay over time or use the second derivative.
 
+# Adversarial Search (04/17)
+  * Alpha-Beta Pruning: If certain branches in a tree have no hope of being "better" than others, prune and do not explore that branch. This allows us to look ahead in search tree significantly further in the same amount of time.
+
 Technical detail: "cost" functions need to be minimized. "utility" functions need to be maximized.
 
 HW: Try graph search (slide 48) instead of tree search, since it will detect cycles. Refer to pseudocode in book.
