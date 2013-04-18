@@ -14,15 +14,19 @@ mode           = sys.argv[3]
 outputFileName = sys.argv[4]
 
 startFile = open(startFileName, 'rU')
-startState = list(csv.reader(startFile, delimiter=','))
+startState = [[int(num) for num in bank] for bank in list(csv.reader(startFile, delimiter=','))]
 startFile.close
 
 goalFile = open(goalFileName, 'rU')
-goalState = list(csv.reader(goalFile, delimiter=','))
+goalState = [[int(num) for num in bank] for bank in list(csv.reader(goalFile, delimiter=','))]
 goalFile.close
 
 
+endState = actions.act1(startState)
+
 
 print startState
+
+print endState
 
 
