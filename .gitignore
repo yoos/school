@@ -17,3 +17,6 @@
 *.o
 *.obj
 
+# Python
+*.pyc
+
