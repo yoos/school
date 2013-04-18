@@ -24,6 +24,8 @@ def act1(gs):
     if succ[curBank][0] >= 1:
         succ[curBank][0] -= 1
         succ[endBank][0] += 1
+    else:
+        return []
 
     # Move boat to other side.
     moveBoat(succ)
@@ -32,25 +34,80 @@ def act1(gs):
 
 # Put two missionaries in the boat
 def act2(gs):
+    succ = copy.deepcopy(gs)
+
     curBank, endBank = getBanks(gs)
+
+    # Move people.
+    if succ[curBank][0] >= 2:
+        succ[curBank][0] -= 2
+        succ[endBank][0] += 2
+    else:
+        return []
+
+    # Move boat to other side.
+    moveBoat(succ)
+
+    return succ
 
 
 # Put one cannibal in the boat
 def act3(gs):
+    succ = copy.deepcopy(gs)
+
     curBank, endBank = getBanks(gs)
+
+    # Move people.
+    if succ[curBank][1] >= 1:
+        succ[curBank][1] -= 1
+        succ[endBank][1] += 1
+    else:
+        return []
+
+    # Move boat to other side.
+    moveBoat(succ)
+
+    return succ
 
 
 # Put one cannibal and one missionary in the boat
 def act4(gs):
+    succ = copy.deepcopy(gs)
+
     curBank, endBank = getBanks(gs)
+
+    # Move people.
+    if succ[curBank][0] >= 1 and succ[curBank][1] >= 1:
+        succ[curBank][0] -= 1
+        succ[endBank][0] += 1
+        succ[curBank][1] -= 1
+        succ[curBank][1] += 1
+    else:
+        return []
+
+    # Move boat to other side.
+    moveBoat(succ)
+
+    return succ
 
 
 # Put two cannibals in the boat
 def act5(gs):
+    succ = copy.deepcopy(gs)
+
     curBank, endBank = getBanks(gs)
 
+    # Move people.
+    if succ[curBank][1] >= 2:
+        succ[curBank][1] -= 2
+        succ[endBank][1] += 2
+    else:
+        return []
 
+    # Move boat to other side.
+    moveBoat(succ)
 
+    return succ
 
 
 # vim: expandtab
