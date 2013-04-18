@@ -2,6 +2,7 @@
 
 import sys
 import csv
+import actions
 
 if len(sys.argv) < 5:
 	print "Usage: " + sys.argv[0] + " [initial state file] [goal state file] [mode] [output file]"
@@ -15,6 +16,10 @@ outputFileName = sys.argv[4]
 startFile = open(startFileName, 'rU')
 startState = list(csv.reader(startFile, delimiter=','))
 startFile.close
+
+goalFile = open(goalFileName, 'rU')
+goalState = list(csv.reader(goalFile, delimiter=','))
+goalFile.close
 
 
 
