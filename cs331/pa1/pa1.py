@@ -88,11 +88,11 @@ def solution(node):
 
 solPath = []
 
-# Graph search. Takes fringe list as input and returns solution path as a list
+# Graph search. Take fringe list as input and return solution path as a list
 # (empty if solution does not exist).
 def graphSearch(fr):
     global expandCounter, maxDepth
-    closed = []
+    closed = {}
 
     while True:
         if len(fringe) == 0:
@@ -107,7 +107,7 @@ def graphSearch(fr):
         if goalTest(node):
             return solution(node)
         if node not in closed:
-            closed.append(node)
+            closed.update({node:0})
 
             successors = expand(node)
 
