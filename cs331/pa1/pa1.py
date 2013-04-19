@@ -12,6 +12,7 @@ startFileName  = sys.argv[1]
 goalFileName   = sys.argv[2]
 mode           = sys.argv[3]
 outputFileName = sys.argv[4]
+actionSeq      = []
 
 startFile = open(startFileName, 'rU')
 startState = [[int(num) for num in bank] for bank in list(csv.reader(startFile, delimiter=','))]
@@ -25,8 +26,14 @@ goalFile.close
 endState = actions.act1(startState)
 
 
-print startState
+actionSeq.append(startState)
+actionSeq.append(endState)
 
-print endState
+print actionSeq
 
+
+outputFile = open(outputFileName, 'wb')
+writer = csv.writer(outputFile, delimiter=',')
+writer.writerows(actionSeq)
+outputFile.close()
 
