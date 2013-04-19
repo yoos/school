@@ -62,6 +62,11 @@ def act(gs, actNum):
     else:
         return []
 
+    # Return empty list if cannibals outnumber a positive number of
+    # missionaries on either side.
+    if (succ[curBank][1] > succ[curBank][0] and succ[curBank][0] > 0) or (succ[endBank][1] > succ[endBank][0] and succ[endBank][0] > 0):
+        return []
+
     # Move boat to other side.
     moveBoat(succ)
 
