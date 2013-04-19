@@ -23,6 +23,14 @@ goalState = [[int(num) for num in bank] for bank in list(csv.reader(goalFile, de
 goalFile.close
 
 
+# Return true if game state is goal state. Otherwise, return false.
+def goalTest(gs):
+    if gs == goalState:
+        return True
+    return False
+
+
+
 endState = actions.act1(startState)
 
 
