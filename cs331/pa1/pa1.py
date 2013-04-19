@@ -123,6 +123,45 @@ def graphSearch(fr):
         maxFringeLen = max(maxFringeLen, len(fringe))   # Just a metric.
 
 
+# A* search heuristic is number of people on right bank x 2 - 1.
+def aStarCost(gs):
+    return (gs[1][0] + gs[1][1]) * 2 - 1
+
+# A* Search. 
+def aStarSearch(fr):
+    global expandCounter, maxFringeLen
+    closed = {}
+
+    fringe = {startState_tup:aStarCost(startState_tup)}
+
+    while True:
+        bestNodeKey = startState_tup
+        bestNodeVal = aStarCost(startState_tup)
+
+        if len(fringe) == 0:
+            return []
+        for each in fringe:
+            if aStarCost(each) < bestNodeVal:
+                bestNodeKey = each
+                bestNodeVal = aStarCost(each)
+        fringe.pop(bestNodeKey)
+        node = bestNodeKey
+
+        expandCounter += 1   # Increment this right after popping from fringe and before expanding.
+
+        if goalTest(node):
+            return solution(node)
+
+        if node not in closed:
+            closed.update({node:0})
+            successors = expand(node)
+
+            for succ in successors:
+                fringe.update({succ:aStarCost(succ)})
+
+        maxFringeLen = max(maxFringeLen, len(fringe))   # Just a metric.
+
+
 # Search.
 def search():
     global parents, actions, depth, fringe, expandCounter, maxDepth
@@ -147,6 +186,8 @@ def search():
             sol = graphSearch(fringe)
             if sol != []:
                 break
+    elif searchMode == 'astar':
+        sol = aStarSearch(fringe)
 
     return sol
 
