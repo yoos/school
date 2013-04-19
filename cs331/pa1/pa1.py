@@ -13,6 +13,7 @@ goalFileName   = sys.argv[2]
 searchMode     = sys.argv[3]
 outputFileName = sys.argv[4]
 expandCounter  = 0
+maxDepth       = 0
 
 if searchMode not in ['bfs', 'dfs', 'iddfs', 'astar']:
     print "Mode should be one of:\n    bfs: Breadth-First Search\n    dfs: Depth-First Search\n    iddfs: Iterative-Deepening Depth-First Search\n    astar: A* Search"
@@ -96,7 +97,7 @@ def graphSearch(fr):
             return []
         if searchMode == 'bfs':
             node = fringe.pop(0)   # Treat list as queue.
-        elif searchMode == 'dfs':
+        elif searchMode in ['dfs', 'iddfs']:
             node = fringe.pop()   # Treat list as stack.
 
         expandCounter += 1   # Increment this right after popping from fringe and before expanding.
@@ -105,9 +106,24 @@ def graphSearch(fr):
             return solution(node)   # TODO
         if node not in closed:
             closed.append(node)
+            if searchMode == 'iddfs':
+                if depth[node] == maxDepth:
+                    pass
             for succ in expand(node):
                 print "appending to fringe", succ
                 fringe.append(succ)
+
+
+# Search.
+def search():
+    if searchMode != 'iddfs':
+        return graphSearch(fringe)
+    else:
+        while True:
+            sol = graphSearch(fringe)
+            if sol != []:
+                return sol
+            maxDepth += 1
 
 
 
