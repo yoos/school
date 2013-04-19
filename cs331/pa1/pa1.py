@@ -5,8 +5,8 @@ import csv
 import actions
 
 if len(sys.argv) < 5:
-	print "Usage: " + sys.argv[0] + " [initial state file] [goal state file] [mode] [output file]"
-	exit()
+    print "Usage: " + sys.argv[0] + " [initial state file] [goal state file] [mode] [output file]"
+    exit()
 
 startFileName  = sys.argv[1]
 goalFileName   = sys.argv[2]
@@ -36,4 +36,8 @@ outputFile = open(outputFileName, 'wb')
 writer = csv.writer(outputFile, delimiter=',')
 writer.writerows(actionSeq)
 outputFile.close()
+
+
+
+# vim: expandtab
 
