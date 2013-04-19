@@ -103,7 +103,7 @@ def graphSearch(fr):
         expandCounter += 1   # Increment this right after popping from fringe and before expanding.
 
         if goalTest(node):
-            return solution(node)   # TODO
+            return solution(node)
         if node not in closed:
             closed.append(node)
             if searchMode == 'iddfs':
