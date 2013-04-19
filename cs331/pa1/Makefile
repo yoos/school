@@ -5,3 +5,6 @@ all:
 view:
 	okular pa1.pdf
 
+clean:
+	rm *.pyc *.aux *.log *.out out.txt
+
