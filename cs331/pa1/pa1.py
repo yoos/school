@@ -39,7 +39,7 @@ print "Start state:", startState
 
 # Return true if game state is goal state. Otherwise, return false.
 def goalTest(gs):
-    if gs == goalState:
+    if gs == goalState_tup:
         return True
     return False
 
@@ -52,22 +52,32 @@ depth = {startState_tup:0}
 def expand(gs_tup):
     successors = []
 
-    # Try all five possible actions.
-    for i in range(5):
-        s_tup = tuplify(boat.act(listify(gs_tup), i))
+    # Try all five possible actions except the one we've just tried.
+    for action in [i for i in range(5) if i != actions[gs_tup]]:
+        s_tup = tuplify(boat.act(listify(gs_tup), action))
 
         # If action was valid, add to output list.
         if s_tup != ():
             parents.update({s_tup:gs_tup})
-            actions.update({s_tup:i})
+            actions.update({s_tup:action})
             depth.update({s_tup:depth[gs_tup]+1})
             successors.append(s_tup)
-            print "Appending", s_tup
 
     return successors
 
 
 fringe = [startState_tup]
+
+def solution(node):
+    path = [node]
+    n = node
+
+    while n != startState_tup:
+        print "Node:", n, " Parent:", parents[n]
+        n = parents[n]
+        path.append(n)
+
+    return path
 
 # Graph search. Takes fringe list as input and returns solution path as a list
 # (empty if solution does not exist).
@@ -83,6 +93,7 @@ def graphSearch(fr):
         if node not in closed:
             closed.append(node)
             for succ in expand(node):
+                print "appending to fringe", succ
                 fringe.append(succ)
 
 
