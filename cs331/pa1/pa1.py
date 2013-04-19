@@ -2,7 +2,7 @@
 
 import sys
 import csv
-import actions
+import boat
 
 if len(sys.argv) < 5:
     print "Usage: " + sys.argv[0] + " [initial state file] [goal state file] [mode] [output file]"
