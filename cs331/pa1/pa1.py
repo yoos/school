@@ -14,20 +14,27 @@ mode           = sys.argv[3]
 outputFileName = sys.argv[4]
 actionSeq      = []
 
-startFile = open(startFileName, 'rU')
-startState = [[int(num) for num in bank] for bank in list(csv.reader(startFile, delimiter=','))]
-startFile.close
-
-goalFile = open(goalFileName, 'rU')
-goalState = [[int(num) for num in bank] for bank in list(csv.reader(goalFile, delimiter=','))]
-goalFile.close
-
-print "Start state:", startState
-
 
 # Take a list of lists and return a tuple of tuples
 def tuplify(lst):
     return tuple(tuple(x) for x in lst)
+
+# Take a tuple of tuples and return a list of lists
+def listify(tup):
+    return list(list(x) for x in tup)
+
+
+startFile = open(startFileName, 'rU')
+startState = [[int(num) for num in bank] for bank in list(csv.reader(startFile, delimiter=','))]
+startState_tup = tuplify(startState)
+startFile.close
+
+goalFile = open(goalFileName, 'rU')
+goalState = [[int(num) for num in bank] for bank in list(csv.reader(goalFile, delimiter=','))]
+goalState_tup = tuplify(goalState)
+goalFile.close
+
+print "Start state:", startState
 
 
 # Return true if game state is goal state. Otherwise, return false.
@@ -37,22 +44,20 @@ def goalTest(gs):
     return False
 
 
-parents = {tuplify(startState):()}
-actions = {tuplify(startState):()}
-depth = {tuplify(startState):0}
+parents = {startState_tup:()}
+actions = {startState_tup:()}
+depth = {startState_tup:0}
 
 # Expand a node. Returns the set of successors, if any exist.
-def expand(gs):
-    gs_tup = tuplify(gs)
+def expand(gs_tup):
     successors = []
 
     # Try all five possible actions.
     for i in range(5):
-        s = boat.act(gs, i)
-        s_tup = tuplify(s)
+        s_tup = tuplify(boat.act(listify(gs_tup), i))
 
         # If action was valid, add to output list.
-        if s != []:
+        if s_tup != ():
             parents.update({s_tup:gs_tup})
             actions.update({s_tup:i})
             depth.update({s_tup:depth[gs_tup]+1})
@@ -62,15 +67,37 @@ def expand(gs):
     return successors
 
 
+fringe = [startState_tup]
+
+# Graph search. Takes fringe list as input and returns solution path as a list
+# (empty if solution does not exist).
+def graphSearch(fr):
+    closed = []
+
+    while True:
+        if len(fringe) == 0:
+            return []
+        node = fringe.pop(0)
+        if goalTest(node):
+            return solution(node)   # TODO
+        if node not in closed:
+            closed.append(node)
+            for succ in expand(node):
+                fringe.append(succ)
 
 
 
-print expand(startState)
+
+
+print expand(tuplify(startState))
 print "parents:", parents
 print "actions:", actions
 print "depth:", depth
 
 
+print graphSearch(fringe)
+
+print depth[goalState_tup]
 
 
 
