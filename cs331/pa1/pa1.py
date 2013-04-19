@@ -39,7 +39,7 @@ goalState = [[int(num) for num in bank] for bank in list(csv.reader(goalFile, de
 goalState_tup = tuplify(goalState)
 goalFile.close
 
-print "Start state:", startState
+print "Start state:", startState, "\n"
 
 
 # Return true if game state is goal state. Otherwise, return false.
@@ -52,8 +52,10 @@ def goalTest(gs):
 parents = {startState_tup:()}
 actions = {startState_tup:()}
 depth = {startState_tup:0}
+fringe = [startState_tup]
 
-# Expand a node. Returns the set of successors, if any exist.
+
+# Expand a node. Return the set of successors, if any exist.
 def expand(gs_tup):
     successors = []
 
@@ -63,7 +65,8 @@ def expand(gs_tup):
 
         # If action was valid and if either the resulting successor is new or
         # its depth is less than that of the same state found previously, add
-        # to output lists.
+        # to output lists. TODO: ..then again, I don't think it's necessary to
+        # check for the depth.
         if s_tup != () and (s_tup not in parents or depth[s_tup] > depth[gs_tup]+1):
             parents.update({s_tup:gs_tup})
             actions.update({s_tup:action})
@@ -73,25 +76,23 @@ def expand(gs_tup):
     return successors
 
 
-fringe = [startState_tup]
-
 def solution(node):
     path = [node]
     n = node
 
     while n != startState_tup:
-        print "Node:", n, " Parent:", parents[n]
         n = parents[n]
         path.append(n)
 
-    return path
+    return [path[-x-1] for x in range(len(path))]
 
 solPath = []
+maxFringeLen = 0
 
 # Graph search. Take fringe list as input and return solution path as a list
 # (empty if solution does not exist).
 def graphSearch(fr):
-    global expandCounter, maxDepth
+    global expandCounter, maxDepth, maxFringeLen
     closed = {}
 
     while True:
@@ -109,59 +110,57 @@ def graphSearch(fr):
         if node not in closed:
             closed.update({node:0})
 
-            successors = expand(node)
-
+            # Don't expand node if we are at maxDepth.
             if searchMode == 'iddfs':
                 if depth[node] == maxDepth:
-                    # Push maxDepth node back onto stack.
-                    for succ in successors:
-                        fringe.append(succ)
-                    successors = []
+                    continue
+
+            successors = expand(node)
 
             for succ in successors:
-                print "appending to fringe", succ
                 fringe.append(succ)
+
+        maxFringeLen = max(maxFringeLen, len(fringe))
 
 
 # Search.
 def search():
-    global maxDepth
+    global parents, actions, depth, fringe, expandCounter, maxDepth
     sol = []
 
-    if searchMode != 'iddfs':
+    if searchMode in ['bfs', 'dfs']:
         sol = graphSearch(fringe)
-    else:
-        while maxDepth < 20:
+    elif searchMode == 'iddfs':
+        while True:
+            # Reset
+            parents = {startState_tup:()}
+            actions = {startState_tup:()}
+            depth = {startState_tup:0}
+            fringe = [startState_tup]
+
+            # Dig one level deeper
             maxDepth += 1
 
+            print "IDDFS maxDepth:", maxDepth
+
+            # Search
             sol = graphSearch(fringe)
             if sol != []:
-                return sol
-
-            print maxDepth, sol
+                break
 
     return sol
 
 
-
-
-
-
 solPath = search()
-print solPath
 
-print "Depth:", depth[goalState_tup]
-print "Counter:", expandCounter
-print "maxDepth:", maxDepth
-
-
+print "Solution depth:          ", depth[goalState_tup]
+print "Number of nodes expanded:", expandCounter
 
 
 outputFile = open(outputFileName, 'wb')
 writer = csv.writer(outputFile, delimiter=',')
 writer.writerows(solPath)
 outputFile.close()
-
 
 
 # vim: expandtab
