@@ -89,7 +89,7 @@ solPath = []
 # Graph search. Takes fringe list as input and returns solution path as a list
 # (empty if solution does not exist).
 def graphSearch(fr):
-    global expandCounter
+    global expandCounter, maxDepth
     closed = []
 
     while True:
@@ -106,35 +106,51 @@ def graphSearch(fr):
             return solution(node)
         if node not in closed:
             closed.append(node)
+
+            successors = expand(node)
+
             if searchMode == 'iddfs':
                 if depth[node] == maxDepth:
-                    pass
-            for succ in expand(node):
+                    # Push maxDepth node back onto stack.
+                    for succ in successors:
+                        fringe.append(succ)
+                    successors = []
+
+            for succ in successors:
                 print "appending to fringe", succ
                 fringe.append(succ)
 
 
 # Search.
 def search():
+    global maxDepth
+    sol = []
+
     if searchMode != 'iddfs':
-        return graphSearch(fringe)
+        sol = graphSearch(fringe)
     else:
-        while True:
+        while maxDepth < 20:
+            maxDepth += 1
+
             sol = graphSearch(fringe)
             if sol != []:
                 return sol
-            maxDepth += 1
+
+            print maxDepth, sol
+
+    return sol
 
 
 
 
 
 
-solPath = graphSearch(fringe)
+solPath = search()
 print solPath
 
 print "Depth:", depth[goalState_tup]
 print "Counter:", expandCounter
+print "maxDepth:", maxDepth
 
 
 
