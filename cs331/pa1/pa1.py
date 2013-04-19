@@ -15,14 +15,19 @@ outputFileName = sys.argv[4]
 actionSeq      = []
 
 startFile = open(startFileName, 'rU')
-startState = tuple([tuple([int(num) for num in bank]) for bank in list(csv.reader(startFile, delimiter=','))])
+startState = [[int(num) for num in bank] for bank in list(csv.reader(startFile, delimiter=','))]
 startFile.close
 
 goalFile = open(goalFileName, 'rU')
-goalState = tuple([tuple([int(num) for num in bank]) for bank in list(csv.reader(goalFile, delimiter=','))])
+goalState = [[int(num) for num in bank] for bank in list(csv.reader(goalFile, delimiter=','))]
 goalFile.close
 
 print "Start state:", startState
+
+
+# Take a list of lists and return a tuple of tuples
+def tuplify(lst):
+    return tuple(tuple(x) for x in lst)
 
 
 # Return true if game state is goal state. Otherwise, return false.
@@ -32,24 +37,42 @@ def goalTest(gs):
     return False
 
 
-# Return all possible successors of a node.
-def getSuccessors(gs):
-    out = []
+parents = {tuplify(startState):()}
+actions = {tuplify(startState):()}
+depth = {tuplify(startState):0}
+
+# Expand a node. Returns the set of successors, if any exist.
+def expand(gs):
+    gs_tup = tuplify(gs)
+    successors = []
 
     # Try all five possible actions.
     for i in range(5):
-        succ = actions.act(gs, i)
+        s = boat.act(gs, i)
+        s_tup = tuplify(s)
 
         # If action was valid, add to output list.
-        if succ != []:
-            out.append(succ)
+        if s != []:
+            parents.update({s_tup:gs_tup})
+            actions.update({s_tup:i})
+            depth.update({s_tup:depth[gs_tup]+1})
+            successors.append(s_tup)
+            print "Appending", s_tup
 
-    return out
+    return successors
 
-actionSeq.append(startState)
-actionSeq.append(endState)
 
-print actionSeq
+
+
+
+print expand(startState)
+print "parents:", parents
+print "actions:", actions
+print "depth:", depth
+
+
+
+
 
 
 outputFile = open(outputFileName, 'wb')
