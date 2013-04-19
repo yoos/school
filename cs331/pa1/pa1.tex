@@ -1,0 +1,104 @@
+\documentclass[10pt,letterpaper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{fancyhdr}
+\usepackage[utf8]{inputenc}
+\usepackage{palatino}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage[hang,bf,small]{caption}
+\usepackage{amsmath,amssymb,amsthm}
+
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{1em}
+
+\hypersetup{colorlinks,
+	linkcolor = black,
+	citecolor = black,
+	urlcolor  = black}
+\urlstyle{same}
+
+\begin{document}
+
+\begin{titlepage}
+	\vspace*{4cm}
+	\begin{flushright}
+	{\huge
+		Programming Assignment \#1 \\ [3cm]
+	}
+	{\large
+		CS 331
+	}
+	\end{flushright}
+
+	\begin{flushright}
+		19 April 2013
+		Soo-Hyun Yoo
+	\end{flushright}
+\end{titlepage}
+
+\section*{Programming Assignment \#1}
+
+\subsection*{Methodology}
+
+
+
+% Methodology: Describe the experiments you ran on the three test cases. Make sure you specify all parameters that you used for the search algorithms (eg. the depth limit in DFS, heuristic for A-star search). You can assume the reader is familiar with search algorithms and you don't need to describe how the search algorithms operate. However, the description should be complete enough that someone else can reimplement these search algorithms on their own and re-run the exact same set of experiments using the parameters you used. Make sure you explain why you chose the heuristic for A-star search.
+
+
+
+\subsection*{Results}
+
+% Results: Summarize your results for the three test cases in terms of the # of nodes on the solution path and # of nodes expanded on each test graph for each of the search techniques. Use either a table or a graph to illustrate the results.
+
+
+\begin{table}[!h]
+	\centering
+	\begin{tabular}{|l|l|l|l|} \hline
+		Search Algorithm & Solution Depth & Nodes Expanded & Time (s) \\ \hline
+		BFS   & 11 & 15 & 0.11 \\
+		DFS   & 11 & 12 & 0.11 \\
+		IDDFS & 11 & 98 & 0.13 \\
+		A*    & 11 & 13 & 0.11 \\ \hline
+	\end{tabular}
+	\caption{Results of search algorithms on test case 1.}
+	\label{tbl:case1}
+\end{table}
+
+\begin{table}[!h]
+	\centering
+	\begin{tabular}{|l|l|l|l|} \hline
+		Search Algorithm & Solution Depth & Nodes Expanded & Time (s) \\ \hline
+		BFS   & 33 & 73 & 0.12 \\
+		DFS   & 33 & 47 & 0.12 \\
+		IDDFS & 33 & 1391 & 0.35 \\
+		A*    & 33 & 47 & 0.12 \\ \hline
+	\end{tabular}
+	\caption{Results of search algorithms on test case 2.}
+	\label{tbl:case2}
+\end{table}
+
+\begin{table}[!h]
+	\centering
+	\begin{tabular}{|l|l|l|l|} \hline
+		Search Algorithm & Solution Depth & Nodes Expanded & Time (s) \\ \hline
+		BFS   & 377 & 2185 & 0.54 \\
+		DFS   & 473 && 1309 & 0.37 \\
+		IDDFS & 471 & 799719 & 112.59 \\
+		A*    & 377 & 709 & 0.38 \\ \hline
+	\end{tabular}
+	\caption{Results of search algorithms on test case 3.}
+	\label{tbl:case3}
+\end{table}
+
+
+
+
+% Discussion: Discuss your results. Are they as expected? Was there any interesting behavior that you found?
+
+
+% Conclusion: Add a conclusion which answers the following questions: What can you conclude from these results? Which search algorithm performs the best? Was this expected?
+
+
+\end{document}
+
