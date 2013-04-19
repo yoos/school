@@ -30,9 +30,19 @@ def goalTest(gs):
     return False
 
 
+# Return all possible successors of a node.
+def getSuccessors(gs):
+    out = []
 
-endState = actions.act1(startState)
+    # Try all five possible actions.
+    for i in range(5):
+        succ = actions.act(gs, i)
 
+        # If action was valid, add to output list.
+        if succ != []:
+            out.append(succ)
+
+    return out
 
 actionSeq.append(startState)
 actionSeq.append(endState)
