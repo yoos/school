@@ -120,7 +120,7 @@ def graphSearch(fr):
             for succ in successors:
                 fringe.append(succ)
 
-        maxFringeLen = max(maxFringeLen, len(fringe))
+        maxFringeLen = max(maxFringeLen, len(fringe))   # Just a metric.
 
 
 # Search.
@@ -153,7 +153,12 @@ def search():
 
 solPath = search()
 
-print "Solution depth:          ", depth[goalState_tup]
+print "Solution path:\n"
+
+for each in solPath:
+    print each
+
+print "\nSolution depth:          ", depth[goalState_tup]
 print "Number of nodes expanded:", expandCounter
 
 
