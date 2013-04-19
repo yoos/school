@@ -61,8 +61,10 @@ def expand(gs_tup):
     for action in [i for i in range(5) if i != actions[gs_tup]]:
         s_tup = tuplify(boat.act(listify(gs_tup), action))
 
-        # If action was valid and the resulting successor is new, add to output lists.
-        if s_tup != () and s_tup not in parents:
+        # If action was valid and if either the resulting successor is new or
+        # its depth is less than that of the same state found previously, add
+        # to output lists.
+        if s_tup != () and (s_tup not in parents or depth[s_tup] > depth[gs_tup]+1):
             parents.update({s_tup:gs_tup})
             actions.update({s_tup:action})
             depth.update({s_tup:depth[gs_tup]+1})
