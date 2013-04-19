@@ -15,12 +15,14 @@ outputFileName = sys.argv[4]
 actionSeq      = []
 
 startFile = open(startFileName, 'rU')
-startState = [[int(num) for num in bank] for bank in list(csv.reader(startFile, delimiter=','))]
+startState = tuple([tuple([int(num) for num in bank]) for bank in list(csv.reader(startFile, delimiter=','))])
 startFile.close
 
 goalFile = open(goalFileName, 'rU')
-goalState = [[int(num) for num in bank] for bank in list(csv.reader(goalFile, delimiter=','))]
+goalState = tuple([tuple([int(num) for num in bank]) for bank in list(csv.reader(goalFile, delimiter=','))])
 goalFile.close
+
+print "Start state:", startState
 
 
 # Return true if game state is goal state. Otherwise, return false.
