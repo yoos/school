@@ -61,8 +61,8 @@ def expand(gs_tup):
     for action in [i for i in range(5) if i != actions[gs_tup]]:
         s_tup = tuplify(boat.act(listify(gs_tup), action))
 
-        # If action was valid, add to output list.
-        if s_tup != ():
+        # If action was valid and the resulting successor is new, add to output lists.
+        if s_tup != () and s_tup not in parents:
             parents.update({s_tup:gs_tup})
             actions.update({s_tup:action})
             depth.update({s_tup:depth[gs_tup]+1})
@@ -128,11 +128,6 @@ def search():
 
 
 
-
-print expand(tuplify(startState))
-print "parents:", parents
-print "actions:", actions
-print "depth:", depth
 
 
 solPath = graphSearch(fringe)
