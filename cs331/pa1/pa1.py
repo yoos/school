@@ -12,7 +12,7 @@ startFileName  = sys.argv[1]
 goalFileName   = sys.argv[2]
 searchMode     = sys.argv[3]
 outputFileName = sys.argv[4]
-actionSeq      = []
+expandCounter  = 0
 
 if searchMode not in ['bfs', 'dfs', 'iddfs', 'astar']:
     print "Mode should be one of:\n    bfs: Breadth-First Search\n    dfs: Depth-First Search\n    iddfs: Iterative-Deepening Depth-First Search\n    astar: A* Search"
@@ -83,9 +83,12 @@ def solution(node):
 
     return path
 
+solPath = []
+
 # Graph search. Takes fringe list as input and returns solution path as a list
 # (empty if solution does not exist).
 def graphSearch(fr):
+    global expandCounter
     closed = []
 
     while True:
@@ -95,6 +98,9 @@ def graphSearch(fr):
             node = fringe.pop(0)   # Treat list as queue.
         elif searchMode == 'dfs':
             node = fringe.pop()   # Treat list as stack.
+
+        expandCounter += 1   # Increment this right after popping from fringe and before expanding.
+
         if goalTest(node):
             return solution(node)   # TODO
         if node not in closed:
@@ -113,16 +119,18 @@ print "actions:", actions
 print "depth:", depth
 
 
-print graphSearch(fringe)
+solPath = graphSearch(fringe)
+print solPath
 
-print depth[goalState_tup]
+print "Depth:", depth[goalState_tup]
+print "Counter:", expandCounter
 
 
 
 
 outputFile = open(outputFileName, 'wb')
 writer = csv.writer(outputFile, delimiter=',')
-writer.writerows(actionSeq)
+writer.writerows(solPath)
 outputFile.close()
 
 
