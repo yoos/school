@@ -10,9 +10,13 @@ if len(sys.argv) < 5:
 
 startFileName  = sys.argv[1]
 goalFileName   = sys.argv[2]
-mode           = sys.argv[3]
+searchMode     = sys.argv[3]
 outputFileName = sys.argv[4]
 actionSeq      = []
+
+if searchMode not in ['bfs', 'dfs', 'iddfs', 'astar']:
+    print "Mode should be one of:\n    bfs: Breadth-First Search\n    dfs: Depth-First Search\n    iddfs: Iterative-Deepening Depth-First Search\n    astar: A* Search"
+    exit()
 
 
 # Take a list of lists and return a tuple of tuples
@@ -87,7 +91,10 @@ def graphSearch(fr):
     while True:
         if len(fringe) == 0:
             return []
-        node = fringe.pop(0)
+        if searchMode == 'bfs':
+            node = fringe.pop(0)   # Treat list as queue.
+        elif searchMode == 'dfs':
+            node = fringe.pop()   # Treat list as stack.
         if goalTest(node):
             return solution(node)   # TODO
         if node not in closed:
