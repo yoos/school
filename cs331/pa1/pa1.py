@@ -163,8 +163,8 @@ print "Number of nodes expanded:", expandCounter
 
 
 outputFile = open(outputFileName, 'wb')
-writer = csv.writer(outputFile, delimiter=',')
-writer.writerows(solPath)
+for each in solPath:
+    outputFile.write(str(each)+"\n")
 outputFile.close()
 
 
