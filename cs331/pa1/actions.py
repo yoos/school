@@ -47,7 +47,7 @@ def act(gs, actNum):
             succ[curBank][0] -= 1
             succ[endBank][0] += 1
             succ[curBank][1] -= 1
-            succ[curBank][1] += 1
+            succ[endBank][1] += 1
         else:
             return []
 
