@@ -2,6 +2,7 @@
 #define CB_CONFIG_H
 
 #define CONTROL_LOOP_DT 0.001   // In seconds
+#define DEATH_RAY_DT    0.001   // In seconds
 
 #define M_PI 3.14159
 #define WHEEL_DIA 0.05842   // In m (2.3 in)
@@ -10,6 +11,8 @@
 #define ROT_SIZE ((BB_VEL * CONTROL_LOOP_DT) / (WHEEL_DIA * M_PI))
 #define ROT_SPEED (BB_VEL/(WHEEL_DIA*M_PI))   // In rev/s
 #define ROT_PERIOD_ST (MS2ST(1000)/(ROT_SPEED*256))   // 256 quadrature pulses per revolution.
+
+#define ESC_MIN_DC 0.053   // Minimum duty cycle for ESCs.
 
 
 #endif /* CB_CONFIG_H */

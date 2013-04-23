@@ -4,20 +4,16 @@
 #include <chsprintf.h>
 
 #include <cb_adc.h>   // ADC code
-#include <cb_pid.h>   // PID function definition
 #include <cb_comm.h>   // Communications code
 #include <cb_icu.h>   // ICU code
 #include <cb_motor.h>   // Motor control
+#include <cb_death_ray.h>   // Death ray control code
 #include <cb_config.h>   // General configuration
 #include <cb_math.h>
 
-static float base_wheel_dc = 0;
-static float last_wheel_pos = 0;
-static float cur_wheel_pos = 0;
-static float des_wheel_pos = 0;
-static float cur_wheel_speed = 0;
-static float des_wheel_speed = 0;
-static float dc[8];
+
+float base_wheel_dc = 0;
+float dc[8];
 
 /*
  * Communications loop
@@ -44,15 +40,7 @@ static msg_t comm_thread(void *arg)
 
 		//chsprintf(txbuf, "ICU: %6d %6d %6d %6d\r\n", (int) (icu_get_period(2)*1000), (int) (icu_get_period(3)*1000), (int) (icu_get_period(4)*1000), (int) (icu_get_period(5)*1000));
 
-		chsprintf(txbuf, "Scur: %4d  Sdes: %4d  Pcur: %5d  Pdes: %4d  DC: %3d  ADC: %3d  Step: %6d  T: %8d\r\n",
-				(int) (cur_wheel_speed*1000),
-				(int) (des_wheel_speed*1000),
-				(int) icu_get_period(5),
-				(int) ROT_PERIOD_ST,
-				(int) (dc[0]*1000),
-				(int) (base_wheel_dc*1000),
-				(int) (ROT_SIZE*1000000),
-				(int) time);
+		death_ray_debug_output(txbuf);
 		uartStartSend(&UARTD3, sizeof(txbuf), txbuf);
 
 		palSetPad(GPIOD, 12);
@@ -94,68 +82,48 @@ static msg_t adc_thread(void *arg)
 }
 
 /*
+ * Death Ray loop
+ */
+static WORKING_AREA(wa_death_ray_thread, 128);
+static msg_t death_ray_thread(void *arg)
+{
+	(void) arg;
+	chRegSetThreadName("death ray");
+	systime_t time = chTimeNow();
+
+	while (TRUE) {
+		time += MS2ST(1000*DEATH_RAY_DT);
+
+		update_death_ray(dc, base_wheel_dc);
+
+		chThdSleepUntil(time);
+	}
+
+	return 0;
+}
+
+/*
  * Control loop
  */
-static WORKING_AREA(wa_control_thread, 2048);
+static WORKING_AREA(wa_control_thread, 128);
 static msg_t control_thread(void *arg)
 {
 	(void) arg;
 	chRegSetThreadName("control");
 	systime_t time = chTimeNow();
 
-	uint16_t j;
 	uint16_t k = 0;
-
-	pid_data_t pid_data_wheel_pos;
-	pid_data_wheel_pos.Kp = 0.001;
-	pid_data_wheel_pos.Ki = 0;
-	pid_data_wheel_pos.Kd = 0;
-	pid_data_wheel_pos.last_val = 0;
-	pid_data_wheel_pos.dt = CONTROL_LOOP_DT;
 
 	while (TRUE) {
 		time += MS2ST(1000*CONTROL_LOOP_DT);   // Next deadline in 1 ms.
 
-		cur_wheel_pos = icu_get_duty_cycle(5);
-		//des_wheel_pos -= ROT_SIZE;
-
-		//if (cur_wheel_pos - des_wheel_pos > 1) {
-		//	des_wheel_pos += 1;
-		//}
-
-		if (base_wheel_dc < 0.053) {
-			dc[0] = 0.053;
-		}
-		else {
-			//dc[0] = base_wheel_dc + (cur_wheel_pos - des_wheel_pos) * pid_data_wheel_pos.Kp;
-			//dc[0] = base_wheel_dc + calculate_pid(cur_wheel_pos, des_wheel_pos, &pid_data_wheel_pos);
-			if (icu_get_period(5) > ROT_PERIOD_ST) {
-				
-				//dc[0] = base_wheel_dc;   // Bang bang, per RVW's suggestion.
-				dc[0] = MIN(1, 0.053 + (MAX(0, icu_get_period(5)-ROT_PERIOD_ST)*pid_data_wheel_pos.Kp));
-			}
-			else {
-				dc[0] = 0.053;
-			}
-		}
-
-		last_wheel_pos = cur_wheel_pos;
-
 		update_motors(dc);
 
 		/* Blink status LED. */
-		if (k < MS2ST(50)) {
-			palSetPad(GPIOD, 13);
-		}
-		else if (k < MS2ST(150)) {
-			palClearPad(GPIOD, 13);
-		}
-		else if (k < MS2ST(200)) {
-			palSetPad(GPIOD, 13);
-		}
-		else {
-			palClearPad(GPIOD, 13);
-		}
+		if      (k < MS2ST(50))  palSetPad  (GPIOD, 13);
+		else if (k < MS2ST(150)) palClearPad(GPIOD, 13);
+		else if (k < MS2ST(200)) palSetPad  (GPIOD, 13);
+		else                     palClearPad(GPIOD, 13);
 
 		k = (k++) % MS2ST(1000);
 
@@ -203,6 +171,11 @@ int main(void)
 	 * Create the ADC thread.
 	 */
 	chThdCreateStatic(wa_adc_thread, sizeof(wa_adc_thread), NORMALPRIO, adc_thread, NULL);
+
+	/*
+	 * Create death ray thread.
+	 */
+	chThdCreateStatic(wa_death_ray_thread, sizeof(wa_death_ray_thread), HIGHPRIO, death_ray_thread, NULL);
 
 	/*
 	 * Create control thread.
