@@ -26,6 +26,13 @@
 # 04/18
   * Syntax vs. semantics.
 
+# 04/23
+  * Data with one constructor can also be represented as a type.
+  * Semantic functions and domains
+  * Monads allow for nicer (modular?) error handling.
+  * Know how the Maybe type works.
+  * Try extending ExprErr.hs with error handlers.
+
 
 <!--
 vim: syntax=markdown
