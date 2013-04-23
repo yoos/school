@@ -1,7 +1,7 @@
 module MiniLogo where
 
 data Cmd = Pen Mode
-         | MoveTo Pos Pos
+         | MoveTo (Pos, Pos)
          | Def String Pars Cmd
          | Call String Vals
          | Mult Cmd Cmd
@@ -31,17 +31,17 @@ data Vals = ValNum Int
 
 vector = Def "vector" (ParsNames "x1" (ParsNames "y1" (ParsNames "x2" (ParsName "y2"))))
                       (Mult (Pen Up)
-                      (Mult (MoveTo (PosName "x1") (PosName "y1"))
+                      (Mult (MoveTo (PosName "x1", PosName "y1"))
                       (Mult (Pen Down)
-                            (MoveTo (PosName "x2") (PosName "y2")))))
+                            (MoveTo (PosName "x2", PosName "y2")))))
 
 steps :: Int -> Cmd
 steps n | n < 1     = (Mult (Pen Up)
-                      (Mult (MoveTo (PosNum 0) (PosNum 0))
+                      (Mult (MoveTo (PosNum 0, PosNum 0))
                             (Pen Down)))
         | otherwise = (Mult (steps (n-1))
-                      (Mult (MoveTo (PosNum (n-1)) (PosNum n))
-                            (MoveTo (PosNum n) (PosNum n))))
+                      (Mult (MoveTo (PosNum (n-1), PosNum n))
+                            (MoveTo (PosNum n, PosNum n))))
 
 -- vim: expandtab
 
