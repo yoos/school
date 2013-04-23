@@ -14,6 +14,8 @@ data Exp = Num Int
          deriving Show
 
 
+origExp = Times (Neg (Plus (N 3) (N 4))) (N 7)
+
 altExp = Apply Multiply [Apply Negate [Apply Add [Num 3, Num 4]], Num 7]
 
 -- 2b) The alternate expression has no contraint on how many operands an
@@ -23,6 +25,13 @@ altExp = Apply Multiply [Apply Negate [Apply Add [Num 3, Num 4]], Num 7]
 -- which makes no sense. The flexibility of the alternative representation
 -- allows the user to more freely express expressions but also leaves it up to
 -- the user to do so properly.
+
+
+translate :: Expr -> Exp
+translate (N a) = Num a
+translate (Plus a b) = Apply Add [translate a, translate b]
+translate (Times a b) = Apply Multiply [translate a, translate b]
+translate (Neg a) = Apply Negate [translate a]
 
 
 -- vim: expandtab
