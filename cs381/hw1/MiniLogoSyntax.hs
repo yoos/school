@@ -23,5 +23,12 @@ data Vals = Num1 Int            -- 1 number
           deriving Show
 
 
+
+-- def vector (x1, y1, x2, y2) pen up;
+--                             moveto (x1, y1);
+--                             pen down;
+--                             moveto (x2, y2)
+
+
 -- vim: expandtab
 
