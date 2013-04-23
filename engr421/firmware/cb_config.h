@@ -12,6 +12,9 @@
 #define ROT_SPEED (BB_VEL/(WHEEL_DIA*M_PI))   // In rev/s
 #define ROT_PERIOD_ST (MS2ST(1000)/(ROT_SPEED*256))   // 256 quadrature pulses per revolution.
 
+#define DEATH_RAY_KP -0.002
+#define DEATH_RAY_KI -0.0015
+
 #define ESC_MIN_DC 0.053   // Minimum duty cycle for ESCs.
 
 

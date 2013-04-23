@@ -8,8 +8,8 @@ float des_wheel_speed = 0;
 
 static pid_data_t pid_data_wheel_pos = {
 	0,       // ID
-	0.001,   // Kp
-	0.0,     // Ki
+	DEATH_RAY_KP,   // Kp
+	DEATH_RAY_KI,   // Ki
 	0.0,     // Kd
 	DEATH_RAY_DT,   // dt
 	0.0,     // last_val
@@ -27,12 +27,9 @@ void update_death_ray(float *dc, float base_wheel_dc)
 		dc[0] = ESC_MIN_DC;
 	}
 	else {
-		//dc[0] = base_wheel_dc + (cur_wheel_pos - des_wheel_pos) * pid_data_wheel_pos.Kp;
-		//dc[0] = base_wheel_dc + calculate_pid(cur_wheel_pos, des_wheel_pos, &pid_data_wheel_pos);
-		if (icu_get_period(5) > ROT_PERIOD_ST) {
-			
-			//dc[0] = base_wheel_dc;   // Bang bang, per RVW's suggestion.
-			dc[0] = MIN(1, ESC_MIN_DC + (MAX(0, icu_get_period(5)-ROT_PERIOD_ST)*pid_data_wheel_pos.Kp));
+		if (base_wheel_dc > ESC_MIN_DC) {
+			//dc[0] = MIN(1, ESC_MIN_DC + (MAX(0, icu_get_period(5)-ROT_PERIOD_ST)*pid_data_wheel_pos.Kp));
+			dc[0] = MIN(1, ESC_MIN_DC + MAX(0, calculate_pid(icu_get_period(5), ROT_PERIOD_ST, &pid_data_wheel_pos)));
 		}
 		else {
 			dc[0] = ESC_MIN_DC;
