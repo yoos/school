@@ -22,7 +22,7 @@ static WORKING_AREA(wa_comm_thread, 1280);
 static msg_t comm_thread(void *arg)
 {
 	(void) arg;
-	chRegSetThreadName("communications 2");
+	chRegSetThreadName("communications");
 	systime_t time = chTimeNow();
 	int counter = 0;
 
