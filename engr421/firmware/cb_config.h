@@ -14,6 +14,9 @@
 
 #define DEATH_RAY_KP -0.002
 #define DEATH_RAY_KI -0.0015
+#define DEATH_RAY_KD -0.000
+
+#define DEATH_RAY_I_CAP -0.5
 
 #define ESC_MIN_DC 0.053   // Minimum duty cycle for ESCs.
 

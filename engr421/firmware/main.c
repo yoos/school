@@ -12,8 +12,17 @@
 #include <cb_math.h>
 
 
+float dutyCycle = 0;
 float base_wheel_dc = 0;
 float dc[8];
+
+void clear_buffer(uint8_t *buffer)
+{
+	uint16_t i;
+	for (i=0; i<sizeof(buffer); i++) {
+		buffer[i] = 0;
+	}
+}
 
 /*
  * Communications loop
@@ -33,12 +42,15 @@ static msg_t comm_thread(void *arg)
 		counter++;
 
 		/* Zero out buffer. */
-		uint8_t i;
-		for (i=0; i<sizeof(txbuf); i++) {
-			txbuf[i] = 0;
-		}
+		clear_buffer(txbuf);
 
 		//chsprintf(txbuf, "ICU: %6d %6d %6d %6d\r\n", (int) (icu_get_period(2)*1000), (int) (icu_get_period(3)*1000), (int) (icu_get_period(4)*1000), (int) (icu_get_period(5)*1000));
+
+		//chsprintf(txbuf, "ADC: %4d  \r\n", (int) (dutyCycle*1000));
+		//uartStartSend(&UARTD3, sizeof(txbuf), txbuf);
+
+		/* Zero out buffer. */
+		//clear_buffer(txbuf);
 
 		death_ray_debug_output(txbuf);
 		uartStartSend(&UARTD3, sizeof(txbuf), txbuf);
@@ -68,7 +80,7 @@ static msg_t adc_thread(void *arg)
 
 		update_adc();
 
-		uint16_t dutyCycle = avg_ch[3] * 500/4096 + 1;   // TODO: The +1 at the end makes this work. Why?
+		dutyCycle = avg_ch[3] * 500/4096 + 1;   // TODO: The +1 at the end makes this work. Why?
 		base_wheel_dc = ((float) avg_ch[3])/4096/5;   // Divide by 5 for safety.
 
 		palSetPad(GPIOD, 14);
@@ -170,7 +182,7 @@ int main(void)
 	/*
 	 * Create the ADC thread.
 	 */
-	chThdCreateStatic(wa_adc_thread, sizeof(wa_adc_thread), NORMALPRIO, adc_thread, NULL);
+	chThdCreateStatic(wa_adc_thread, sizeof(wa_adc_thread), NORMALPRIO+1, adc_thread, NULL);
 
 	/*
 	 * Create death ray thread.
@@ -180,7 +192,7 @@ int main(void)
 	/*
 	 * Create control thread.
 	 */
-	chThdCreateStatic(wa_control_thread, sizeof(wa_control_thread), HIGHPRIO, control_thread, NULL);
+	chThdCreateStatic(wa_control_thread, sizeof(wa_control_thread), HIGHPRIO+1, control_thread, NULL);
 
 	while (TRUE) {
 	}
