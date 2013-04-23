@@ -14,5 +14,8 @@ data Exp = Num Int
          deriving Show
 
 
+altExp = Apply Multiply [Apply Negate [Apply Add [Num 3, Num 4]], Num 7]
+
+
 -- vim: expandtab
 
