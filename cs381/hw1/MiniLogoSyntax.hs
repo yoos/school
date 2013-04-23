@@ -35,5 +35,13 @@ vector = Def "vector" (ParsNames "x1" (ParsNames "y1" (ParsNames "x2" (ParsName 
                       (Mult (Pen Down)
                             (MoveTo (PosName "x2") (PosName "y2")))))
 
+steps :: Int -> Cmd
+steps n | n < 1     = (Mult (Pen Up)
+                      (Mult (MoveTo (PosNum 0) (PosNum 0))
+                            (Pen Down)))
+        | otherwise = (Mult (steps (n-1))
+                      (Mult (MoveTo (PosNum (n-1)) (PosNum n))
+                            (MoveTo (PosNum n) (PosNum n))))
+
 -- vim: expandtab
 
