@@ -1,3 +1,5 @@
+{--- Designing Abstract Syntax ---}
+
 module DesAS where
 
 data Expr = N Int
@@ -16,16 +18,24 @@ data Exp = Num Int
 
 origExp = Times (Neg (Plus (N 3) (N 4))) (N 7)
 
+
+{- 3a: Alternative expression -}
+
 altExp = Apply Multiply [Apply Negate [Apply Add [Num 3, Num 4]], Num 7]
 
--- 2b) The alternate expression has no contraint on how many operands an
--- operator can be applied to, which makes it more concise when there are
--- more than two operands. On the flipside, because there is no constraint, it
--- is possible to apply an operator such as Add to only a single or no operand,
--- which makes no sense. The flexibility of the alternative representation
--- allows the user to more freely express expressions but also leaves it up to
--- the user to do so properly.
 
+{- 3b: Advantages/disadvantages -}
+
+-- The alternate expression has no contraint on how many operands an operator
+-- can be applied to, which makes it more concise when there are more than two
+-- operands. On the flipside, because there is no constraint, it is possible to
+-- apply an operator such as Add to only a single or no operand, which makes no
+-- sense. The flexibility of the alternative representation allows the user to
+-- more freely express expressions but also leaves it up to the user to do so
+-- properly.
+
+
+{- 3c: Translator -}
 
 translate :: Expr -> Exp
 translate (N a) = Num a

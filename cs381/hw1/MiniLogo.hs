@@ -1,4 +1,8 @@
+{--- MiniLogo ---}
+
 module MiniLogo where
+
+{- 1a: Abstract syntax definition -}
 
 data Cmd = Pen Mode
          | MoveTo (Pos, Pos)
@@ -23,6 +27,7 @@ data Vals = ValNum Int
           deriving Show
 
 
+{- 1b: vector macro -}
 
 -- def vector (x1, y1, x2, y2) pen up;
 --                             moveto (x1, y1);
@@ -35,6 +40,9 @@ vector = Def "vector" (ParsNames "x1" (ParsNames "y1" (ParsNames "x2" (ParsName 
                       (Mult (Pen Down)
                             (MoveTo (PosName "x2", PosName "y2")))))
 
+
+{- 1c: Step-drawing function -}
+
 steps :: Int -> Cmd
 steps n | n < 1     = (Mult (Pen Up)
                       (Mult (MoveTo (PosNum 0, PosNum 0))
@@ -42,6 +50,7 @@ steps n | n < 1     = (Mult (Pen Up)
         | otherwise = (Mult (steps (n-1))
                       (Mult (MoveTo (PosNum (n-1), PosNum n))
                             (MoveTo (PosNum n, PosNum n))))
+
 
 -- vim: expandtab
 
