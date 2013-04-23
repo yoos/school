@@ -1,4 +1,4 @@
-module MiniLogoSyntax where
+module MiniLogo where
 
 data Cmd = Pen Mode
          | MoveTo Pos Pos
