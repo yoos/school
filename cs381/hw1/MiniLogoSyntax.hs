@@ -14,12 +14,12 @@ data Pos = Num Int
          | Name String
          deriving Show
 
-data Pars = Name String
-          | Name String Pars
+data Pars = Name1 String        -- 1 name
+          | NameN String Pars   -- n names
           deriving Show
 
-data Vals = Num Int
-          | Num Int Vals
+data Vals = Num1 Int            -- 1 number
+          | NumN Int Vals       -- n numbers
           deriving Show
 
 
