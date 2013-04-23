@@ -10,16 +10,16 @@ data Cmd = Pen Mode
 data Mode = Up | Down
           deriving Show
 
-data Pos = Num Int
-         | Name String
+data Pos = PosNum Int
+         | PosName String
          deriving Show
 
-data Pars = Name1 String        -- 1 name
-          | NameN String Pars   -- n names
+data Pars = ParsName String
+          | ParsNames String Pars
           deriving Show
 
-data Vals = Num1 Int            -- 1 number
-          | NumN Int Vals       -- n numbers
+data Vals = ValNum Int
+          | ValNums Int Vals
           deriving Show
 
 
