@@ -1,5 +1,5 @@
-#ifndef OSUAR_PID_H
-#define OSUAR_PID_H
+#ifndef CB_PID_H
+#define CB_PID_H
 
 #include <stdint.h>
 
@@ -23,5 +23,5 @@ typedef struct {
  */
 float calculate_pid (float cur, float des, pid_data_t* pid_data);
 
-#endif // OSUAR_PID_H
+#endif // CB_PID_H
 

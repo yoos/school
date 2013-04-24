@@ -1,5 +1,5 @@
-#ifndef OSUAR_ADC_H
-#define OSUAR_ADC_H
+#ifndef CB_ADC_H
+#define CB_ADC_H
 
 #include <ch.h>
 #include <hal.h>
@@ -55,5 +55,5 @@ static const ADCConversionGroup adcgrpcfg = {
 	ADC_SQR3_SQ3_N(ADC_CHANNEL_IN10)      // SQR3 initialization data
 };
 
-#endif // OSUAR_ADC_H
+#endif // CB_ADC_H
 
