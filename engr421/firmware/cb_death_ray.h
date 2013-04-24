@@ -10,6 +10,11 @@
 #include <chsprintf.h>
 
 /**
+ * @brief Set up death ray.
+ */
+void setup_death_ray(void);
+
+/**
  * @brief Update death ray velocity and stuff.
  *
  * @param dc Array of duty cycles.
@@ -21,7 +26,7 @@ void update_death_ray(float *dc, float base_wheel_dc);
  *
  * @param buffer Output buffer.
  */
-void death_ray_debug_output(uint8_t *buffer);
+void death_ray_debug_output(uint8_t *buffer, float base_wheel_dc);
 
 #endif /* CB_DEATH_RAY_H */
 

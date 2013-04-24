@@ -46,13 +46,7 @@ static msg_t comm_thread(void *arg)
 
 		//chsprintf(txbuf, "ICU: %6d %6d %6d %6d\r\n", (int) (icu_get_period(2)*1000), (int) (icu_get_period(3)*1000), (int) (icu_get_period(4)*1000), (int) (icu_get_period(5)*1000));
 
-		//chsprintf(txbuf, "ADC: %4d  \r\n", (int) (dutyCycle*1000));
-		//uartStartSend(&UARTD3, sizeof(txbuf), txbuf);
-
-		/* Zero out buffer. */
-		//clear_buffer(txbuf);
-
-		death_ray_debug_output(txbuf);
+		death_ray_debug_output(txbuf, base_wheel_dc);
 		uartStartSend(&UARTD3, sizeof(txbuf), txbuf);
 
 		palSetPad(GPIOD, 12);
@@ -168,6 +162,8 @@ int main(void)
 	setup_icu();
 
 	setup_motors();
+
+	setup_death_ray();
 
 	/*
 	 * Short delay to let the various setup functions finish.
