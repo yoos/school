@@ -1,4 +1,4 @@
-package edu.oregonstate.eecs.cs331.assn2;
+package pa2;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;

@@ -1,4 +1,4 @@
-package edu.oregonstate.eecs.cs331.assn2;
+package pa2;
 
 import java.util.ArrayList;
 import java.util.Random;

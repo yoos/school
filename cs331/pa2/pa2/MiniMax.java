@@ -1,4 +1,4 @@
-package edu.oregonstate.eecs.cs331.assn2;
+package pa2;
 
 /**
  * This class represents the module for minimax.
