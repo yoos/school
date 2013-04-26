@@ -1,0 +1,15 @@
+<project name="Lab 9" default="compile" basedir=".">
+    <target name="init">
+        <property name="sourceDir" value="src" />
+        <property name="outputDir" value="bin" />
+    </target>
+    <target name="clean" depends="init">
+        <deltree dir="${outputDir}" />
+    </target>
+    <target name="prepare" depends="clean">
+        <mkdir dir="${outputDir}" />
+    </target>
+    <target name="compile" depends="prepare">
+        <javac srcdir="${sourceDir}" destdir="${outputDir}" />
+    </target>
+</project>

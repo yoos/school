@@ -1,0 +1,19 @@
+
+
+BattleshipGUI
+  * drawBoard() called by each player after every turn to refresh boards.
+  * shoot(int col, int row) called to make shots and report result (hit or miss). If Player returns surrender, then announce game over.
+  * --
+  * One instance of BattleshipGUI exists and is accessed by both Players.
+
+Player
+  * board[10][10] -- store own board.
+  * shotsTaken[10][10] -- keep track of shots taken.
+  * receiveShot(int col, int row) -- Called by BattleshipGUI.shoot() and update board[][] and return result (hit, miss, or surrender).
+
+SystematicPlayer extends Player
+  * int i, j -- keep track of which cell to shoot at next.
+
+RandomPlayer exdends Player
+  * Use Random.nextInt() to randomly select cells to shoot at.
+
