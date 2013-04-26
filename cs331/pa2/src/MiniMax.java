@@ -88,8 +88,6 @@ public class MiniMax implements Player {
 			// Do nothing.
 		}
 
-		System.out.println("u: " + u);
-
 		return u;
 	}
 
@@ -107,10 +105,26 @@ public class MiniMax implements Player {
 
 	private Position minimaxDecision(TicTacToeBoard state) {
 		Position bestMove = new Position();
-		int v = maxValue(state);
+
+		int turn = state.getTurn();
+		int v;
+		if (turn == TicTacToeBoard.PLAYER_X) {
+			v = maxValue(state);
+		}
+		else {
+			v = minValue(state);
+		}
 
 		for (TicTacToeBoard s : successors(state)) {
-			if (maxValue(s) == v) {
+			int sVal;
+			if (turn == TicTacToeBoard.PLAYER_X) {
+				sVal = minValue(s);
+			}
+			else {
+				sVal = maxValue(s);
+			}
+
+			if (sVal == v) {
 				bestMove = s.getLastMove();
 			}
 		}
