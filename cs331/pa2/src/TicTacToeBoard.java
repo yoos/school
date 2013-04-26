@@ -194,8 +194,8 @@ public class TicTacToeBoard {
 	/**
 	 * Set last move.
 	 */
-	private void setLastMove(row, col) {
-		lastMove = Position(row, col);
+	private void setLastMove(int row, int col) {
+		lastMove = new Position(row, col);
 	}
 
 	/**
