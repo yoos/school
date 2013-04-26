@@ -1,0 +1,16 @@
+<project name="Battleship" default="compile" basedir=".">
+    <target name="init">
+        <property name="sourceDir" value="src" />
+        <property name="outputDir" value="bin" />
+        <property name="packageName" value="yoos_battleship" />
+    </target>
+    <target name="clean" depends="init">
+        <deltree dir="${outputDir}/${packageName}" />
+    </target>
+    <target name="prepare" depends="clean">
+        <mkdir dir="${outputDir}/${packageName}" />
+    </target>
+    <target name="compile" depends="prepare">
+        <javac srcdir="${sourceDir}" destdir="${outputDir}" />
+    </target>
+</project>
