@@ -73,8 +73,7 @@ public class MiniMax implements Player {
 	}
 
 	private int utility(TicTacToeBoard state) {
-		// TODO
-		return 0;
+		return maxValue(state);
 	}
 
 	private boolean terminalTest(TicTacToeBoard state) {
