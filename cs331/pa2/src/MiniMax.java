@@ -23,6 +23,8 @@ public class MiniMax implements Player {
 	 * @return The next move
 	 */
 	public Position getNextMove(TicTacToeBoard state) throws Exception {
+		nextPos = minimaxDecision(state);
+
 		return nextPos;
 	}
 
@@ -73,7 +75,17 @@ public class MiniMax implements Player {
 	}
 
 	private int utility(TicTacToeBoard state) {
-		return maxValue(state);
+		int u = -1;
+		try {
+			if (state.isWin(TicTacToeBoard.PLAYER_X)) {
+				u = 1;
+			}
+		}
+		catch (Exception e) {
+			// Do nothing.
+		}
+
+		return u;
 	}
 
 	private boolean terminalTest(TicTacToeBoard state) {
