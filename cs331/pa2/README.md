@@ -2,11 +2,12 @@
 
 First, compile the program with:
 
-	make
+	ant
 
 Then run:
 
-	java pa2.GameFrame [player 1] [player 2]
+	cd bin
+	java GameFrame [player 1] [player 2]
 
 Where the player arguments are one of: human, random, minimax.
 
