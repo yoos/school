@@ -75,15 +75,20 @@ public class MiniMax implements Player {
 	}
 
 	private int utility(TicTacToeBoard state) {
-		int u = -1;
+		int u = 0;
 		try {
 			if (state.isWin(TicTacToeBoard.PLAYER_X)) {
 				u = 1;
+			}
+			else if (state.isWin(TicTacToeBoard.PLAYER_O)) {
+				u = -1;
 			}
 		}
 		catch (Exception e) {
 			// Do nothing.
 		}
+
+		System.out.println("u: " + u);
 
 		return u;
 	}
@@ -105,7 +110,7 @@ public class MiniMax implements Player {
 		int v = maxValue(state);
 
 		for (TicTacToeBoard s : successors(state)) {
-			if (utility(s) == v) {
+			if (maxValue(s) == v) {
 				bestMove = s.getLastMove();
 			}
 		}
