@@ -60,6 +60,11 @@ public class TicTacToeBoard {
 	private int numEmptySquares;
 
 	/**
+	 * Last move by either player.
+	 */
+	private Position lastMove = new Position();
+
+	/**
 	 * The contructor for the class. It sets the current state of the game to
 	 * the initial state of the game.
 	 * 
@@ -94,6 +99,7 @@ public class TicTacToeBoard {
 			throw new Exception("Invalid player symbol");
 		}
 		square[row][col] = playerSymbol;
+		setLastMove(row, col);
 	}
 
 	/**
@@ -120,6 +126,7 @@ public class TicTacToeBoard {
 			throw new Exception("Invalid player symbol");
 		}
 		square[row][col] = playerSymbol;
+		setLastMove(row, col);
 	}
 
 	/**
@@ -175,6 +182,20 @@ public class TicTacToeBoard {
 	 */
 	public synchronized void setTurn(int player) {
 		this.turn = player;
+	}
+
+	/**
+	 * Get last move.
+	 */
+	public Position getLastMove() {
+		return lastMove;
+	}
+
+	/**
+	 * Set last move.
+	 */
+	private void setLastMove(row, col) {
+		lastMove = Position(row, col);
 	}
 
 	/**
