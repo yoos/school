@@ -3,7 +3,7 @@ import static java.lang.Math.*;
 
 /**
  * This class represents the module for minimax.
- * @author Chris Ventura
+ * @author Soo-Hyun Yoo
  *
  */
 public class MiniMax implements Player {
@@ -18,7 +18,7 @@ public class MiniMax implements Player {
 	}
 
 	/**
-	 * Returns the next move.
+	 * Return the next move.
 	 * @param state The current board state in the game
 	 * @return The next move
 	 */
@@ -29,12 +29,17 @@ public class MiniMax implements Player {
 	}
 
 	/**
-	 * Returns the player type 
+	 * Return the player type.
 	 */
 	public int getPlayerType() {
 		return MINIMAX_PLAYER;
 	}
 
+	/**
+	 * Return list of successors.
+	 * @param state The current board state in the game
+	 * @return The list of successors.
+	 */
 	private List<TicTacToeBoard> successors(TicTacToeBoard state) {
 		List<TicTacToeBoard> succ = new ArrayList<TicTacToeBoard>();
 
@@ -74,6 +79,12 @@ public class MiniMax implements Player {
 		return succ;
 	}
 
+	/**
+	 * Return utility of game state.
+	 * @param state The current board state in the game
+	 * @return The utility of the game state. 1 if Player X wins, -1 if Player
+	 *     O wins, 0 if draw.
+	 */
 	private int utility(TicTacToeBoard state) {
 		int u = 0;
 		try {
@@ -91,6 +102,11 @@ public class MiniMax implements Player {
 		return u;
 	}
 
+	/**
+	 * Return terminal status of game.
+	 * @param state The current board state in the game
+	 * @return Terminal status. True if state is terminal. False otherwise.
+	 */
 	private boolean terminalTest(TicTacToeBoard state) {
 		boolean testRes = false;
 		try {
@@ -103,16 +119,21 @@ public class MiniMax implements Player {
 		return testRes;
 	}
 
+	/**
+	 * Return minimax decision.
+	 * @param state The current board state in the game
+	 * @return The best move.
+	 */
 	private Position minimaxDecision(TicTacToeBoard state) {
 		Position bestMove = new Position();
 
 		int turn = state.getTurn();
 		int v;
 		if (turn == TicTacToeBoard.PLAYER_X) {
-			v = maxValue(state);
+			v = maxValue(state);   // Player X maximizes.
 		}
 		else {
-			v = minValue(state);
+			v = minValue(state);   // Player O minimizes.
 		}
 
 		for (TicTacToeBoard s : successors(state)) {
@@ -132,6 +153,11 @@ public class MiniMax implements Player {
 		return bestMove;
 	}
 
+	/**
+	 * Return maximum value of game state.
+	 * @param state The current board state in the game.
+	 * @return The maximum value.
+	 */
 	private int maxValue(TicTacToeBoard state) {
 		if (terminalTest(state)) {
 			return utility(state);
@@ -146,6 +172,11 @@ public class MiniMax implements Player {
 		return v;
 	}
 
+	/**
+	 * Return minimum value of game state.
+	 * @param state The current board state in the game.
+	 * @return The minimum value.
+	 */
 	private int minValue(TicTacToeBoard state) {
 		if (terminalTest(state)) {
 			return utility(state);
