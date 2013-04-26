@@ -1,5 +1,3 @@
-package pa2;
-
 import java.io.PrintStream;
 
 /**

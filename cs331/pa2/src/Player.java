@@ -1,9 +1,4 @@
 /**
- * 
- */
-package pa2;
-
-/**
  * This is the interface for the game player.
  * @author Chris Ventura
  *

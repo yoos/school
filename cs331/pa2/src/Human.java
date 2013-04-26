@@ -1,5 +1,3 @@
-package pa2;
-
 /**
  * This class defines the Player Interface implemenation for human players. 
  * @author Chris Ventura

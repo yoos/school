@@ -1,5 +1,3 @@
-package pa2;
-
 /**
  * A simple class to store the position of a move.
  * @author wong

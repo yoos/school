@@ -1,5 +1,3 @@
-package pa2;
-
 /**
  * This class represents the module for minimax.
  * @author Chris Ventura
