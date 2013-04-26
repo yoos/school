@@ -35,13 +35,16 @@ Four types:
   * Alpha-Beta Pruning: If certain branches in a tree have no hope of being "better" than others, prune and do not explore that branch. This allows us to look ahead in search tree significantly further in the same amount of time.
 
 # Evaluation Functions (04/22)
-  * If we can't fit game tree in memory, rank different game states in order of "godness."
+  * If we can't fit game tree in memory, rank different game states in order of "goodness."
   * Weighted linear functions -- find weights with machine learning.
   * Assume features are independent (i.e., weights don't overcount).
 
-# Propositional Logic (04/24)
+# Propositional Logic (04/24, 26)
   * We need to represent knowledge and reason about it.
   * Entailment, i.e., if-and-only-if.
+  * Algorithms for propositional logic take exponential time and space, but some algorithms are O(n) in practice.
+  * Keep tautologies out of the knowledge base.
+  * Resolution.   <!-- TODO: Figure this out. -->
 
 Technical detail: "cost" functions need to be minimized. "utility" functions need to be maximized.
 
