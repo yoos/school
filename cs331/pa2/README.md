@@ -4,7 +4,7 @@ First, compile the program with:
 
 	ant
 
-Then run:
+To run:
 
 	cd bin
 	java GameFrame [player 1] [player 2]
