@@ -29,7 +29,7 @@ rosbuild_genmsg()
 #rosbuild_add_executable(example examples/example.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
 
-rosbuild_add_executable(cb_vision src/cb_vision.cpp)
+rosbuild_add_executable(cb_vision src/cb_vision.cpp src/cb_image_converter.cpp)
 
 find_package(OpenCV REQUIRED)
 if (OpenCV_FOUND)

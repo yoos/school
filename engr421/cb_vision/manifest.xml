@@ -10,6 +10,12 @@
   <url>http://ros.org/wiki/cb_vision</url>
 
   <depend package="gscam"/>
+  <depend package="sensor_msgs"/>
+  <depend package="opencv2"/>
+  <depend package="cv_bridge"/>
+  <depend package="roscpp"/>
+  <depend package="std_msgs"/>
+  <depend package="image_transport"/>
 
 </package>
 

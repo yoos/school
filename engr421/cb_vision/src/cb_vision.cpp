@@ -4,10 +4,11 @@
 
 #include <ros/ros.h>
 
-#include "opencv2/core/core.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
-#include "opencv2/highgui/highgui.hpp"
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
+#include <cb_vision/cb_image_converter.h>
 #include <cb_vision/cb_puck_coordinates.h>
 
 
@@ -16,6 +17,8 @@ using namespace cv;
 
 ros::Publisher cb_vision_pub;
 
+static const char RAW_WINDOW[] = "cb_vision_raw_frames";
+static const char BW_WINDOW[]  = "cb_vision_bw_frames";
 
 /**
  * Video frames.
@@ -39,28 +42,21 @@ int main(int argc, char** argv)
 	ros::init(argc, argv, "cb_vision");
 	ros::NodeHandle nh;
 
+	CBImageConverter ic(nh);
+
 	cb_vision_pub = nh.advertise<cb_vision::cb_puck_coordinates>("cb_puck_coordinates", 1);
-
-	// Instantiate VideoCapture object. See here for details:
-	// http://opencv.willowgarage.com/documentation/cpp/reading_and_writing_images_and_video.html
-	VideoCapture cap(0);
-
-	// Configure video.
-	cap.set(CV_CAP_PROP_FRAME_WIDTH, 320);
-	cap.set(CV_CAP_PROP_FRAME_HEIGHT, 240);
-	cap.set(CV_CAP_PROP_FPS, 125);
+	cb_vision::cb_puck_coordinates pc;
+	pc.x = 0;
+	pc.y = 0;
 
 	// Set up windows.
-	cvNamedWindow("cb_raw_frame", 1);
-	cvMoveWindow("cb_raw_frame", 20, 20);
+	cvNamedWindow(RAW_WINDOW, 1);
+	cvMoveWindow(RAW_WINDOW, 20, 20);
 
-	cvNamedWindow("cb_bw_frame", 1);
-	cvMoveWindow("cb_bw_frame", 20, 270);
+	cvNamedWindow(BW_WINDOW, 1);
+	cvMoveWindow(BW_WINDOW, 20, 270);
 
 	while (true) {
-		// Capture image.
-		cap >> raw_frame;
-
 		// Convert frame to HSV space and save to hsv_frame.
 		cvtColor(raw_frame, hsv_frame, CV_BGR2HSV);
 
@@ -69,8 +65,8 @@ int main(int argc, char** argv)
 				Scalar(puck_hue_high, puck_sat_high, puck_val_high), bw_frame);
 
 		// Show images.
-		imshow("cb_raw_frame", raw_frame);
-		imshow("cb_bw_frame", bw_frame);
+		imshow(RAW_WINDOW, raw_frame);
+		imshow(BW_WINDOW, bw_frame);
 
 		// Wait 2 ms for a keypress.
 		int c = waitKey(2);
@@ -80,6 +76,8 @@ int main(int argc, char** argv)
 		if ((char) c == 32) {
 			return 0;
 		}
+
+		cb_vision_pub.publish(pc);
 	}
 
 	return 0;
