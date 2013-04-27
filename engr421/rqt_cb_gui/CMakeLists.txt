@@ -4,7 +4,7 @@ project(rqt_cb_gui)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS rospy rqt_gui rqt_gui_py)
+find_package(catkin REQUIRED COMPONENTS rospy rqt_gui rqt_gui_cpp)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -47,7 +47,7 @@ find_package(catkin REQUIRED COMPONENTS rospy rqt_gui rqt_gui_py)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES rqt_cb_gui
-#  CATKIN_DEPENDS rospy rqt_gui rqt_gui_py
+#  CATKIN_DEPENDS rospy rqt_gui rqt_gui_cpp
 #  DEPENDS system_lib
 )
 
