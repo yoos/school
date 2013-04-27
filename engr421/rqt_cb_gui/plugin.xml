@@ -1,0 +1,20 @@
+<library path="src">
+	<class name="rqt_cb_gui/CBGUI" type="rqt_cb_gui::CBGUI" base_class_type="rqt_gui_cpp::Plugin">
+    <description>
+      C++ GUI plugin for Cattlestar Balactica.
+    </description>
+    <qtgui>
+      <!-- optional grouping...
+      <group>
+        <label>Group</label>
+      </group>
+      <group>
+        <label>Subgroup</label>
+      </group>
+      -->
+      <label>CB GUI Plugin</label>
+      <icon type="theme">system-help</icon>
+      <statustip>CATTLE BATTLE PEW PEW</statustip>
+    </qtgui>
+  </class>
+</library>
