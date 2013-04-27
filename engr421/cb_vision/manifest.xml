@@ -10,7 +10,6 @@
   <url>http://ros.org/wiki/cb_vision</url>
 
   <depend package="gscam"/>
-  <depend package="cmvision"/>
 
 </package>
 

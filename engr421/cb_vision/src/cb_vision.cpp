@@ -8,6 +8,8 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
 
+#include <cb_vision/cb_puck_coordinates.h>
+
 
 using namespace cv;
 
@@ -60,17 +62,17 @@ int main(int argc, char** argv)
 		cap >> raw_frame;
 
 		// Convert frame to HSV space and save to hsv_frame.
-		cvtColor(raw_frame hsv_frame, CV_BGR2HSV);
+		cvtColor(raw_frame, hsv_frame, CV_BGR2HSV);
 
 		// Threshold hsv_frame for color of pucks and save to bw_frame.
 		inRange(hsv_frame, Scalar(puck_hue_low, puck_sat_low, puck_val_low),
-				Scalar(puck_hue_high, puck_sat_high, puck_val_high), bwFrame);
+				Scalar(puck_hue_high, puck_sat_high, puck_val_high), bw_frame);
 
 		// Show images.
 		imshow("cb_raw_frame", raw_frame);
 		imshow("cb_bw_frame", bw_frame);
 
-		// Wait for a keypress.
+		// Wait 2 ms for a keypress.
 		int c = waitKey(2);
 		// Exit if the spacebar is pressed. NOTE: killing the program with
 		// Ctrl+C sometimes stops OpenCV at a bad place and effects a kernel
