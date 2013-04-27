@@ -2,7 +2,7 @@
 
 CBPuckFinder::CBPuckFinder(ros::NodeHandle nh) : it(nh)
 {
-	cb_vision_sub = it.subscribe("/gscam/image_raw", 1, &CBPuckFinder::image_cb, this);
+	cb_vision_sub = it.subscribe("cb_vision_image_in", 1, &CBPuckFinder::image_cb, this);
 	cb_vision_pub = nh.advertise<cb_vision::cb_puck_coordinates>("cb_puck_coordinates", 1);
 
 	pc.x = 0;
