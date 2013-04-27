@@ -1,5 +1,5 @@
-#ifndef CB_IMAGE_CONVERTER_H
-#define CB_IMAGE_CONVERTER_H
+#ifndef CB_PUCK_FINDER_H
+#define CB_PUCK_FINDER_H
 
 #include <ros/ros.h>
 
@@ -49,5 +49,5 @@ public:
 	CBPuckFinder(ros::NodeHandle nh);
 };
 
-#endif // CB_IMAGE_CONVERTER_H
+#endif // CB_PUCK_FINDER_H
 
