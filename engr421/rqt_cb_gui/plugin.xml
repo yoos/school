@@ -1,4 +1,4 @@
-<library path="src">
+<library path="lib/librqt_cb_gui">
 	<class name="rqt_cb_gui/CBGUI" type="rqt_cb_gui::CBGUI" base_class_type="rqt_gui_cpp::Plugin">
     <description>
       C++ GUI plugin for Cattlestar Balactica.
