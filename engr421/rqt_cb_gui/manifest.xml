@@ -8,7 +8,6 @@
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/rqt_cb_gui</url>
-  <depend package="rospy"/>
   <depend package="rqt_gui"/>
   <depend package="rqt_gui_cpp"/>
 

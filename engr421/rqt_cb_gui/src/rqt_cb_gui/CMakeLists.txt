@@ -25,6 +25,6 @@ rosbuild_include(pluginlib hide_plugin_symbols)
 pluginlib_hide_plugin_symbols(rqt_cb_gui CBGUI)
 
 include_directories(${PROJECT_NAME} ${rqt_cb_gui_INCLUDE_DIRECTORIES})
-rosbuild_add_library(${PROJECT_NAME} ${rqt_cb_gui_SRCS} ${rqt_cb_gui_HDRS} ${rqt_cb_gui_UIS_H})
+rosbuild_add_library(${PROJECT_NAME} ${rqt_cb_gui_SRCS} ${rqt_cb_gui_MOCS} ${rqt_cb_gui_UIS_H})
 target_link_libraries(${PROJECT_NAME} ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY})
 
