@@ -1,6 +1,8 @@
 #ifndef rqt_cb_gui__CBGUI_H
 #define rqt_cb_gui__CBGUI_H
 
+#include <ros/ros.h>
+
 #include <rqt_gui_cpp/plugin.h>
 #include <rqt_cb_gui/ui_cb_gui.h>
 #include <QWidget>
