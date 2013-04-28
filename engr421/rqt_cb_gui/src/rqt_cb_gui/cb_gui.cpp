@@ -12,8 +12,6 @@ CBGUI::CBGUI()
 
 	// give QObjects reasonable names
 	setObjectName("CBGUI");
-
-	cb_gui_pub = getNodeHandle().advertise<rqt_cb_gui::cb_params>("cb_params", 1);
 }
 
 void CBGUI::initPlugin(qt_gui_cpp::PluginContext& context)
@@ -26,6 +24,10 @@ void CBGUI::initPlugin(qt_gui_cpp::PluginContext& context)
 	ui_.setupUi(widget_);
 	// add widget to the user interface
 	context.addWidget(widget_);
+
+	nh_ = getNodeHandle();
+
+	cb_gui_pub = nh_.advertise<rqt_cb_gui::cb_params>("cb_params", 1);
 }
 
 void CBGUI::shutdownPlugin()
@@ -45,6 +47,11 @@ instance_settings)
 {
 	// TODO restore intrinsic configuration, usually using:
 	// v = instance_settings.value(k)
+}
+
+void CBGUI::pub_cb(void)
+{
+	cb_gui_pub.publish(cb_params_msg);
 }
 
 /*bool hasConfiguration() const
