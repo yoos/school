@@ -12,6 +12,8 @@ CBGUI::CBGUI()
 
 	// give QObjects reasonable names
 	setObjectName("CBGUI");
+
+	cb_gui_pub = getNodeHandle().advertise<rqt_cb_gui::cb_params>("cb_params", 1);
 }
 
 void CBGUI::initPlugin(qt_gui_cpp::PluginContext& context)

@@ -5,6 +5,8 @@
 #include <rqt_cb_gui/ui_cb_gui.h>
 #include <QWidget>
 
+#include <rqt_cb_gui/cb_params.h>
+
 namespace rqt_cb_gui {
 
 class CBGUI
@@ -24,6 +26,9 @@ public:
 private:
 	Ui::CBGUIWidget ui_;
 	QWidget* widget_;
+
+	rqt_cb_gui::cb_params cb_params_msg;
+	ros::Publisher cb_gui_pub;
 };
 } // namespace
 #endif // rqt_cb_gui__CBGUI_H
