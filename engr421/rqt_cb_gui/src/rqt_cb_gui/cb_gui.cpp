@@ -25,9 +25,12 @@ void CBGUI::initPlugin(qt_gui_cpp::PluginContext& context)
 	// add widget to the user interface
 	context.addWidget(widget_);
 
+	// Get nodehandle and advertise publisher.
 	nh_ = getNodeHandle();
-
 	cb_gui_pub = nh_.advertise<rqt_cb_gui::cb_params>("cb_params", 1);
+
+	// Connect ROS timer to publisher callback.
+	pub_timer = nh_.createTimer(ros::Duration(0.02), &CBGUI::pub_cb, this);
 }
 
 void CBGUI::shutdownPlugin()
@@ -49,7 +52,7 @@ instance_settings)
 	// v = instance_settings.value(k)
 }
 
-void CBGUI::pub_cb(void)
+void CBGUI::pub_cb(const ros::TimerEvent& event)
 {
 	cb_gui_pub.publish(cb_params_msg);
 }
