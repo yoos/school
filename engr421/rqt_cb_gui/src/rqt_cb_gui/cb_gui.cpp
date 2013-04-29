@@ -31,6 +31,15 @@ void CBGUI::initPlugin(qt_gui_cpp::PluginContext& context)
 
 	// Connect ROS timer to publisher callback.
 	pub_timer = nh_.createTimer(ros::Duration(0.02), &CBGUI::pub_cb, this);
+
+	// Connect UI elements to callback for updating cb_params_msg. Be sure to
+	// include every element that can be updated here!
+	connect(ui_.puck_hue_low_spinBox,  SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
+	connect(ui_.puck_hue_high_spinBox, SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
+	connect(ui_.puck_sat_low_spinBox,  SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
+	connect(ui_.puck_sat_high_spinBox, SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
+	connect(ui_.puck_val_low_spinBox,  SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
+	connect(ui_.puck_val_high_spinBox, SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
 }
 
 void CBGUI::shutdownPlugin()
@@ -55,6 +64,16 @@ instance_settings)
 void CBGUI::pub_cb(const ros::TimerEvent& event)
 {
 	cb_gui_pub.publish(cb_params_msg);
+}
+
+void CBGUI::onEditingFinished(void)
+{
+	cb_params_msg.puck_hue_low  = ui_.puck_hue_low_spinBox->value();
+	cb_params_msg.puck_hue_high = ui_.puck_hue_high_spinBox->value();
+	cb_params_msg.puck_sat_low  = ui_.puck_sat_low_spinBox->value();
+	cb_params_msg.puck_sat_high = ui_.puck_sat_high_spinBox->value();
+	cb_params_msg.puck_val_low  = ui_.puck_val_low_spinBox->value();
+	cb_params_msg.puck_val_high = ui_.puck_val_high_spinBox->value();
 }
 
 /*bool hasConfiguration() const
