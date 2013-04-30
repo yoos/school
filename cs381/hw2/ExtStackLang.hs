@@ -64,19 +64,19 @@ getMacro :: String -> Macros -> ExtProg
 getMacro s ms = snd (head (filter ((==s).fst) ms))
 
 -- Some programs
-p = [EXTLD 3, EXTDUP, EXTADD, EXTDUP, EXTMULT]
-p' = [EXTLD 3, EXTADD]
-p'' = []
-p''' = [EXTADD, DEF "a" p', CALL "a"]
+ep = [EXTLD 3, EXTDUP, EXTADD, EXTDUP, EXTMULT]
+ep' = [EXTLD 3, EXTADD]
+ep'' = []
+ep''' = [EXTADD, DEF "a" ep', CALL "a"]
 
 -- Some stacks
-s :: Maybe Stack
-s = Just [1, 2, 3, 4]
-s' = Just [1]
+es :: Maybe Stack
+es = Just [1, 2, 3, 4]
+es' = Just [1]
 
 -- Language state
 ls :: Maybe State
-ls = Just ([], s)
+ls = Just ([], es)
 
 
 
