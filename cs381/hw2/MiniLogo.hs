@@ -21,11 +21,14 @@ type State = (Mode, Int, Int)
 
 -- Semantic functions
 semS :: Cmd -> State -> (State, Lines)
---TODO
+
 
 sem' :: Cmd -> Lines
 --TODO
 
+
+s :: State
+s = (Up, 0, 0)
 
 -- vim: expandtab
 
