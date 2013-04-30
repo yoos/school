@@ -47,7 +47,7 @@ p' = [LD 3, ADD]
 p'' = []
 
 -- Some stacks
-s :: Maybe [Int]   -- Without this, GHC assumes s is of type Maybe [Integer] instead of Maybe [Int]. Why?
+s :: Maybe Stack
 s = Just [1, 2, 3]
 s' = Just [1]
 
