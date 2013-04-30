@@ -15,18 +15,18 @@ data ExtCmd = EXTLD Int
             deriving Show
 
 -- Semantic domain defined as Maybe to account for errors.
-type D = Maybe State -> Maybe State
+type EXTD = Maybe State -> Maybe State
 
 type Macros = [(String, ExtProg)]   -- List of macro names and the programs they represent.
 type State = (Macros, Maybe Stack)   -- Language state.
 
 -- Semantic function with plenty of error checking. Does this really have to be
 -- so messy?
-sem2 :: ExtProg -> D
+sem2 :: ExtProg -> EXTD
 sem2 [] i = i
 sem2 (o:os) i = sem2 os (semCmd2 o i)
 
-semCmd2 :: ExtCmd -> D
+semCmd2 :: ExtCmd -> EXTD
 semCmd2 (EXTLD i) (Just (ms, Just is)) =   -- Load i onto stack.
     case Just is of
         Just is -> Just (ms, Just (is ++ [i]))
