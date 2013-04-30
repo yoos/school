@@ -22,8 +22,10 @@ type Image = [Pixel]
 --
 sem :: Shape -> Image 
 sem X           = [(1,1)]
-sem (LR s1 s2) = d1 ++ [(x+maxx d1,y) | (x,y) <- sem s2] where d1 = sem s1
-sem (TD s1 s2) = d2 ++ [(x,y+maxy d2) | (x,y) <- sem s1] where d2 = sem s2
+sem (LR s1 s2) = d1 ++ [(x+maxx d1,y) | (x,y) <- sem s2] 
+                 where d1 = sem s1
+sem (TD s1 s2) = d2 ++ [(x,y+maxy d2) | (x,y) <- sem s1] 
+                 where d2 = sem s2
 
 maxx :: [Pixel] -> Int
 maxx = maximum . map fst
