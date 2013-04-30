@@ -5,3 +5,6 @@ all:
 view:
 	okular hw2.pdf
 
+clean:
+	rm hw2.aux hw2.log hw2.pdf
+
