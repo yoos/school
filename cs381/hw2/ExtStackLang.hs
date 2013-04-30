@@ -17,5 +17,8 @@ data ExtCmd = LD Int
 -- Semantic domain defined as Maybe to account for errors.
 type D = Maybe Stack -> Maybe Stack
 
+type Macros = [(String, Prog)]   -- List of macro names and the programs they represent.
+type State = (Macros, Stack)   -- Language state.
+
 -- vim: expandtab
 
