@@ -10,7 +10,7 @@ data ExtCmd = EXTLD Int
             | EXTADD
             | EXTMULT
             | EXTDUP
-            | DEF String
+            | DEF String [ExtCmd]
             | CALL String
             deriving Show
 
@@ -18,48 +18,65 @@ data ExtCmd = EXTLD Int
 type D = Maybe State -> Maybe State
 
 type Macros = [(String, ExtProg)]   -- List of macro names and the programs they represent.
-type State = (Macros, Stack)   -- Language state.
+type State = (Macros, Maybe Stack)   -- Language state.
 
--- Semantic function
+-- Semantic function with plenty of error checking. Does this really have to be
+-- so messy?
 sem2 :: ExtProg -> D
 sem2 [] i = i
 sem2 (o:os) i = sem2 os (semCmd2 o i)
 
 semCmd2 :: ExtCmd -> D
-semCmd2 (EXTLD i) (Just (ms,is)) =   -- Load i onto stack.
+semCmd2 (EXTLD i) (Just (ms, Just is)) =   -- Load i onto stack.
     case Just is of
-        Just is -> Just (ms, is ++ [i])
+        Just is -> Just (ms, Just (is ++ [i]))
         _       -> Nothing
-semCmd2 EXTADD (Just (ms,is)) =   -- Remove two topmost integers from stack and put their sum onto stack.
-    case Just is of
-        Just is -> if length is < 2 then Nothing
-                                    else Just (ms, init(init is) ++ [last is + last(init is)])
-        _       -> Nothing
-semCmd2 EXTMULT (Just (ms,is)) =   -- Remove two topmost integers from stack and put their product onto stack.
+semCmd2 EXTADD (Just (ms, Just is)) =   -- Remove two topmost integers from stack and put their sum onto stack.
     case Just is of
         Just is -> if length is < 2 then Nothing
-                                    else Just (ms, init(init is) ++ [last is * last(init is)])
+                                    else Just (ms, Just (init(init is) ++ [last is + last(init is)]))
         _       -> Nothing
-semCmd2 EXTDUP (Just (ms,is)) =   -- Place second copy of topmost integer onto stack.
+semCmd2 EXTMULT (Just (ms, Just is)) =   -- Remove two topmost integers from stack and put their product onto stack.
+    case Just is of
+        Just is -> if length is < 2 then Nothing
+                                    else Just (ms, Just (init(init is) ++ [last is * last(init is)]))
+        _       -> Nothing
+semCmd2 EXTDUP (Just (ms, Just is)) =   -- Place second copy of topmost integer onto stack.
     case Just is of
         Just is -> if length is < 1 then Nothing
-                                    else Just (ms, is ++ [last is])
+                                    else Just (ms, Just (is ++ [last is]))
+        _       -> Nothing
+semCmd2 (DEF s cs) (Just (ms, Just is)) =   -- Define a macro.
+    case Just is of
+        Just is -> Just (ms ++ [(s, cs)], Just is)
+        _       -> Nothing
+semCmd2 (CALL s) (Just (ms, Just is)) =   -- Call a macro.
+    case (ms, Just is) of
+        (ms, Just is) -> if (isMacro s ms) then sem2 (getMacro s ms) (Just (ms, Just is))
+                                          else Nothing
         _       -> Nothing
 
-{-
- - In the above semantic function definition, I wanted to do something like
- - this:
- -
- -     semCmd2 (EXTLD i) (ms,is) =
- -         case is of
- -             Just is -> Just (ms, is ++ [i])
- -             _       -> Nothing
- -
- - but GHC complained that it "Couldn't match expected type `Maybe State' with
- - actual type `(t0, t1)'"
- -
- - What I've done instead seems like an unnecessary hack.
- -}
+-- Helper functions for finding macro program s in list of macros ms.
+isMacro :: String -> Macros -> Bool
+isMacro s ms = if length (filter ((==s).fst) ms) > 0 then True else False
+
+getMacro :: String -> Macros -> ExtProg
+getMacro s ms = snd (head (filter ((==s).fst) ms))
+
+-- Some programs
+p = [EXTLD 3, EXTDUP, EXTADD, EXTDUP, EXTMULT]
+p' = [EXTLD 3, EXTADD]
+p'' = []
+p''' = [EXTADD, DEF "a" p', CALL "a"]
+
+-- Some stacks
+s :: Maybe Stack
+s = Just [1, 2, 3, 4]
+s' = Just [1]
+
+-- Language state
+ls :: Maybe State
+ls = Just ([], s)
 
 
 
