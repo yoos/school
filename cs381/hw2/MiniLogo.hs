@@ -13,22 +13,22 @@ data Cmd = Pen Mode
 data Mode = Up | Down
           deriving Show
 
-type State = (Mode, Int, Int)
+type StateML = (Mode, Int, Int)
 
 -- Semantic domain
 --type Line = (Int, Int, Int, Int)
 --type Lines = [Line]
 
 -- Semantic functions
-semS :: Cmd -> State -> (State, Lines)
+semS :: Cmd -> StateML -> (StateML, Lines)
 
 
 sem' :: Cmd -> Lines
 --TODO
 
 
-s :: State
-s = (Up, 0, 0)
+sml :: StateML
+sml = (Up, 0, 0)
 
 -- vim: expandtab
 
