@@ -28,6 +28,11 @@ semS (Seq c c') s = (fst (semS c' (fst (semS c s))), snd (semS c s) ++ snd (semS
 sem' :: Cmd -> Lines
 sem' c = snd (semS c (Up, 0, 0))
 
+-- Commands for drawing a lambda
+yc = Seq (Pen Down) (Seq (MoveTo 1 2) (Seq (Pen Up) (Seq (MoveTo 0 4) (Seq (Pen Down) (MoveTo 2 0)))))
+
+-- Output to SVG.
+ysvg = ppLines (sem' yc)
 
 -- vim: expandtab
 
