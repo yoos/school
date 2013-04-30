@@ -46,9 +46,10 @@ p = [LD 3, DUP, ADD, DUP, MULT]
 p' = [LD 3, ADD]
 p'' = []
 
--- A stack
+-- Some stacks
 s :: Maybe [Int]   -- Without this, GHC assumes s is of type Maybe [Integer] instead of Maybe [Int]. Why?
 s = Just [1, 2, 3]
+s' = Just [1]
 
 
 -- vim: expandtab
