@@ -3,6 +3,7 @@
 module StackLang where
 
 type Prog = [Cmd]
+type Stack = [Int]
 
 -- Abstract syntax
 data Cmd = LD Int
@@ -10,8 +11,6 @@ data Cmd = LD Int
          | MULT
          | DUP
          deriving Show
-
-type Stack = [Int]
 
 -- Semantic domain defined as Maybe to account for errors.
 type D = Maybe Stack -> Maybe Stack
