@@ -20,6 +20,8 @@ static const char BW_WINDOW[]  = "cb_vision_bw_frames";
 
 class CBPuckFinder
 {
+	ros::NodeHandle nh_;
+
 	/**
 	 * Video frames.
 	 */

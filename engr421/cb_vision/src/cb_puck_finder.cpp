@@ -2,8 +2,10 @@
 
 CBPuckFinder::CBPuckFinder(ros::NodeHandle nh) : it(nh)
 {
+	nh_ = nh;
+
 	cb_vision_sub = it.subscribe("cb_vision_image_in", 1, &CBPuckFinder::image_cb, this);
-	cb_vision_pub = nh.advertise<cb_vision::cb_puck_coordinates>("cb_puck_coordinates", 1);
+	cb_vision_pub = nh_.advertise<cb_vision::cb_puck_coordinates>("cb_puck_coordinates", 1);
 
 	pc.x = 0;
 	pc.y = 0;
@@ -32,7 +34,7 @@ void CBPuckFinder::image_cb(const sensor_msgs::ImageConstPtr& msg)
 		ROS_ERROR("cv_bridge exception: %s", e.what());
 		return;
 	}
-	
+
 	// Convert frame to HSV space and save to hsv_frame.
 	cvtColor(cv_ptr->image, hsv_frame, CV_BGR2HSV);
 
