@@ -1,4 +1,6 @@
-# CS381: http://classes.engr.oregonstate.edu/~erwig/cs381
+# CS381
+
+Class website: http://classes.engr.oregonstate.edu/~erwig/cs381
 
 ## 04/02
   * Syntax, semantics
@@ -19,9 +21,12 @@
 
 # 04/16
   * Abstract vs concrete syntaxes.
-  * Pretty printer (and parser, which is pretty print in reverse) using abstract syntax?
-  * When writing grammars, consider features of the metalanguage and how they can help me.
-  * Remember that each case of a data type (that is a nonterminal) must have a constructor!
+  * Pretty printer (and parser, which is pretty print in reverse) using
+    abstract syntax?
+  * When writing grammars, consider features of the metalanguage and how they
+    can help me.
+  * Remember that each case of a data type (that is a nonterminal) must have
+    a constructor!
 
 # 04/18
   * Syntax vs. semantics.
@@ -32,6 +37,18 @@
   * Monads allow for nicer (modular?) error handling.
   * Know how the Maybe type works.
   * Try extending ExprErr.hs with error handlers.
+
+# 04/30
+  * Type safety and static vs dynamic typing
+  * Food for thought: what is the type of f x = f (x+1) * 2? (Note that it does
+    not terminate but "returns" an Int.) A type checker is not a termination
+    checker.
+  * A type checker is like a semantic function.
+
+# 05/02
+  * Think about:
+        undefined :: a
+        undefined = undefined
 
 
 <!--
