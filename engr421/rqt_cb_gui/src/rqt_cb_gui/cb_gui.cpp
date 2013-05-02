@@ -40,6 +40,9 @@ void CBGUI::initPlugin(qt_gui_cpp::PluginContext& context)
 	connect(ui_.puck_sat_high_spinBox, SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
 	connect(ui_.puck_val_low_spinBox,  SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
 	connect(ui_.puck_val_high_spinBox, SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
+
+	// Call editingFinished() once at beginning to get the values out there.
+	onEditingFinished();
 }
 
 void CBGUI::shutdownPlugin()
