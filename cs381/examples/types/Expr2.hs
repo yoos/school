@@ -5,8 +5,8 @@ module Expr2 where
 
 data Expr = N Int
           | Plus Expr Expr
-	        | Equal Expr Expr
-	        | Not Expr
+          | Equal Expr Expr
+          | Not Expr
           deriving Show
 
 
