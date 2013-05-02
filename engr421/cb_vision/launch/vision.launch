@@ -3,6 +3,7 @@
 
 	<node name="cb_vision" pkg="cb_vision" type="cb_vision" respawn="false" output="screen">
 		<remap from="cb_vision_image_in" to="/gscam/image_raw"/>
+		<remap from="cb_vision_params_in" to="/rqt_cb_gui/cb_params"/>
 	</node>
 </launch>
 

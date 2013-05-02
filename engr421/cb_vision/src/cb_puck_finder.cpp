@@ -5,11 +5,14 @@ CBPuckFinder::CBPuckFinder(ros::NodeHandle nh) : it(nh)
 	nh_ = nh;
 
 	cb_vision_sub = it.subscribe("cb_vision_image_in", 1, &CBPuckFinder::image_cb, this);
+	cb_vision_params_sub = nh_.subscribe("cb_vision_params_in", 1, &CBPuckFinder::params_cb, this);
 	cb_vision_pub = nh_.advertise<cb_vision::cb_puck_coordinates>("cb_puck_coordinates", 1);
 
 	pc.x = 0;
 	pc.y = 0;
 
+	// Initialize HSV parameters rather arbitrarily. These will be updated from
+	// the ROS parameter server later.
 	puck_hue_low  = 100;
 	puck_hue_high = 160;
 	puck_sat_low  = 10;
@@ -56,5 +59,15 @@ void CBPuckFinder::image_cb(const sensor_msgs::ImageConstPtr& msg)
 	}
 
 	cb_vision_pub.publish(pc);
+}
+
+void CBPuckFinder::params_cb(const rqt_cb_gui::cb_params& msg)
+{
+	puck_hue_low  = msg.puck_hue_low;
+	puck_hue_high = msg.puck_hue_high;
+	puck_sat_low  = msg.puck_sat_low;
+	puck_sat_high = msg.puck_sat_high;
+	puck_val_low  = msg.puck_val_low;
+	puck_val_high = msg.puck_val_high;
 }
 
