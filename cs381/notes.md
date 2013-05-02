@@ -45,6 +45,11 @@ Class website: http://classes.engr.oregonstate.edu/~erwig/cs381
     checker.
   * A type checker is like a semantic function.
 
+# 05/02
+  * Think about:
+        undefined :: a
+        undefined = undefined
+
 
 <!--
 vim: syntax=markdown
