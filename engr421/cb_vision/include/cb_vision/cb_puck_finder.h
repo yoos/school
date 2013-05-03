@@ -27,8 +27,9 @@ class CBPuckFinder
 	/**
 	 * Video frames.
 	 */
-	Mat blurred_frame;
+	Mat rectified_frame;
 	Mat hsv_frame;   // Converted to HSV space from raw_frame.
+	Mat eroded_frame;
 	Mat bw_frame;    // Converted to black/white from hsv_frame.
 	Mat canny_frame;   // Converted to edges from bw_frame.
 

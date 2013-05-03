@@ -53,18 +53,28 @@ void CBPuckFinder::image_cb(const sensor_msgs::ImageConstPtr& msg)
 	closed_contours.clear();
 	pucks.clear();
 
+	// Rectify image.
+	perspectiveTransform(cv_ptr->image, rectified_frame, getPerspectiveTransform(Point(0,40), Point(0,200)));
+	// TODO: Get board and do polygon recognition on board. Erosion+dilation
+	// steps should get us a clean trapezoid, from which we can extract corners
+	// and use for perspective transform. Some good HSV thresholds for the
+	// board:
+	//     HL: 0   HH: 40
+	//     SL: 0   SH: 255
+	//     VL: 80  VH: 200
+
 	// Convert frame to HSV space and save to hsv_frame.
-	cvtColor(cv_ptr->image, hsv_frame, CV_BGR2HSV);
+	cvtColor(rectified_frame, hsv_frame, CV_BGR2HSV);
 
 	// Threshold hsv_frame for color of pucks and save to bw_frame.
 	inRange(hsv_frame, Scalar(puck_hue_low, puck_sat_low, puck_val_low),
 			Scalar(puck_hue_high, puck_sat_high, puck_val_high), bw_frame);
 
 	// Erode image to get sharper corners.
-	erode(bw_frame, blurred_frame, Mat(), Point(-1, -1), erosion_iter);
+	erode(bw_frame, eroded_frame, Mat(), Point(-1, -1), erosion_iter);
 
 	// Find edges with Canny.
-	Canny(blurred_frame, canny_frame, canny_lower_threshold, canny_lower_threshold*2, 5);
+	Canny(eroded_frame, canny_frame, canny_lower_threshold, canny_lower_threshold*2, 5);
 
 	// Find contours.
 	findContours(canny_frame, contours, contours_hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
@@ -106,7 +116,7 @@ void CBPuckFinder::image_cb(const sensor_msgs::ImageConstPtr& msg)
 
 	// Show images.
 	imshow(RAW_WINDOW, cv_ptr->image);
-	imshow(BW_WINDOW, blurred_frame);
+	imshow(BW_WINDOW, eroded_frame);
 	imshow(PUCKS_WINDOW, drawing);
 
 	// Wait 2 ms for a keypress.
