@@ -18,6 +18,7 @@ using namespace cv;
 
 static const char RAW_WINDOW[] = "cb_vision_raw_frames";
 static const char BW_WINDOW[]  = "cb_vision_bw_frames";
+static const char PUCKS_WINDOW[] = "cb_vision_pucks";
 
 class CBPuckFinder
 {
@@ -26,8 +27,22 @@ class CBPuckFinder
 	/**
 	 * Video frames.
 	 */
+	Mat rectified_frame;
 	Mat hsv_frame;   // Converted to HSV space from raw_frame.
+	Mat eroded_frame;
 	Mat bw_frame;    // Converted to black/white from hsv_frame.
+	Mat canny_frame;   // Converted to edges from bw_frame.
+
+	/**
+	 * Stuff to keep track of.
+	 */
+	vector<vector<Point> > contours;   // Keep track of all contours found in a frame.
+	vector<Vec4i> contours_hierarchy;   // Used to store hierarchy of contours found.
+	vector<Point> maybe_puck;   // Used to temporarily store a contour when determining whether or not it's a puck.
+	vector<vector<Point> > closed_contours;
+	vector<vector<Point> > pucks;   // Pucks identified.
+	//vector<Point2f> center;   // Centers of minimum enclosing circles around pucks.
+	//vector<float> radius;   // Radii of enclosing circles.
 
 	/**
 	 * Thresholds.
@@ -38,6 +53,11 @@ class CBPuckFinder
 	uint8_t puck_sat_high;
 	uint8_t puck_val_low;
 	uint8_t puck_val_high;
+	uint16_t encircle_min_size;   // Maximum size of the enclosing circle around contours.
+	uint16_t encircle_max_size;   // Minimum size of the enclosing circle around contours.
+	uint8_t erosion_iter;   // Erode this many times.
+	float puckiness_min_ratio;   // Minimum ratio of contour-to-enclosing-circle. This helps us filter out noise.
+	uint8_t canny_lower_threshold;
 
 	cv_bridge::CvImagePtr cv_ptr;
 	cb_vision::cb_puck_coordinates pc;
