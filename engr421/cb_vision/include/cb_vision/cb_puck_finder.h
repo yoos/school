@@ -38,6 +38,7 @@ class CBPuckFinder
 	vector<vector<Point> > contours;   // Keep track of all contours found in a frame.
 	vector<Vec4i> contours_hierarchy;   // Used to store hierarchy of contours found.
 	vector<Point> maybe_puck;   // Used to temporarily store a contour when determining whether or not it's a puck.
+	vector<vector<Point> > closed_contours;
 	vector<vector<Point> > pucks;   // Pucks identified.
 	//vector<Point2f> center;   // Centers of minimum enclosing circles around pucks.
 	//vector<float> radius;   // Radii of enclosing circles.

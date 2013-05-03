@@ -47,6 +47,7 @@ void CBPuckFinder::image_cb(const sensor_msgs::ImageConstPtr& msg)
 
 	// Clear old stuff.
 	contours.clear();
+	closed_contours.clear();
 	pucks.clear();
 
 	// Convert frame to HSV space and save to hsv_frame.
@@ -65,25 +66,29 @@ void CBPuckFinder::image_cb(const sensor_msgs::ImageConstPtr& msg)
 	// Find contours.
 	findContours(canny_frame, contours, contours_hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
 
-	// Test each contour for puckiness.
+	/**
+	 * Test each contour for puckiness.
+	 */
+
+	// Find closed contours.
 	for (uint16_t i=0; i<contours.size(); i++) {
 		// Approximate contour with accuracy proportional to contour perimeter.
 		approxPolyDP(Mat(contours[i]), maybe_puck, arcLength(Mat(contours[i]), true)*0.02, true);
-
-		// Pucks are large triangles.
-		if (//maybe_puck.size() == 3 &&
-			//	fabs(contourArea(Mat(maybe_puck))) > encircle_min_size &&
-			//	fabs(contourArea(Mat(maybe_puck))) < encircle_max_size) {
-			true) {
-			pucks.push_back(maybe_puck);
-		}
+		closed_contours.push_back(maybe_puck);
 	}
 
-	// Calculate centers of pucks.
-	vector<Point2f> center(pucks.size());
-	vector<float> radius(pucks.size());
-	for (uint16_t i=0; i<pucks.size(); i++) {
-		minEnclosingCircle((Mat) pucks[i], center[i], radius[i]);
+	// Calculate centers of contours.
+	vector<Point2f> center(closed_contours.size());
+	vector<float> radius(closed_contours.size());
+	for (uint16_t i=0; i<closed_contours.size(); i++) {
+		minEnclosingCircle((Mat) closed_contours[i], center[i], radius[i]);
+	}
+
+	for (uint16_t i=0; i<closed_contours.size(); i++) {
+		// Pucks should have a certain minimum area-to-enclosing-circle ratio.
+		if (fabs(contourArea(Mat(closed_contours[i]))) / (3.14159*radius[i]*radius[i]) > puckiness_min_ratio) {
+			pucks.push_back(closed_contours[i]);
+		}
 	}
 
 	// Generate drawing of puck locations.
