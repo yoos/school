@@ -29,10 +29,13 @@ CBPuckFinder::CBPuckFinder(ros::NodeHandle nh) : it(nh)
 
 	// Set up windows.
 	cvNamedWindow(RAW_WINDOW, 1);
-	cvMoveWindow(RAW_WINDOW, 20, 20);
+	cvMoveWindow(RAW_WINDOW, 50, 50);
 
 	cvNamedWindow(BW_WINDOW, 1);
-	cvMoveWindow(BW_WINDOW, 20, 270);
+	cvMoveWindow(BW_WINDOW, 380, 50);
+
+	cvNamedWindow(PUCKS_WINDOW, 1);
+	cvMoveWindow(PUCKS_WINDOW, 710, 50);
 }
 
 void CBPuckFinder::image_cb(const sensor_msgs::ImageConstPtr& msg)
