@@ -51,9 +51,10 @@ class CBPuckFinder
 	uint8_t puck_sat_high;
 	uint8_t puck_val_low;
 	uint8_t puck_val_high;
-	uint16_t puck_min_size;
-	uint16_t puck_max_size;
-	uint8_t blur_size;
+	uint16_t encircle_min_size;   // Maximum size of the enclosing circle around contours.
+	uint16_t encircle_max_size;   // Minimum size of the enclosing circle around contours.
+	uint8_t erosion_iter;   // Erode this many times.
+	float puckiness_min_ratio;   // Minimum ratio of contour-to-enclosing-circle. This helps us filter out noise.
 	uint8_t canny_lower_threshold;
 
 	cv_bridge::CvImagePtr cv_ptr;
