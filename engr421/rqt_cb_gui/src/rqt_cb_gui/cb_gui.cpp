@@ -34,6 +34,17 @@ void CBGUI::initPlugin(qt_gui_cpp::PluginContext& context)
 
 	// Connect UI elements to callback for updating cb_params_msg. Be sure to
 	// include every element that can be updated here!
+	// TODO: Functionify this.
+	connect(ui_.board_hue_low_spinBox,  SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
+	connect(ui_.board_hue_high_spinBox, SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
+	connect(ui_.board_sat_low_spinBox,  SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
+	connect(ui_.board_sat_high_spinBox, SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
+	connect(ui_.board_val_low_spinBox,  SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
+	connect(ui_.board_val_high_spinBox, SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
+	connect(ui_.board_erosion_iter_spinBox, SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
+	connect(ui_.board_dilation_iter_spinBox, SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
+	connect(ui_.board_canny_lower_threshold_spinBox, SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
+
 	connect(ui_.puck_hue_low_spinBox,  SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
 	connect(ui_.puck_hue_high_spinBox, SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
 	connect(ui_.puck_sat_low_spinBox,  SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
@@ -42,8 +53,9 @@ void CBGUI::initPlugin(qt_gui_cpp::PluginContext& context)
 	connect(ui_.puck_val_high_spinBox, SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
 	connect(ui_.encircle_min_size_spinBox, SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
 	connect(ui_.encircle_max_size_spinBox, SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
-	connect(ui_.erosion_iter_spinBox,  SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
+	connect(ui_.puck_erosion_iter_spinBox, SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
 	connect(ui_.puckiness_min_ratio_doubleSpinBox, SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
+	connect(ui_.puck_canny_lower_threshold_spinBox, SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
 
 	// Call editingFinished() once at beginning to get the values out there.
 	onEditingFinished();
@@ -75,6 +87,16 @@ void CBGUI::pub_cb(const ros::TimerEvent& event)
 
 void CBGUI::onEditingFinished(void)
 {
+	cb_params_msg.board_hue_low  = ui_.board_hue_low_spinBox->value();
+	cb_params_msg.board_hue_high = ui_.board_hue_high_spinBox->value();
+	cb_params_msg.board_sat_low  = ui_.board_sat_low_spinBox->value();
+	cb_params_msg.board_sat_high = ui_.board_sat_high_spinBox->value();
+	cb_params_msg.board_val_low  = ui_.board_val_low_spinBox->value();
+	cb_params_msg.board_val_high = ui_.board_val_high_spinBox->value();
+	cb_params_msg.board_erosion_iter = ui_.board_erosion_iter_spinBox->value();
+	cb_params_msg.board_dilation_iter = ui_.board_dilation_iter_spinBox->value();
+	cb_params_msg.board_canny_lower_threshold = ui_.board_canny_lower_threshold_spinBox->value();
+
 	cb_params_msg.puck_hue_low  = ui_.puck_hue_low_spinBox->value();
 	cb_params_msg.puck_hue_high = ui_.puck_hue_high_spinBox->value();
 	cb_params_msg.puck_sat_low  = ui_.puck_sat_low_spinBox->value();
@@ -83,8 +105,9 @@ void CBGUI::onEditingFinished(void)
 	cb_params_msg.puck_val_high = ui_.puck_val_high_spinBox->value();
 	cb_params_msg.encircle_min_size = ui_.encircle_min_size_spinBox->value();
 	cb_params_msg.encircle_max_size = ui_.encircle_max_size_spinBox->value();
-	cb_params_msg.puck_erosion_iter  = ui_.erosion_iter_spinBox->value();
+	cb_params_msg.puck_erosion_iter  = ui_.puck_erosion_iter_spinBox->value();
 	cb_params_msg.puckiness_min_ratio = ui_.puckiness_min_ratio_doubleSpinBox->value();
+	cb_params_msg.puck_canny_lower_threshold = ui_.puck_canny_lower_threshold_spinBox->value();
 }
 
 /*bool hasConfiguration() const
