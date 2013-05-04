@@ -19,4 +19,11 @@
 
 # Python
 *.pyc
+_*.py
+
+# ROS
+bin
+build
+lib
+msg_gen
 
