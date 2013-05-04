@@ -83,7 +83,7 @@ void CBGUI::onEditingFinished(void)
 	cb_params_msg.puck_val_high = ui_.puck_val_high_spinBox->value();
 	cb_params_msg.encircle_min_size = ui_.encircle_min_size_spinBox->value();
 	cb_params_msg.encircle_max_size = ui_.encircle_max_size_spinBox->value();
-	cb_params_msg.erosion_iter  = ui_.erosion_iter_spinBox->value();
+	cb_params_msg.puck_erosion_iter  = ui_.erosion_iter_spinBox->value();
 	cb_params_msg.puckiness_min_ratio = ui_.puckiness_min_ratio_doubleSpinBox->value();
 }
 

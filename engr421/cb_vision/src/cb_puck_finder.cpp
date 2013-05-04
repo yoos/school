@@ -15,6 +15,16 @@ CBPuckFinder::CBPuckFinder(ros::NodeHandle nh) : it(nh)
 
 	// Initialize HSV parameters rather arbitrarily. These will be updated from
 	// the ROS parameter server later.
+	board_hue_low  = 100;
+	board_hue_high = 160;
+	board_sat_low  = 10;
+	board_sat_high = 80;
+	board_val_low  = 60;
+	board_val_high = 255;
+	board_erosion_iter = 0;
+	board_dilation_iter = 0;
+	board_canny_lower_threshold = 0;
+
 	puck_hue_low  = 100;
 	puck_hue_high = 160;
 	puck_sat_low  = 10;
@@ -23,9 +33,9 @@ CBPuckFinder::CBPuckFinder(ros::NodeHandle nh) : it(nh)
 	puck_val_high = 255;
 	encircle_min_size = 0;
 	encircle_max_size = 1000;
-	erosion_iter = 0;
+	puck_erosion_iter = 0;
 	puckiness_min_ratio = 0.0;
-	canny_lower_threshold = 0;
+	puck_canny_lower_threshold = 0;
 
 	// Set up windows.
 	cvNamedWindow(RAW_WINDOW, 1);
@@ -38,7 +48,7 @@ CBPuckFinder::CBPuckFinder(ros::NodeHandle nh) : it(nh)
 	cvMoveWindow(PUCKS_WINDOW, 710, 50);
 }
 
-void CBPuckFinder::rectify_board(Mat orig_image, Mat rect_image)
+void CBPuckFinder::rectify_board(Mat image, Mat rect_image)
 {
 	// Rectify image.
 	//perspectiveTransform(orig_image, rect_frame, getPerspectiveTransform(Point(0,40), Point(0,200)));
@@ -71,11 +81,11 @@ void CBPuckFinder::find_pucks(Mat image, vector<vector<Point> > pucks)
 
 	// Erode image to get sharper corners.
 	static Mat eroded_image;
-	erode(bw_image, eroded_image, Mat(), Point(-1, -1), erosion_iter);
+	erode(bw_image, eroded_image, Mat(), Point(-1, -1), puck_erosion_iter);
 
 	// Find edges with Canny.
 	static Mat canny_image;
-	Canny(eroded_image, canny_image, canny_lower_threshold, canny_lower_threshold*2, 5);
+	Canny(eroded_image, canny_image, puck_canny_lower_threshold, puck_canny_lower_threshold*2, 5);
 
 	// Find contours.
 	findContours(canny_image, pucks_contours, pucks_contours_hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
@@ -149,13 +159,25 @@ void CBPuckFinder::image_cb(const sensor_msgs::ImageConstPtr& msg)
 	}
 
 	pc.x[0] = target_pucks.size();
-	pc.x[1] = erosion_iter;
+	pc.x[1] = puck_erosion_iter;
 
 	cb_vision_pub.publish(pc);
 }
 
 void CBPuckFinder::params_cb(const rqt_cb_gui::cb_params& msg)
 {
+	// Board-related parameters.
+	board_hue_low  = msg.board_hue_low;
+	board_hue_high = msg.board_hue_high;
+	board_sat_low  = msg.board_sat_low;
+	board_sat_high = msg.board_sat_high;
+	board_val_low  = msg.board_val_low;
+	board_val_high = msg.board_val_high;
+	board_erosion_iter  = msg.board_erosion_iter;
+	board_dilation_iter = msg.board_dilation_iter;
+	board_canny_lower_threshold = msg.board_canny_lower_threshold;
+
+	// Puck-related parameters.
 	puck_hue_low  = msg.puck_hue_low;
 	puck_hue_high = msg.puck_hue_high;
 	puck_sat_low  = msg.puck_sat_low;
@@ -164,8 +186,8 @@ void CBPuckFinder::params_cb(const rqt_cb_gui::cb_params& msg)
 	puck_val_high = msg.puck_val_high;
 	encircle_min_size = msg.encircle_min_size;
 	encircle_max_size = msg.encircle_max_size;
-	erosion_iter  = msg.erosion_iter;
+	puck_erosion_iter  = msg.puck_erosion_iter;
 	puckiness_min_ratio = msg.puckiness_min_ratio;
-	canny_lower_threshold = msg.canny_lower_threshold;
+	puck_canny_lower_threshold = msg.puck_canny_lower_threshold;
 }
 
