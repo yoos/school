@@ -221,6 +221,7 @@ void CBPuckFinder::params_cb(const rqt_cb_gui::cb_params& msg)
 	board_sat_high = msg.board_sat_high;
 	board_val_low  = msg.board_val_low;
 	board_val_high = msg.board_val_high;
+	board_min_size = msg.board_min_size;
 	board_erosion_iter  = msg.board_erosion_iter;
 	board_dilation_iter = msg.board_dilation_iter;
 	board_canny_lower_threshold = msg.board_canny_lower_threshold;
