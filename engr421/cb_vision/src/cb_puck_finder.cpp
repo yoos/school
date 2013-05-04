@@ -38,6 +38,77 @@ CBPuckFinder::CBPuckFinder(ros::NodeHandle nh) : it(nh)
 	cvMoveWindow(PUCKS_WINDOW, 710, 50);
 }
 
+void CBPuckFinder::rectify_board(Mat orig_image, Mat rect_image)
+{
+	// Rectify image.
+	//perspectiveTransform(orig_image, rect_frame, getPerspectiveTransform(Point(0,40), Point(0,200)));
+	// TODO: Get board and do polygon recognition on board. Erosion+dilation
+	// steps should get us a clean trapezoid, from which we can extract corners
+	// and use for perspective transform. Some good HSV thresholds for the
+	// board:
+	//     HL: 0   HH: 40
+	//     SL: 0   SH: 255
+	//     VL: 80  VH: 200
+}
+
+void CBPuckFinder::find_pucks(Mat image, vector<vector<Point> > pucks)
+{
+	// Clear old vectors.
+	pucks_contours.clear();
+	pucks_closed_contours.clear();
+	target_pucks.clear();
+	pucks_encircle_centers.clear();
+	pucks_encircle_radii.clear();
+
+	// Convert image to HSV space and save to hsv_image.
+	static Mat hsv_image;
+	cvtColor(image, hsv_image, CV_BGR2HSV);
+
+	// Threshold hsv_image for color of pucks and save to bw_image.
+	static Mat bw_image;
+	inRange(hsv_image, Scalar(puck_hue_low, puck_sat_low, puck_val_low),
+			Scalar(puck_hue_high, puck_sat_high, puck_val_high), bw_image);
+
+	// Erode image to get sharper corners.
+	static Mat eroded_image;
+	erode(bw_image, eroded_image, Mat(), Point(-1, -1), erosion_iter);
+
+	// Find edges with Canny.
+	static Mat canny_image;
+	Canny(eroded_image, canny_image, canny_lower_threshold, canny_lower_threshold*2, 5);
+
+	// Find contours.
+	findContours(canny_image, pucks_contours, pucks_contours_hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+
+	/**
+	 * Test each contour for puckiness.
+	 */
+
+	// Check that the contour is closed.
+	for (uint16_t i=0; i<pucks_contours.size(); i++) {
+		// Approximate contour with accuracy proportional to contour perimeter.
+		approxPolyDP(Mat(pucks_contours[i]), maybe_puck, arcLength(Mat(pucks_contours[i]), true)*0.02, true);
+		pucks_closed_contours.push_back(maybe_puck);
+	}
+
+	// Calculate centers of contours.
+	static Point2f center;
+	static float radius;
+	for (uint16_t i=0; i<pucks_closed_contours.size(); i++) {
+		minEnclosingCircle((Mat) pucks_closed_contours[i], center, radius);
+
+		pucks_encircle_centers.push_back(center);
+		pucks_encircle_radii.push_back(radius);
+	}
+
+	// Check that the contour has a certain minimum area-to-enclosing-circle ratio that makes it pucky.
+	for (uint16_t i=0; i<pucks_closed_contours.size(); i++) {
+		if (fabs(contourArea(Mat(pucks_closed_contours[i]))) / (3.14159*pucks_encircle_radii[i]*pucks_encircle_radii[i]) > puckiness_min_ratio) {
+			pucks.push_back(pucks_closed_contours[i]);
+		}
+	}
+}
+
 void CBPuckFinder::image_cb(const sensor_msgs::ImageConstPtr& msg)
 {
 	try {
@@ -48,76 +119,25 @@ void CBPuckFinder::image_cb(const sensor_msgs::ImageConstPtr& msg)
 		return;
 	}
 
-	// Clear old stuff.
-	contours.clear();
-	closed_contours.clear();
-	pucks.clear();
+	static Mat rectified_frame;
+	rectify_board(cv_ptr->image, rectified_frame);
 
-	// Rectify image.
-	perspectiveTransform(cv_ptr->image, rectified_frame, getPerspectiveTransform(Point(0,40), Point(0,200)));
-	// TODO: Get board and do polygon recognition on board. Erosion+dilation
-	// steps should get us a clean trapezoid, from which we can extract corners
-	// and use for perspective transform. Some good HSV thresholds for the
-	// board:
-	//     HL: 0   HH: 40
-	//     SL: 0   SH: 255
-	//     VL: 80  VH: 200
+	find_pucks(rectified_frame, target_pucks);
 
-	// Convert frame to HSV space and save to hsv_frame.
-	cvtColor(rectified_frame, hsv_frame, CV_BGR2HSV);
-
-	// Threshold hsv_frame for color of pucks and save to bw_frame.
-	inRange(hsv_frame, Scalar(puck_hue_low, puck_sat_low, puck_val_low),
-			Scalar(puck_hue_high, puck_sat_high, puck_val_high), bw_frame);
-
-	// Erode image to get sharper corners.
-	erode(bw_frame, eroded_frame, Mat(), Point(-1, -1), erosion_iter);
-
-	// Find edges with Canny.
-	Canny(eroded_frame, canny_frame, canny_lower_threshold, canny_lower_threshold*2, 5);
-
-	// Find contours.
-	findContours(canny_frame, contours, contours_hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
-
-	/**
-	 * Test each contour for puckiness.
-	 */
-
-	// Find closed contours.
-	for (uint16_t i=0; i<contours.size(); i++) {
-		// Approximate contour with accuracy proportional to contour perimeter.
-		approxPolyDP(Mat(contours[i]), maybe_puck, arcLength(Mat(contours[i]), true)*0.02, true);
-		closed_contours.push_back(maybe_puck);
-	}
-
-	// Calculate centers of contours.
-	vector<Point2f> center(closed_contours.size());
-	vector<float> radius(closed_contours.size());
-	for (uint16_t i=0; i<closed_contours.size(); i++) {
-		minEnclosingCircle((Mat) closed_contours[i], center[i], radius[i]);
-	}
-
-	for (uint16_t i=0; i<closed_contours.size(); i++) {
-		// Pucks should have a certain minimum area-to-enclosing-circle ratio.
-		if (fabs(contourArea(Mat(closed_contours[i]))) / (3.14159*radius[i]*radius[i]) > puckiness_min_ratio) {
-			pucks.push_back(closed_contours[i]);
-		}
-	}
-
-	// Generate drawing of puck locations.
-	Mat drawing = Mat::zeros(240, 320, CV_8UC3);
-	for (uint16_t i=0; i<pucks.size(); i++) {
+	// Draw puck locations.
+	Mat pucks_drawing = Mat::zeros(240, 320, CV_8UC3);
+	for (uint16_t i=0; i<target_pucks.size(); i++) {
 		Scalar color = Scalar(0, 255, 0);   // Green!
-		if (radius[i] > encircle_min_size && radius[i] < encircle_max_size) {
-			drawContours(drawing, pucks, i, color, 1, 8, vector<Vec4i>(), 0, Point());
-			circle(drawing, center[i], (int) radius[i], color, 2, 8, 0);
+		if (pucks_encircle_radii[i] > encircle_min_size && pucks_encircle_radii[i] < encircle_max_size) {
+			drawContours(pucks_drawing, target_pucks, i, color, 1, 8, vector<Vec4i>(), 0, Point());
+			circle(pucks_drawing, pucks_encircle_centers[i], (int) pucks_encircle_radii[i], color, 2, 8, 0);
 		}
 	}
 
 	// Show images.
 	imshow(RAW_WINDOW, cv_ptr->image);
-	imshow(BW_WINDOW, eroded_frame);
-	imshow(PUCKS_WINDOW, drawing);
+	imshow(BW_WINDOW, rectified_frame);
+	imshow(PUCKS_WINDOW, pucks_drawing);
 
 	// Wait 2 ms for a keypress.
 	int c = waitKey(2);
@@ -128,7 +148,7 @@ void CBPuckFinder::image_cb(const sensor_msgs::ImageConstPtr& msg)
 		return;
 	}
 
-	pc.x[0] = pucks.size();
+	pc.x[0] = target_pucks.size();
 	pc.x[1] = erosion_iter;
 
 	cb_vision_pub.publish(pc);

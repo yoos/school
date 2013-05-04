@@ -25,24 +25,15 @@ class CBPuckFinder
 	ros::NodeHandle nh_;
 
 	/**
-	 * Video frames.
-	 */
-	Mat rectified_frame;
-	Mat hsv_frame;   // Converted to HSV space from raw_frame.
-	Mat eroded_frame;
-	Mat bw_frame;    // Converted to black/white from hsv_frame.
-	Mat canny_frame;   // Converted to edges from bw_frame.
-
-	/**
 	 * Stuff to keep track of.
 	 */
-	vector<vector<Point> > contours;   // Keep track of all contours found in a frame.
-	vector<Vec4i> contours_hierarchy;   // Used to store hierarchy of contours found.
+	vector<vector<Point> > pucks_contours;   // Keep track of all contours found in a frame of pucks.
+	vector<Vec4i> pucks_contours_hierarchy;   // Used to store hierarchy of contours found in frame of pucks.
 	vector<Point> maybe_puck;   // Used to temporarily store a contour when determining whether or not it's a puck.
-	vector<vector<Point> > closed_contours;
-	vector<vector<Point> > pucks;   // Pucks identified.
-	//vector<Point2f> center;   // Centers of minimum enclosing circles around pucks.
-	//vector<float> radius;   // Radii of enclosing circles.
+	vector<vector<Point> > pucks_closed_contours;
+	vector<vector<Point> > target_pucks;   // Pucks to shoot at.
+	vector<Point2f> pucks_encircle_centers;   // Centers of minimum enclosing circles around pucks.
+	vector<float> pucks_encircle_radii;   // Radii of enclosing circles.
 
 	/**
 	 * Thresholds.
@@ -66,6 +57,16 @@ class CBPuckFinder
 	image_transport::Subscriber cb_vision_sub;
 	ros::Subscriber cb_vision_params_sub;
 	ros::Publisher cb_vision_pub;
+
+	/**
+	 * Rectify the board. Takes orig_image as input and outputs to rect_image.
+	 */
+	void rectify_board(Mat orig_image, Mat rect_image);
+
+	/**
+	 * Find pucks in input image and output vector of puck coordinates.
+	 */
+	void find_pucks(Mat image, vector<vector<Point> > pucks);
 
 	/**
 	 * Callback for input video.
