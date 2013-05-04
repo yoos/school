@@ -96,7 +96,7 @@ void CBPuckFinder::rectify_board(Mat* image, Mat* rect_image)
 		board = board_closed_contours[0];
 	}
 
-	*rect_image = hsv_image.clone();   // TODO: for now, since I don't have perspective transform yet.
+	*rect_image = bw_image;   // TODO: for now, since I don't have perspective transform yet.
 
 	// Rectify image.
 	//perspectiveTransform(orig_image, rect_frame, getPerspectiveTransform(Point(0,40), Point(0,200)));
@@ -173,28 +173,28 @@ void CBPuckFinder::image_cb(const sensor_msgs::ImageConstPtr& msg)
 		return;
 	}
 
-	static Mat rectified_frame;
-	rectify_board(&cv_ptr->image, &rectified_frame);
+	static Mat rectified_image;
+	rectify_board(&cv_ptr->image, &rectified_image);
 
-	find_pucks(&rectified_frame, &target_pucks);
+	find_pucks(&rectified_image, &target_pucks);
 
 	// Draw puck locations.
-	static Mat pucks_drawing = Mat::zeros(240, 320, CV_8UC3);
+	Mat pucks_drawing = Mat::zeros(240, 320, CV_8UC3);
 	for (uint16_t i=0; i<target_pucks.size(); i++) {
 		Scalar color = Scalar(0, 255, 0);   // Green!
 		if (pucks_encircle_radii[i] > encircle_min_size && pucks_encircle_radii[i] < encircle_max_size) {
-			//drawContours(pucks_drawing, target_pucks, i, color, 1, 8, vector<Vec4i>(), 0, Point());
-			//circle(pucks_drawing, pucks_encircle_centers[i], (int) pucks_encircle_radii[i], color, 2, 8, 0);
+			drawContours(pucks_drawing, target_pucks, i, color, 1, 8, vector<Vec4i>(), 0, Point());
+			circle(pucks_drawing, pucks_encircle_centers[i], (int) pucks_encircle_radii[i], color, 2, 8, 0);
 		}
 	}
 
 	// Draw the board.
-	//Scalar board_color = Scalar(0, 0, 255);   // Red
-	//drawContours(pucks_drawing, board_closed_contours, 0, board_color, 1, 8, vector<Vec4i>(), 0, Point());
+	Scalar board_color = Scalar(0, 0, 255);   // Red.
+	drawContours(pucks_drawing, board_closed_contours, 0, board_color, 1, 8, vector<Vec4i>(), 0, Point());
 
 	// Show images.
 	imshow(RAW_WINDOW, cv_ptr->image);
-	imshow(BW_WINDOW, rectified_frame);
+	imshow(BW_WINDOW, rectified_image);
 	imshow(PUCKS_WINDOW, pucks_drawing);
 
 	// Wait 2 ms for a keypress.
