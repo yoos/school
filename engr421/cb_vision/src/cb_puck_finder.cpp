@@ -96,7 +96,8 @@ void CBPuckFinder::rectify_board(Mat* image, Mat* rect_image)
 		board = board_closed_contours[0];
 	}
 
-	*rect_image = bw_image;   // TODO: for now, since I don't have perspective transform yet.
+	debug_image_1 = dilated_image;
+	*rect_image = hsv_image;   // TODO: for now, since I don't have perspective transform yet.
 
 	// Rectify image.
 	//perspectiveTransform(orig_image, rect_frame, getPerspectiveTransform(Point(0,40), Point(0,200)));
@@ -194,7 +195,7 @@ void CBPuckFinder::image_cb(const sensor_msgs::ImageConstPtr& msg)
 
 	// Show images.
 	imshow(RAW_WINDOW, cv_ptr->image);
-	imshow(BW_WINDOW, rectified_image);
+	imshow(BW_WINDOW, debug_image_1);
 	imshow(PUCKS_WINDOW, pucks_drawing);
 
 	// Wait 2 ms for a keypress.

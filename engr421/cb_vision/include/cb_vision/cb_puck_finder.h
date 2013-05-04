@@ -24,6 +24,8 @@ class CBPuckFinder
 {
 	ros::NodeHandle nh_;
 
+	Mat debug_image_1;
+
 	/**
 	 * Stuff to keep track of.
 	 */
