@@ -88,7 +88,7 @@ class CBPuckFinder
 	/**
 	 * Find pucks in input image and output vector of puck coordinates.
 	 */
-	void find_pucks(Mat* image, vector<vector<Point> >* pucks);
+	void find_pucks(Mat* hsv_image, vector<vector<Point> >* pucks);
 
 	/**
 	 * Callback for input video.

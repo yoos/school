@@ -110,7 +110,7 @@ void CBPuckFinder::rectify_board(Mat* image, Mat* rect_image)
 	//     VL: 80  VH: 200
 }
 
-void CBPuckFinder::find_pucks(Mat* image, vector<vector<Point> >* pucks)
+void CBPuckFinder::find_pucks(Mat* hsv_image, vector<vector<Point> >* pucks)
 {
 	// Clear old vectors.
 	pucks_contours.clear();
@@ -121,7 +121,7 @@ void CBPuckFinder::find_pucks(Mat* image, vector<vector<Point> >* pucks)
 
 	// Threshold image for color of pucks and save to bw_image.
 	static Mat bw_image;
-	inRange(*image, Scalar(puck_hue_low, puck_sat_low, puck_val_low),
+	inRange(*hsv_image, Scalar(puck_hue_low, puck_sat_low, puck_val_low),
 			Scalar(puck_hue_high, puck_sat_high, puck_val_high), bw_image);
 
 	// Erode image to get sharper corners.
