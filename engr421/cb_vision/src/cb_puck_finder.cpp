@@ -48,8 +48,56 @@ CBPuckFinder::CBPuckFinder(ros::NodeHandle nh) : it(nh)
 	cvMoveWindow(PUCKS_WINDOW, 710, 50);
 }
 
-void CBPuckFinder::rectify_board(Mat image, Mat rect_image)
+void CBPuckFinder::rectify_board(Mat* image, Mat* rect_image)
 {
+	// Clear old vectors.
+	board_contours.clear();
+	board_closed_contours.clear();
+
+	// Convert image to HSV space and save to hsv_image.
+	static Mat hsv_image;
+	cvtColor(*image, hsv_image, CV_BGR2HSV);
+
+	// Threshold hsv_image for color of board and save to bw_image.
+	static Mat bw_image;
+	inRange(hsv_image, Scalar(board_hue_low, board_sat_low, board_val_low),
+			Scalar(board_hue_high, board_sat_high, board_val_high), bw_image);
+
+	// Erode image to remove noise from outside the board, then dilate to fill
+	// in gaps within the board.
+	static Mat eroded_image;
+	erode(bw_image, eroded_image, Mat(), Point(-1, -1), board_erosion_iter);
+	static Mat dilated_image;
+	dilate(eroded_image, dilated_image, Mat(), Point(-1, -1), board_dilation_iter);
+
+	// Find edges with Canny.
+	static Mat canny_image;
+	Canny(dilated_image, canny_image, board_canny_lower_threshold, board_canny_lower_threshold*2, 5);
+
+	// Find contours.
+	findContours(canny_image, board_contours, board_contours_hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+
+	/**
+	 * Test each contour for boardiness.
+	 */
+
+	// Check that the contour is closed.
+	for (uint16_t i=0; i<board_contours.size(); i++) {
+		// Approximate contour with accuracy proportional to contour perimeter.
+		approxPolyDP(Mat(board_contours[i]), maybe_board, arcLength(Mat(board_contours[i]), true)*0.02, true);
+
+		// The board is big and has four sides.
+		if (maybe_board.size() == 4 && fabs(contourArea(Mat(maybe_board))) > board_min_size) {
+			board_closed_contours.push_back(maybe_board);
+		}
+	}
+
+	if (board_closed_contours.size() == 1) {
+		board = board_closed_contours[0];
+	}
+
+	*rect_image = hsv_image.clone();   // TODO: for now, since I don't have perspective transform yet.
+
 	// Rectify image.
 	//perspectiveTransform(orig_image, rect_frame, getPerspectiveTransform(Point(0,40), Point(0,200)));
 	// TODO: Get board and do polygon recognition on board. Erosion+dilation
@@ -61,7 +109,7 @@ void CBPuckFinder::rectify_board(Mat image, Mat rect_image)
 	//     VL: 80  VH: 200
 }
 
-void CBPuckFinder::find_pucks(Mat image, vector<vector<Point> > pucks)
+void CBPuckFinder::find_pucks(Mat* image, vector<vector<Point> >* pucks)
 {
 	// Clear old vectors.
 	pucks_contours.clear();
@@ -70,13 +118,9 @@ void CBPuckFinder::find_pucks(Mat image, vector<vector<Point> > pucks)
 	pucks_encircle_centers.clear();
 	pucks_encircle_radii.clear();
 
-	// Convert image to HSV space and save to hsv_image.
-	static Mat hsv_image;
-	cvtColor(image, hsv_image, CV_BGR2HSV);
-
-	// Threshold hsv_image for color of pucks and save to bw_image.
+	// Threshold image for color of pucks and save to bw_image.
 	static Mat bw_image;
-	inRange(hsv_image, Scalar(puck_hue_low, puck_sat_low, puck_val_low),
+	inRange(*image, Scalar(puck_hue_low, puck_sat_low, puck_val_low),
 			Scalar(puck_hue_high, puck_sat_high, puck_val_high), bw_image);
 
 	// Erode image to get sharper corners.
@@ -114,7 +158,7 @@ void CBPuckFinder::find_pucks(Mat image, vector<vector<Point> > pucks)
 	// Check that the contour has a certain minimum area-to-enclosing-circle ratio that makes it pucky.
 	for (uint16_t i=0; i<pucks_closed_contours.size(); i++) {
 		if (fabs(contourArea(Mat(pucks_closed_contours[i]))) / (3.14159*pucks_encircle_radii[i]*pucks_encircle_radii[i]) > puckiness_min_ratio) {
-			pucks.push_back(pucks_closed_contours[i]);
+			(*pucks).push_back(pucks_closed_contours[i]);
 		}
 	}
 }
@@ -130,19 +174,23 @@ void CBPuckFinder::image_cb(const sensor_msgs::ImageConstPtr& msg)
 	}
 
 	static Mat rectified_frame;
-	rectify_board(cv_ptr->image, rectified_frame);
+	rectify_board(&cv_ptr->image, &rectified_frame);
 
-	find_pucks(rectified_frame, target_pucks);
+	find_pucks(&rectified_frame, &target_pucks);
 
 	// Draw puck locations.
-	Mat pucks_drawing = Mat::zeros(240, 320, CV_8UC3);
+	static Mat pucks_drawing = Mat::zeros(240, 320, CV_8UC3);
 	for (uint16_t i=0; i<target_pucks.size(); i++) {
 		Scalar color = Scalar(0, 255, 0);   // Green!
 		if (pucks_encircle_radii[i] > encircle_min_size && pucks_encircle_radii[i] < encircle_max_size) {
-			drawContours(pucks_drawing, target_pucks, i, color, 1, 8, vector<Vec4i>(), 0, Point());
-			circle(pucks_drawing, pucks_encircle_centers[i], (int) pucks_encircle_radii[i], color, 2, 8, 0);
+			//drawContours(pucks_drawing, target_pucks, i, color, 1, 8, vector<Vec4i>(), 0, Point());
+			//circle(pucks_drawing, pucks_encircle_centers[i], (int) pucks_encircle_radii[i], color, 2, 8, 0);
 		}
 	}
+
+	// Draw the board.
+	//Scalar board_color = Scalar(0, 0, 255);   // Red
+	//drawContours(pucks_drawing, board_closed_contours, 0, board_color, 1, 8, vector<Vec4i>(), 0, Point());
 
 	// Show images.
 	imshow(RAW_WINDOW, cv_ptr->image);

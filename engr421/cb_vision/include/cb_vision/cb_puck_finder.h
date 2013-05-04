@@ -27,6 +27,13 @@ class CBPuckFinder
 	/**
 	 * Stuff to keep track of.
 	 */
+	vector<vector<Point> > board_contours;   // Keep track of all contours found in the frame.
+	vector<Vec4i> board_contours_hierarchy;   // Used to store hierarchy of contours found in frame.
+	vector<Point> maybe_board;   // Used to temporarily store a contour when determining whether or not it's a board.
+	vector<vector<Point> > board_closed_contours;
+	vector<Point> board;   // Board (hopefully the right one).
+	vector<Point2f> board_corners;   // Corners of board.
+
 	vector<vector<Point> > pucks_contours;   // Keep track of all contours found in a frame of pucks.
 	vector<Vec4i> pucks_contours_hierarchy;   // Used to store hierarchy of contours found in frame of pucks.
 	vector<Point> maybe_puck;   // Used to temporarily store a contour when determining whether or not it's a puck.
@@ -45,6 +52,7 @@ class CBPuckFinder
 	uint8_t board_sat_high;
 	uint8_t board_val_low;
 	uint8_t board_val_high;
+	uint16_t board_min_size;
 	uint8_t board_erosion_iter;   // Erode this many times.
 	uint8_t board_dilation_iter;   // Dilate this many times.
 	uint8_t board_canny_lower_threshold;
@@ -73,12 +81,12 @@ class CBPuckFinder
 	/**
 	 * Rectify the board. Takes orig_image as input and outputs to rect_image.
 	 */
-	void rectify_board(Mat image, Mat rect_image);
+	void rectify_board(Mat* image, Mat* rect_image);
 
 	/**
 	 * Find pucks in input image and output vector of puck coordinates.
 	 */
-	void find_pucks(Mat image, vector<vector<Point> > pucks);
+	void find_pucks(Mat* image, vector<vector<Point> >* pucks);
 
 	/**
 	 * Callback for input video.
