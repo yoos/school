@@ -41,6 +41,7 @@ void CBGUI::initPlugin(qt_gui_cpp::PluginContext& context)
 	connect(ui_.board_sat_high_spinBox, SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
 	connect(ui_.board_val_low_spinBox,  SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
 	connect(ui_.board_val_high_spinBox, SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
+	connect(ui_.board_min_size_spinBox, SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
 	connect(ui_.board_erosion_iter_spinBox, SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
 	connect(ui_.board_dilation_iter_spinBox, SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
 	connect(ui_.board_canny_lower_threshold_spinBox, SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
@@ -93,6 +94,7 @@ void CBGUI::onEditingFinished(void)
 	cb_params_msg.board_sat_high = ui_.board_sat_high_spinBox->value();
 	cb_params_msg.board_val_low  = ui_.board_val_low_spinBox->value();
 	cb_params_msg.board_val_high = ui_.board_val_high_spinBox->value();
+	cb_params_msg.board_min_size = ui_.board_min_size_spinBox->value();
 	cb_params_msg.board_erosion_iter = ui_.board_erosion_iter_spinBox->value();
 	cb_params_msg.board_dilation_iter = ui_.board_dilation_iter_spinBox->value();
 	cb_params_msg.board_canny_lower_threshold = ui_.board_canny_lower_threshold_spinBox->value();

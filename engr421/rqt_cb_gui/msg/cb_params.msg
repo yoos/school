@@ -4,6 +4,7 @@ uint8 board_sat_low
 uint8 board_sat_high
 uint8 board_val_low
 uint8 board_val_high
+uint16 board_min_size
 uint8 board_erosion_iter
 uint8 board_dilation_iter
 uint8 board_canny_lower_threshold
