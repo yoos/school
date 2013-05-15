@@ -46,6 +46,12 @@ Four types:
   * Keep tautologies out of the knowledge base.
   * Resolution.   <!-- TODO: Figure this out. -->
 
+# Bayesian Networks
+  * Directed acyclic graph (i.e., cause and effect) of conditionally
+    independent nodes (why acyclic?). This can be used to break up
+    a probability of many factors into one with fewer factors.
+  * D-separation (two special cases) used to determine conditional independence.
+
 Technical detail: "cost" functions need to be minimized. "utility" functions need to be maximized.
 
 Try GA on PID tuning.
