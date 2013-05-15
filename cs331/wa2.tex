@@ -1,0 +1,77 @@
+\documentclass[10pt,letterpaper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{fancyhdr}
+\usepackage[utf8]{inputenc}
+\usepackage{palatino}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage[hang,bf,small]{caption}
+\usepackage{amsmath,amssymb,amsthm}
+
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{1em}
+
+\hypersetup{colorlinks,
+	linkcolor = black,
+	citecolor = black,
+	urlcolor  = black}
+\urlstyle{same}
+
+\begin{document}
+
+\begin{titlepage}
+	\vspace*{4cm}
+	\begin{flushright}
+	{\huge
+		Written Assignment \#2 \\ [3cm]
+	}
+	{\large
+		CS 331
+	}
+	\end{flushright}
+
+	\begin{flushright}
+	Soo-Hyun Yoo
+	\end{flushright}
+\end{titlepage}
+
+\section*{Written Assignment \#2}
+
+\begin{enumerate}
+	\item
+		\begin{enumerate}
+			\item True. The antecedent is false, so we can make up
+				anything we want in the consequent.
+			\item True. The consequent is equivalent to $(A \land B) \lor (\neg A \land \neg B)$.
+			\item True. This can be satisfied with $A$ and $\neg B$.
+		\end{enumerate}
+
+	\item
+		\begin{enumerate}
+			\item No.
+			\item Yes. The unicorn is either immortal or a mortal mammal, so it must be horned, which makes it magical.
+			\item Yes, as explained in (b).
+		\end{enumerate}
+
+	\item
+		\begin{enumerate}
+			\item Valid. If Smoke is given, Smoke must be true.
+			\item Invalid. The inverse is false.
+			\item Valid. Smoke is still given in te consequent, so Fire follows.
+		\end{enumerate}
+
+	\item
+		\begin{enumerate}
+			\item
+				\begin{align*}
+					[(Food \Rightarrow Party) \lor (Drinks \Rightarrow Party)] &\Rightarrow [(Food \land Drinks) \Rightarrow Party] \\
+					[(\neg Food \lor Party) \lor (\neg Drinks \lor Party)] &\Rightarrow [\neg (Food \land Drinks) \lor Party] \\
+					(\neg Food \lor \neg Drinks \lor Party) &\Rightarrow (\neg Food \lor \neg Drinks \lor Party)
+				\end{align*}
+			\item The two sides are equivalent, which makes the statement valid.
+		\end{enumerate}
+\end{enumerate}
+
+\end{document}
+
