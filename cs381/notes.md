@@ -50,6 +50,12 @@ Class website: http://classes.engr.oregonstate.edu/~erwig/cs381
         undefined :: a
         undefined = undefined
 
+# 05/16
+  * Access links useful for static scoping implementation.
+  * Closure: function expression + environment. This allows the function to
+    remember local variables after termination.
+  * Dynamic vs. static runtime stack -- look at slide 23 for (maybe) a higher-level explanation.
+
 
 <!--
 vim: syntax=markdown
