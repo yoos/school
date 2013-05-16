@@ -17,6 +17,7 @@ float dutyCycle = 0;
 float base_wheel_dc = 0;
 float dc[8];
 float lr_des_pos[2];   /* Desired linear rail position from serial input. */
+uint8_t digital_state[8];
 
 void clear_buffer(uint8_t *buffer)
 {
@@ -49,7 +50,8 @@ static msg_t comm_thread(void *arg)
 
 		command_t rc = packet_to_command(rxbuf, sizeof(rxbuf));
 		if (rc.new_command) {
-			// TODO: do things
+			lr_des_pos[0] = rc.one.linear_rail_pos;
+			lr_des_pos[1] = rc.two.linear_rail_pos;
 		}
 
 		/* Zero out buffer. TODO: Maybe check whether or not we've finished
@@ -59,7 +61,7 @@ static msg_t comm_thread(void *arg)
 		//chsprintf(txbuf, "ICU: %6d %6d %6d %6d\r\n", (int) (icu_get_period(2)*1000), (int) (icu_get_period(3)*1000), (int) (icu_get_period(4)*1000), (int) (icu_get_period(5)*1000));
 
 		//death_ray_debug_output(base_wheel_dc, txbuf);
-		//chsprintf(txbuf, "%s", rxbuf);
+		chsprintf(txbuf, "%s", rxbuf);
 		uartStartSend(&UARTD3, sizeof(txbuf), txbuf);
 
 		clear_buffer(rxbuf);
@@ -134,13 +136,18 @@ static msg_t linear_rail_thread(void *arg)
 	chRegSetThreadName("linear rail");
 	systime_t time = chTimeNow();
 
-	uint8_t dir[2];   /* Direction of linear rail motor. */
-	float dc[2];   /* Duty cycle of linear rail motor. */
+	uint8_t lr_dir[2];   /* Direction of linear rail motor. */
+	float lr_dc[2];   /* Duty cycle of linear rail motor. */
 
 	while (TRUE) {
 		time += MS2ST(1000*LINEAR_RAIL_DT);
 
-		update_linear_rail(base_wheel_dc, lr_des_pos, dir, dc);
+		update_linear_rail(base_wheel_dc, lr_des_pos, lr_dir, lr_dc);
+
+		dc[4] = lr_dc[0];
+		dc[5] = lr_dc[1];
+		digital_state[0] = lr_dir[0];
+		digital_state[1] = lr_dir[1];
 
 		chThdSleepUntil(time);
 	}
@@ -164,6 +171,16 @@ static msg_t control_thread(void *arg)
 		time += MS2ST(1000*CONTROL_LOOP_DT);   // Next deadline in 1 ms.
 
 		update_motors(dc);
+
+		uint8_t j;
+		for (j=0; j<8; j++) {
+			if (digital_state[j] == 1) {
+				palSetPad(GPIOD, j);
+			}
+			else {
+				palClearPad(GPIOD, j);
+			}
+		}
 
 		/* Blink status LED. */
 		if      (k < MS2ST(50))  palSetPad  (GPIOD, 13);
