@@ -2,7 +2,7 @@
 
 static command_t rc;   /* Robot commands */
 
-static void rxend(UARTDriver *uartp)
+void rxend(UARTDriver *uartp)
 {
 	(void)uartp;
 
