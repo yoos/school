@@ -44,7 +44,7 @@ void setup_death_ray(void)
 	pid_data_wheel_pos.last_val = 0;
 }
 
-void update_death_ray(float *dc, float base_wheel_dc)
+void update_death_ray(float base_wheel_dc, float *dc)
 {
 	cur_wheel_period = MIN(2000, icu_get_period(5));   /* The 2000 here is arbitrary. */
 
@@ -87,7 +87,7 @@ void update_death_ray(float *dc, float base_wheel_dc)
 	}
 }
 
-void death_ray_debug_output(uint8_t *buffer, float base_wheel_dc)
+void death_ray_debug_output(float base_wheel_dc, uint8_t *buffer)
 {
 	chsprintf(buffer, "ADC: %4d  Speed: %5d/%4d  Step: %6d  T: %8d\r\n",
 			(int) (base_wheel_dc*1000),
