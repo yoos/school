@@ -40,10 +40,10 @@ command_t packet_to_command(uint8_t *buffer, uint16_t bufsize)
 		b_index = (b_index+1) % COMM_RECEIVE_BUFFER_LENGTH;   /* TODO: This doesn't look correct. */
 
 		if (rc.new_command) {
-			rc.one.death_ray_intensity = comm_input[0];
-			rc.one.linear_rail_pos     = comm_input[1];
-			rc.two.death_ray_intensity = comm_input[2];
-			rc.two.linear_rail_pos     = comm_input[3];
+			rc.one.death_ray_intensity = ((float) comm_input[0]) / 250.0;
+			rc.one.linear_rail_pos     = ((float) comm_input[1]) / 250.0;
+			rc.two.death_ray_intensity = ((float) comm_input[2]) / 250.0;
+			rc.two.linear_rail_pos     = ((float) comm_input[3]) / 250.0;
 
 			return rc;
 		}
