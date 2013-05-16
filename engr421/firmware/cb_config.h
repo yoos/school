@@ -13,7 +13,7 @@
 
 #define DEATH_RAY_I_CAP 15   // I term cap. The right value here can minimize positive overshoot.
 #define DEATH_RAY_STARTUP_COUNTER_MAX 200
-#define DEATH_RAY_STARTUP_DC 0.068
+#define DEATH_RAY_STARTUP_DC 0.60
 
 #define LINEAR_RAIL_POS_KP (0)
 #define LINEAR_RAIL_POS_KI (0)
@@ -43,8 +43,8 @@
 #define ROT_SPEED (BB_VEL/(WHEEL_DIA*M_PI))   // In rev/s
 #define ROT_PERIOD_ST (MS2ST(1000)/(ROT_SPEED*256))   // 256 quadrature pulses per revolution.
 
-#define ESC_MIN_DC 0.053   // Minimum duty cycle for ESCs.
-#define ESC_MAX_DC 0.335
+#define ESC_MIN_DC 0.485   // Minimum duty cycle for Mikrokopter ESCs.
+#define ESC_MAX_DC 0.83    // Maximum duty cycle for Mikrokopter ESCs.
 
 #endif /* CB_CONFIG_H */
 

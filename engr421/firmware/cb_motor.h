@@ -30,8 +30,8 @@ void update_motors(float* dc);
  * See datasheet page 45 for pinouts.
  */
 static const PWMConfig pwm1cfg = {
-	200000,   // 200 kHz PWM clock frequency.
-	1000,     // PWM period 5 ms.
+	400000,   // 400 kHz PWM clock frequency.
+	1000,     // PWM period 2.5 ms.
 	NULL,     // No callback.
 	{
 		{PWM_OUTPUT_ACTIVE_HIGH, NULL},
@@ -64,8 +64,8 @@ static const PWMConfig pwm1cfg = {
  * PC9) of TIM8.
  */
 static const PWMConfig pwm8cfg = {
-	200000,   // 200 kHz PWM clock frequency.
-	1000,     // PWM period 5 ms.
+	400000,   // 400 kHz PWM clock frequency.
+	1000,     // PWM period 2.5 ms.
 	NULL,     // No callback.
 	{
 		{PWM_OUTPUT_ACTIVE_HIGH, NULL},

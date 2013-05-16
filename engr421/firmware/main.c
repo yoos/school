@@ -75,7 +75,7 @@ static msg_t adc_thread(void *arg)
 		update_adc();
 
 		dutyCycle = avg_ch[3] * 500/4096 + 1;   // TODO: The +1 at the end makes this work. Why?
-		base_wheel_dc = ((float) avg_ch[3])/4096/5;   // Divide by 5 for safety.
+		base_wheel_dc = ((float) avg_ch[3])/4096;
 
 		palSetPad(GPIOD, 14);
 		chThdSleepMilliseconds(20);
