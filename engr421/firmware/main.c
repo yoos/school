@@ -44,18 +44,29 @@ static msg_t comm_thread(void *arg)
 		time += MS2ST(20);
 		counter++;
 
-		/* Zero out buffer. */
+		uartStopSend(&UARTD3);
+		uartStopReceive(&UARTD3);
+
+		command_t rc = packet_to_command(rxbuf, sizeof(rxbuf));
+		if (rc.new_command) {
+			// TODO: do things
+		}
+
+		/* Zero out buffer. TODO: Maybe check whether or not we've finished
+		 * transmitting? */
 		clear_buffer(txbuf);
 
 		//chsprintf(txbuf, "ICU: %6d %6d %6d %6d\r\n", (int) (icu_get_period(2)*1000), (int) (icu_get_period(3)*1000), (int) (icu_get_period(4)*1000), (int) (icu_get_period(5)*1000));
 
 		//death_ray_debug_output(base_wheel_dc, txbuf);
-		uartStopReceive(&UARTD3);
+		//chsprintf(txbuf, "%s", rxbuf);
+		uartStartSend(&UARTD3, sizeof(txbuf), txbuf);
+
+		clear_buffer(rxbuf);
 		uartStartReceive(&UARTD3, sizeof(rxbuf), rxbuf);
-		uartStartSend(&UARTD3, sizeof(rxbuf), rxbuf);
 
 		palSetPad(GPIOD, 12);
-		chThdSleepMilliseconds(10);
+		chThdSleepMilliseconds(5);
 		palClearPad(GPIOD, 12);
 
 		chThdSleepUntil(time);

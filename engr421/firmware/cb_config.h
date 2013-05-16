@@ -28,6 +28,12 @@
 #define LINEAR_RAIL_DC_MIN 0.0   // Minimum duty cycle for linear rail motor controllers.
 #define LINEAR_RAIL_DC_MAX 1.0   // Maximum duty cycle for linear rail motor controllers.
 
+/* Communication */
+#define COMM_HEADER 255
+#define COMM_PACKET_LENGTH 4   // Length of command packet excluding header.
+#define COMM_RECEIVE_BUFFER_LENGTH 50   // Size of circular buffer used to store received bytes.
+#define COMM_INPUT_MAX 250   // Highest valid command byte value (lowest is 0).
+
 /* Indices */
 #define I_ICU_DEATH_RAY_0   2
 #define I_ICU_DEATH_RAY_1   3

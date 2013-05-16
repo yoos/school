@@ -15,6 +15,7 @@ typedef struct {
 } robot_t;
 
 typedef struct {
+	bool new_command;
 	robot_t one;
 	robot_t two;
 } command_t;
@@ -22,7 +23,12 @@ typedef struct {
 /*
  * This callback is invoked when a receive buffer has been completely written.
  */
-static void rxend(UARTDriver *uartp);
+void rxend(UARTDriver *uartp);
+
+/*
+ * Collect received bytes and try to extract valid commands.
+ */
+command_t packet_to_command(uint8_t *buffer, uint16_t bufsize);
 
 /*
  * USART3 configuration structure.
