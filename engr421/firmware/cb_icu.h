@@ -14,7 +14,7 @@ void setup_icu(void);
  *
  * @param icu_num The number of the ICU whose duty cycle we wish to fetch.
  *
- * @output Duty cycle in seconds.
+ * @output Duty cycle as fraction of 1.0.
  */
 float icu_get_duty_cycle(uint8_t icu_num);
 
