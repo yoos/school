@@ -8,6 +8,7 @@
 #include <cb_icu.h>   // ICU code
 #include <cb_motor.h>   // Motor control
 #include <cb_death_ray.h>   // Death ray control code
+#include <cb_linear_rail.h>   // Linear rail control code
 #include <cb_config.h>   // General configuration
 #include <cb_math.h>
 
@@ -15,6 +16,7 @@
 float dutyCycle = 0;
 float base_wheel_dc = 0;
 float dc[8];
+float lr_des_pos[2];   /* Desired linear rail position from serial input. */
 
 void clear_buffer(uint8_t *buffer)
 {
@@ -109,6 +111,30 @@ static msg_t death_ray_thread(void *arg)
 }
 
 /*
+ * Linear rail loop
+ */
+static WORKING_AREA(wa_linear_rail_thread, 128);
+static msg_t linear_rail_thread(void *arg)
+{
+	(void) arg;
+	chRegSetThreadName("linear rail");
+	systime_t time = chTimeNow();
+
+	uint8_t dir[2];   /* Direction of linear rail motor. */
+	float dc[2];   /* Duty cycle of linear rail motor. */
+
+	while (TRUE) {
+		time += MS2ST(1000*LINEAR_RAIL_DT);
+
+		update_linear_rail(base_wheel_dc, lr_des_pos, dir, dc);
+
+		chThdSleepUntil(time);
+	}
+
+	return 0;
+}
+
+/*
  * Control loop
  */
 static WORKING_AREA(wa_control_thread, 128);
@@ -165,6 +191,8 @@ int main(void)
 
 	setup_death_ray();
 
+	setup_linear_rail();
+
 	/*
 	 * Short delay to let the various setup functions finish.
 	 */
@@ -184,6 +212,11 @@ int main(void)
 	 * Create death ray thread.
 	 */
 	chThdCreateStatic(wa_death_ray_thread, sizeof(wa_death_ray_thread), HIGHPRIO, death_ray_thread, NULL);
+
+	/*
+	 * Create linear rail thread.
+	 */
+	chThdCreateStatic(wa_linear_rail_thread, sizeof(wa_linear_rail_thread), HIGHPRIO, linear_rail_thread, NULL);
 
 	/*
 	 * Create control thread.

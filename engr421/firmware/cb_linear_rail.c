@@ -62,7 +62,12 @@ void update_linear_rail(float base_wheel_dc, float *des_lin_pos, uint8_t *dir, f
 			linear_rail_velocity_controller(&pid_data_vel[i], cur_lin_vel[i], des_lin_vel[i], dc_shift[i]);
 
 			dir[i] = (dc_shift[i] < 0) ? 0 : 1;
-			dc[i] = MIN(1.0, ABS(dc_shift[i]));
+			if (dir[i] == 0) {
+				dc[i] = MIN(1.0, ABS(dc_shift[i]));
+			}
+			else {
+				dc[i] = MAX(0.0, 1.0-ABS(dc_shift[i]));   /* Invert duty cycle if reverse. */
+			}
 		}
 	}
 }
