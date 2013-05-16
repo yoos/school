@@ -38,9 +38,10 @@ static msg_t comm_thread(void *arg)
 	int counter = 0;
 
 	uint8_t txbuf[200];
+	uint8_t rxbuf[200];
 
 	while (TRUE) {
-		time += MS2ST(50);
+		time += MS2ST(20);
 		counter++;
 
 		/* Zero out buffer. */
@@ -48,8 +49,10 @@ static msg_t comm_thread(void *arg)
 
 		//chsprintf(txbuf, "ICU: %6d %6d %6d %6d\r\n", (int) (icu_get_period(2)*1000), (int) (icu_get_period(3)*1000), (int) (icu_get_period(4)*1000), (int) (icu_get_period(5)*1000));
 
-		death_ray_debug_output(base_wheel_dc, txbuf);
+		//death_ray_debug_output(base_wheel_dc, txbuf);
 		uartStartSend(&UARTD3, sizeof(txbuf), txbuf);
+		uartStopReceive(&UARTD3);
+		uartStartReceive(&UARTD3, sizeof(rxbuf), rxbuf);
 
 		palSetPad(GPIOD, 12);
 		chThdSleepMilliseconds(10);

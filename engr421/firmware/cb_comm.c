@@ -1,5 +1,16 @@
 #include <cb_comm.h>
 
+static command_t rc;   /* Robot commands */
+
+static void rxend(UARTDriver *uartp)
+{
+	(void)uartp;
+
+	/* Update commands from serial input. */
+	//rc.one.death_ray_intensity = 
+}
+
+
 void setup_comm(void)
 {
 	/*

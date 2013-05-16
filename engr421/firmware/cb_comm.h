@@ -7,13 +7,30 @@
 
 void setup_comm(void);
 
+/* Command structures. TODO: Incorporate this into the actual communications
+ * code instead of mapping bytes to floats. */
+typedef struct {
+	float death_ray_intensity;   /* Hopper motor duty cycle */
+	float linear_rail_pos;
+} robot_t;
+
+typedef struct {
+	robot_t one;
+	robot_t two;
+} command_t;
+
+/*
+ * This callback is invoked when a receive buffer has been completely written.
+ */
+static void rxend(UARTDriver *uartp);
+
 /*
  * USART3 configuration structure.
  */
 static const UARTConfig uart3cfg = {
 	NULL,          /* End of Transmission buffer callback               */
 	NULL,          /* Physical end of transmission callback             */
-	NULL,          /* Receive buffer filled callback                    */
+	rxend,         /* Receive buffer filled callback                    */
 	NULL,          /* Char received while out of the UART_RECEIVE state */
 	NULL,          /* Receive error callback                            */
 	460800,        /* Baudrate                                          */
