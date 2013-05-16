@@ -7,13 +7,13 @@
 #define LINEAR_RAIL_DT  0.005
 
 /* Controller parameters */
-#define DEATH_RAY_KP (-0.003)
-#define DEATH_RAY_KI (-0.003)
+#define DEATH_RAY_KP (-0.005)
+#define DEATH_RAY_KI (-0.005)
 #define DEATH_RAY_KD (-0.000)
 
 #define DEATH_RAY_I_CAP 15   // I term cap. The right value here can minimize positive overshoot.
 #define DEATH_RAY_STARTUP_COUNTER_MAX 200
-#define DEATH_RAY_STARTUP_DC 0.058
+#define DEATH_RAY_STARTUP_DC 0.068
 
 #define LINEAR_RAIL_POS_KP (0)
 #define LINEAR_RAIL_POS_KI (0)
