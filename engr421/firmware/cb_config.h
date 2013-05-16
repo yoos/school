@@ -43,6 +43,8 @@
 #define ROT_SPEED (BB_VEL/(WHEEL_DIA*M_PI))   // In rev/s
 #define ROT_PERIOD_ST (MS2ST(1000)/(ROT_SPEED*256))   // 256 quadrature pulses per revolution.
 
+#define REVS_PER_LENGTH 9.9   // Number of revolutions encoder pulley spins as it moves from one end of the slide to the other.
+
 #define ESC_MIN_DC 0.485   // Minimum duty cycle for Mikrokopter ESCs.
 #define ESC_MAX_DC 0.83    // Maximum duty cycle for Mikrokopter ESCs.
 
