@@ -14,6 +14,7 @@
   <depend package="opencv2"/>
   <depend package="cv_bridge"/>
   <depend package="roscpp"/>
+  <depend package="rospy"/>
   <depend package="std_msgs"/>
   <depend package="image_transport"/>
   <depend package="rqt_cb_gui"/>

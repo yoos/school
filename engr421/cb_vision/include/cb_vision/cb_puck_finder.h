@@ -72,6 +72,17 @@ class CBPuckFinder
 	float puckiness_min_ratio;   // Minimum ratio of contour-to-enclosing-circle. This helps us filter out noise.
 	uint8_t puck_canny_lower_threshold;
 
+	// Board corner locations. Should be grabbed later from ROS parameter
+	// server.
+	int board_corner_0_x,
+			 board_corner_0_y,
+			 board_corner_1_x,
+			 board_corner_1_y,
+			 board_corner_2_x,
+			 board_corner_2_y,
+			 board_corner_3_x,
+			 board_corner_3_y;
+
 	cv_bridge::CvImagePtr cv_ptr;
 	cb_vision::cb_puck_coordinates pc;
 
@@ -88,7 +99,7 @@ class CBPuckFinder
 	/**
 	 * Find pucks in input image and output vector of puck coordinates.
 	 */
-	void find_pucks(Mat* hsv_image, vector<vector<Point> >* pucks);
+	void find_pucks(Mat* image, vector<vector<Point> >* pucks);
 
 	/**
 	 * Callback for input video.
@@ -99,6 +110,8 @@ class CBPuckFinder
 	 * Callback for parameters set by GUI.
 	 */
 	void params_cb(const rqt_cb_gui::cb_params& msg);
+
+	void get_parameters(void);
 
 public:
 	CBPuckFinder(ros::NodeHandle nh);
