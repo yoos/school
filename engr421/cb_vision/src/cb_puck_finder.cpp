@@ -37,6 +37,17 @@ CBPuckFinder::CBPuckFinder(ros::NodeHandle nh) : it(nh)
 	puckiness_min_ratio = 0.0;
 	puck_canny_lower_threshold = 0;
 
+	// Board corner locations. Should be grabbed later from ROS parameter
+	// server.
+	board_corner_0_x = 0;
+	board_corner_0_y = 0;
+	board_corner_1_x = 0;
+	board_corner_1_y = 0;
+	board_corner_2_x = 0;
+	board_corner_2_y = 0;
+	board_corner_3_x = 0;
+	board_corner_3_y = 0;
+
 	// Set up windows.
 	cvNamedWindow(RAW_WINDOW, 1);
 	cvMoveWindow(RAW_WINDOW, 50, 50);
@@ -50,67 +61,31 @@ CBPuckFinder::CBPuckFinder(ros::NodeHandle nh) : it(nh)
 
 void CBPuckFinder::rectify_board(Mat* image, Mat* rect_image)
 {
-	// Clear old vectors.
-	board_contours.clear();
-	board_closed_contours.clear();
-
-	// Convert image to HSV space and save to hsv_image.
-	static Mat hsv_image;
-	cvtColor(*image, hsv_image, CV_BGR2HSV);
-
-	// Threshold hsv_image for color of board and save to bw_image.
-	static Mat bw_image;
-	inRange(hsv_image, Scalar(board_hue_low, board_sat_low, board_val_low),
-			Scalar(board_hue_high, board_sat_high, board_val_high), bw_image);
-
-	// Erode image to remove noise from outside the board, then dilate to fill
-	// in gaps within the board.
-	static Mat eroded_image;
-	erode(bw_image, eroded_image, Mat(), Point(-1, -1), board_erosion_iter);
-	static Mat dilated_image;
-	dilate(eroded_image, dilated_image, Mat(), Point(-1, -1), board_dilation_iter);
-
-	// Find edges with Canny.
-	static Mat canny_image;
-	Canny(dilated_image, canny_image, board_canny_lower_threshold, board_canny_lower_threshold*2, 5);
-
-	// Find contours.
-	findContours(canny_image, board_contours, board_contours_hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
-
-	/**
-	 * Test each contour for boardiness.
-	 */
-
-	// Check that the contour is closed.
-	for (uint16_t i=0; i<board_contours.size(); i++) {
-		// Approximate contour with accuracy proportional to contour perimeter.
-		approxPolyDP(Mat(board_contours[i]), maybe_board, arcLength(Mat(board_contours[i]), true)*0.02, true);
-
-		// The board is big and has four sides.
-		if (maybe_board.size() == 4 && fabs(contourArea(Mat(maybe_board))) > board_min_size) {
-			board_closed_contours.push_back(maybe_board);
-		}
+	// Wait for the user to select board corners.
+	while (!nh_.hasParam("corner0/x")) {
+		ros::Duration(0.2).sleep();
 	}
-
-	if (board_closed_contours.size() == 1) {
-		board = board_closed_contours[0];
-	}
-
-	debug_image_1 = dilated_image;
-	*rect_image = hsv_image;   // TODO: for now, since I don't have perspective transform yet.
+	get_parameters();   // Is it bad to call this every loop?
 
 	// Rectify image.
 	//perspectiveTransform(orig_image, rect_frame, getPerspectiveTransform(Point(0,40), Point(0,200)));
-	// TODO: Get board and do polygon recognition on board. Erosion+dilation
-	// steps should get us a clean trapezoid, from which we can extract corners
-	// and use for perspective transform. Some good HSV thresholds for the
-	// board:
-	//     HL: 0   HH: 40
-	//     SL: 0   SH: 255
-	//     VL: 80  VH: 200
+	// Board size is 22.3125 x 45 inches.
+	int dpi = 20;
+	Point2f src = {Point2f(board_corner_0_x, board_corner_0_y),
+				   Point2f(board_corner_1_x, board_corner_1_y),
+				   Point2f(board_corner_2_x, board_corner_2_y),
+				   Point2f(board_corner_3_x, board_corner_3_y)};
+	Point2f dst = {Point2f(0, 0),
+				   Point2f(0, 45*dpi),
+				   Point2f(22.3125*dpi, 0),
+				   Ponit2f(22.3125*dpi, 45*dpi)};
+
+	Mat trans = getPerspectiveTransform(src, dst);
+
+	perspectiveTransform(image, rect_image, trans);
 }
 
-void CBPuckFinder::find_pucks(Mat* hsv_image, vector<vector<Point> >* pucks)
+void CBPuckFinder::find_pucks(Mat* image, vector<vector<Point> >* pucks)
 {
 	// Clear old vectors.
 	pucks_contours.clear();
@@ -118,6 +93,10 @@ void CBPuckFinder::find_pucks(Mat* hsv_image, vector<vector<Point> >* pucks)
 	target_pucks.clear();
 	pucks_encircle_centers.clear();
 	pucks_encircle_radii.clear();
+
+	// Convert image to HSV space and save to hsv_image.
+	static Mat hsv_image;
+	cvtColor(*image, hsv_image, CV_BGR2HSV);
 
 	// Threshold image for color of pucks and save to bw_image.
 	static Mat bw_image;
@@ -239,5 +218,17 @@ void CBPuckFinder::params_cb(const rqt_cb_gui::cb_params& msg)
 	puck_erosion_iter  = msg.puck_erosion_iter;
 	puckiness_min_ratio = msg.puckiness_min_ratio;
 	puck_canny_lower_threshold = msg.puck_canny_lower_threshold;
+}
+
+void CBPuckFinder::get_parameters()
+{
+	nh_.getParam("corner0/x", board_corner_0_x);
+	nh_.getParam("corner0/y", board_corner_0_y);
+	nh_.getParam("corner1/x", board_corner_1_x);
+	nh_.getParam("corner1/y", board_corner_1_y);
+	nh_.getParam("corner2/x", board_corner_2_x);
+	nh_.getParam("corner2/y", board_corner_2_y);
+	nh_.getParam("corner3/x", board_corner_3_x);
+	nh_.getParam("corner3/y", board_corner_3_y);
 }
 
