@@ -23,12 +23,13 @@ command_t packet_to_command(uint8_t *buffer, uint16_t bufsize)
 		cmd_buffer[b_index] = buffer[i];
 
 		if (cmd_buffer[b_index] == COMM_HEADER) {   /* Receive header byte. */
-			uint8_t j;
+			uint8_t j, b;
 			for (j=0; j<COMM_PACKET_LENGTH; j++) {   /* Are these valid values? */
-				uint8_t b = cmd_buffer[(COMM_RECEIVE_BUFFER_LENGTH + b_index - COMM_PACKET_LENGTH + j) % COMM_RECEIVE_BUFFER_LENGTH];
+				b = cmd_buffer[(COMM_RECEIVE_BUFFER_LENGTH + b_index - COMM_PACKET_LENGTH + j) % COMM_RECEIVE_BUFFER_LENGTH];
 				if (b <= COMM_INPUT_MAX) {
-					comm_input[i] = b;
+					comm_input[j] = b;
 					rc.new_command = true;
+					palSetPad(GPIOD, 15);
 				}
 				else {
 					rc.new_command = false;
@@ -40,10 +41,10 @@ command_t packet_to_command(uint8_t *buffer, uint16_t bufsize)
 		b_index = (b_index+1) % COMM_RECEIVE_BUFFER_LENGTH;   /* TODO: This doesn't look correct. */
 
 		if (rc.new_command) {
-			rc.one.death_ray_intensity = ((float) comm_input[0]) / 250.0;
-			rc.one.linear_rail_pos     = ((float) comm_input[1]) / 250.0;
-			rc.two.death_ray_intensity = ((float) comm_input[2]) / 250.0;
-			rc.two.linear_rail_pos     = ((float) comm_input[3]) / 250.0;
+			rc.one.death_ray_intensity = ((float) comm_input[0]) / ((float) COMM_INPUT_MAX);
+			rc.one.linear_rail_pos     = ((float) comm_input[1]) / ((float) COMM_INPUT_MAX);
+			rc.two.death_ray_intensity = ((float) comm_input[2]) / ((float) COMM_INPUT_MAX);
+			rc.two.linear_rail_pos     = ((float) comm_input[3]) / ((float) COMM_INPUT_MAX);
 
 			return rc;
 		}
@@ -62,5 +63,10 @@ void setup_comm(void)
 
 	palSetPadMode(GPIOB, 10, PAL_MODE_ALTERNATE(7));   // USART3 TX
 	palSetPadMode(GPIOB, 11, PAL_MODE_ALTERNATE(7));   // USART3 RX
+
+	uint16_t i;
+	for (i=0; i<COMM_RECEIVE_BUFFER_LENGTH; i++) {
+		cmd_buffer[i] = 0;
+	}
 }
 

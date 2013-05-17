@@ -59,9 +59,11 @@ static msg_t comm_thread(void *arg)
 		clear_buffer(txbuf);
 
 		//chsprintf(txbuf, "ICU: %6d %6d %6d %6d\r\n", (int) (icu_get_period(2)*1000), (int) (icu_get_period(3)*1000), (int) (icu_get_period(4)*1000), (int) (icu_get_period(5)*1000));
+		chsprintf(txbuf, "%u %6u %6u | %u %u\r\n", (int) rc.new_command, (uint8_t) (ABS(rc.one.linear_rail_pos)*255), (uint8_t) (ABS(rc.two.linear_rail_pos)*255), (uint8_t) (ABS(rc.one.death_ray_intensity*255)), (uint8_t) (ABS(rc.two.death_ray_intensity*255)));
+		dc[7] = rc.one.linear_rail_pos;
 
 		//death_ray_debug_output(base_wheel_dc, txbuf);
-		chsprintf(txbuf, "%s", rxbuf);
+		//chsprintf(txbuf, "%s", rxbuf);
 		uartStartSend(&UARTD3, sizeof(txbuf), txbuf);
 
 		clear_buffer(rxbuf);
@@ -247,7 +249,7 @@ int main(void)
 	/*
 	 * Create linear rail thread.
 	 */
-	chThdCreateStatic(wa_linear_rail_thread, sizeof(wa_linear_rail_thread), HIGHPRIO, linear_rail_thread, NULL);
+	chThdCreateStatic(wa_linear_rail_thread, sizeof(wa_linear_rail_thread), HIGHPRIO-1, linear_rail_thread, NULL);
 
 	/*
 	 * Create control thread.
