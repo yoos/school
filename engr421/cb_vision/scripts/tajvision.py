@@ -6,6 +6,10 @@ import time
 import numpy
 import os
 
+# Set up node for ROS.
+import roslib; roslib.load_manifest("cb_vision")
+import rospy
+
 ##
 # Opens a video capture device with a resolution of 800x600
 # at 30 FPS.
@@ -57,18 +61,12 @@ def mouse_click_callback(event, x, y, flags, param):
         corner_point_list.append( (x,y) )
  
 ##
-# Computes a perspective transform matrix by capturing a single
-# frame from a video source and displaying it to the user for
-# corner selection.
+# Prompt user to select the four corners of the board.
 #
 # Parameters:
 # * dev: Video Device (from open_camera())
-# * board_size: A tuple/list with 2 elements containing the width and height (respectively) of the gameboard (in arbitrary units, like inches)
-# * dpi: Scaling factor for elements of board_size
-# * calib_file: Optional. If specified, the perspective transform matrix is saved under this filename.
-#   This file can be loaded later to bypass the calibration step (assuming nothing has moved).
 ##
-def get_transform_matrix(dev, board_size, dpi, calib_file = None):
+def get_board_corners(dev):
     # Read a frame from the video device
     img = get_frame(dev)
  
@@ -93,65 +91,47 @@ def get_transform_matrix(dev, board_size, dpi, calib_file = None):
  
     # Close the calibration window:
     cv2.destroyWindow("Calibrate")
- 
-    # If the user selected 4 points
-    if (len(corner_point_list) >= 4):
-        # Do calibration
- 
-        # src is a list of 4 points on the original image selected by the user
-        # in the order [TOP_LEFT, BOTTOM_LEFT, TOP_RIGHT, BOTTOM_RIGHT]
-        src = numpy.array(corner_point_list, numpy.float32)
- 
-        # dest is a list of where these 4 points should be located on the
-        # rectangular board (in the same order):
-        dest = numpy.array( [ (0, 0), (0, board_size[1]*dpi), (board_size[0]*dpi, 0), (board_size[0]*dpi, board_size[1]*dpi) ], numpy.float32)
- 
-        # Calculate the perspective transform matrix
-        trans = cv2.getPerspectiveTransform(src, dest)
- 
-        # If we were given a calibration filename, save this matrix to a file
-        if calib_file:
-            numpy.savetxt(calib_file, trans)
-        return trans
-    else:
-        return None
- 
 
+    # Put corner coordinates on ROS parameter server.
+    rospy.set_param("corner0/x", corner_point_list[0][0])
+    rospy.set_param("corner0/y", corner_point_list[0][1])
+    rospy.set_param("corner1/x", corner_point_list[1][0])
+    rospy.set_param("corner1/y", corner_point_list[1][1])
+    rospy.set_param("corner2/x", corner_point_list[2][0])
+    rospy.set_param("corner2/y", corner_point_list[2][1])
+    rospy.set_param("corner3/x", corner_point_list[3][0])
+    rospy.set_param("corner3/y", corner_point_list[3][1])
+ 
 
 ##################################################### 
 ### Calibration Example ###
 if __name__ == "__main__":
+    # Initialize ROS node.
+    rospy.init_node("cb_rectify", anonymous=False)
+
     cam_id = 0
     dev = open_camera(cam_id)
+
+    # Get board corners.
+    get_board_corners(dev)
  
-    # The size of the board in inches, measured between the two
-    # robot boundaries:
-    board_size = [22.3125, 45]
+
+    # # Size (in pixels) of the transformed image
+    # transform_size = (int(board_size[0]*dpi), int(board_size[1]*dpi))
+    # while True:
+    #     img_orig = get_frame(dev)
+    #     if img_orig is not None: # if we did get an image
+    #         # Show the original (untransformed) image
+    #         cv2.imshow("video", img_orig)
+    #
+    #         # Apply the transformation matrix to skew the image and display it
+    #         img = cv2.warpPerspective(img_orig, transform, dsize=transform_size)
+    #         cv2.imshow("warped", img)
  
-    # Number of pixels to display per inch in the final transformed image. This
-    # was selected somewhat arbitrarily (I chose 17 because it fit on my screen):
-    dpi = 17
+    #     else: # if we failed to capture (camera disconnected?), then quit
+    #         break
  
-    # Calculate the perspective transform matrix
-    transform = get_transform_matrix(dev, board_size, dpi)
- 
- 
-    # Size (in pixels) of the transformed image
-    transform_size = (int(board_size[0]*dpi), int(board_size[1]*dpi))
-    while True:
-        img_orig = get_frame(dev)
-        if img_orig is not None: # if we did get an image
-            # Show the original (untransformed) image
-            cv2.imshow("video", img_orig)
-            
-            # Apply the transformation matrix to skew the image and display it
-            img = cv2.warpPerspective(img_orig, transform, dsize=transform_size)
-            cv2.imshow("warped", img)
- 
-        else: # if we failed to capture (camera disconnected?), then quit
-            break
- 
-        if (cv2.waitKey(2) >= 0):
-            break
+    #     if (cv2.waitKey(2) >= 0):
+    #         break
  
     cleanup(cam_id)
