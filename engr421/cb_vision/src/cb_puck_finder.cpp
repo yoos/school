@@ -71,18 +71,19 @@ void CBPuckFinder::rectify_board(Mat* image, Mat* rect_image)
 	//perspectiveTransform(orig_image, rect_frame, getPerspectiveTransform(Point(0,40), Point(0,200)));
 	// Board size is 22.3125 x 45 inches.
 	int dpi = 20;
-	Point2f src = {Point2f(board_corner_0_x, board_corner_0_y),
-				   Point2f(board_corner_1_x, board_corner_1_y),
-				   Point2f(board_corner_2_x, board_corner_2_y),
-				   Point2f(board_corner_3_x, board_corner_3_y)};
-	Point2f dst = {Point2f(0, 0),
-				   Point2f(0, 45*dpi),
-				   Point2f(22.3125*dpi, 0),
-				   Ponit2f(22.3125*dpi, 45*dpi)};
+	Point2f src[4], dst[4];
+	src[0] = Point2f(board_corner_0_x, board_corner_0_y);
+	src[1] = Point2f(board_corner_1_x, board_corner_1_y);
+	src[2] = Point2f(board_corner_2_x, board_corner_2_y);
+	src[3] = Point2f(board_corner_3_x, board_corner_3_y);
+	dst[0] = Point2f(0, 0);
+	dst[1] = Point2f(0, 45*dpi);
+	dst[2] = Point2f(22.3125*dpi, 0);
+	dst[3] = Point2f(22.3125*dpi, 45*dpi);
 
 	Mat trans = getPerspectiveTransform(src, dst);
 
-	perspectiveTransform(image, rect_image, trans);
+	perspectiveTransform(*image, *rect_image, trans);
 }
 
 void CBPuckFinder::find_pucks(Mat* image, vector<vector<Point> >* pucks)
@@ -100,7 +101,7 @@ void CBPuckFinder::find_pucks(Mat* image, vector<vector<Point> >* pucks)
 
 	// Threshold image for color of pucks and save to bw_image.
 	static Mat bw_image;
-	inRange(*hsv_image, Scalar(puck_hue_low, puck_sat_low, puck_val_low),
+	inRange(hsv_image, Scalar(puck_hue_low, puck_sat_low, puck_val_low),
 			Scalar(puck_hue_high, puck_sat_high, puck_val_high), bw_image);
 
 	// Erode image to get sharper corners.
@@ -220,7 +221,7 @@ void CBPuckFinder::params_cb(const rqt_cb_gui::cb_params& msg)
 	puck_canny_lower_threshold = msg.puck_canny_lower_threshold;
 }
 
-void CBPuckFinder::get_parameters()
+void CBPuckFinder::get_parameters(void)
 {
 	nh_.getParam("corner0/x", board_corner_0_x);
 	nh_.getParam("corner0/y", board_corner_0_y);

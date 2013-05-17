@@ -74,7 +74,7 @@ class CBPuckFinder
 
 	// Board corner locations. Should be grabbed later from ROS parameter
 	// server.
-	uint32_t board_corner_0_x,
+	int board_corner_0_x,
 			 board_corner_0_y,
 			 board_corner_1_x,
 			 board_corner_1_y,
@@ -110,6 +110,8 @@ class CBPuckFinder
 	 * Callback for parameters set by GUI.
 	 */
 	void params_cb(const rqt_cb_gui::cb_params& msg);
+
+	void get_parameters(void);
 
 public:
 	CBPuckFinder(ros::NodeHandle nh);
