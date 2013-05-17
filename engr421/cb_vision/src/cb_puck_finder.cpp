@@ -187,8 +187,10 @@ void CBPuckFinder::image_cb(const sensor_msgs::ImageConstPtr& msg)
 		return;
 	}
 
-	pc.x[0] = target_pucks.size();
-	pc.x[1] = puck_erosion_iter;
+	for (int i=0; i<2; i++) {
+		pc.x[i] = pucks_encircle_centers[i].x;
+		pc.y[i] = pucks_encircle_centers[i].y;
+	}
 
 	cb_vision_pub.publish(pc);
 }
