@@ -18,6 +18,7 @@ float base_wheel_dc = 0;
 float dc[8];
 float lr_des_pos[2];   /* Desired linear rail position from serial input. */
 uint8_t digital_state[8];
+uint8_t enabled = 0;
 
 void clear_buffer(uint8_t *buffer)
 {
@@ -62,7 +63,8 @@ static msg_t comm_thread(void *arg)
 		//chsprintf(txbuf, "%u %6u %6u | %u %u\r\n", (int) rc.new_command, (uint8_t) (ABS(rc.one.linear_rail_pos)*255), (uint8_t) (ABS(rc.two.linear_rail_pos)*255), (uint8_t) (ABS(rc.one.death_ray_intensity*255)), (uint8_t) (ABS(rc.two.death_ray_intensity*255)));
 		///comm_debug_output(txbuf);
 		///dc[7] = rc.one.linear_rail_pos;
-		lr_des_pos[0] = ((float)rxbuf[0]) / COMM_INPUT_MAX;
+		lr_des_pos[0] = ((float) (0x7f & rxbuf[0])) / 128;   // Use highest-order bit as enable signal.
+		enabled = 0x80 & rxbuf[0];
 
 		chsprintf(txbuf, "%u\r\n", (int)(lr_des_pos[0]*1000));
 
@@ -124,7 +126,16 @@ static msg_t death_ray_thread(void *arg)
 	while (TRUE) {
 		time += MS2ST(1000*DEATH_RAY_DT);
 
-		update_death_ray(base_wheel_dc, dc);
+		update_death_ray(enabled, dc);
+
+		// Hopper
+		digital_state[2] = enabled;
+		if (enabled) {
+			palSetPad(GPIOD, 15);
+		}
+		else {
+			palClearPad(GPIOD, 15);
+		}
 
 		chThdSleepUntil(time);
 	}
@@ -148,7 +159,7 @@ static msg_t linear_rail_thread(void *arg)
 	while (TRUE) {
 		time += MS2ST(1000*LINEAR_RAIL_DT);
 
-		update_linear_rail(base_wheel_dc, lr_des_pos, lr_dir, lr_dc);
+		update_linear_rail(enabled, lr_des_pos, lr_dir, lr_dc);
 
 		dc[4] = lr_dc[0];
 		dc[5] = lr_dc[1];

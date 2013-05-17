@@ -12,7 +12,7 @@ void rxchar(UARTDriver *uartp, uint16_t c)
 
 	cmd_buffer[last_rx_char_index] = (uint8_t) c;
 	last_rx_char_index = (last_rx_char_index+1) % COMM_RECEIVE_BUFFER_LENGTH;
-	palSetPad(GPIOD, 15);
+	//palSetPad(GPIOD, 15);
 }
 
 void rxend(UARTDriver *uartp)

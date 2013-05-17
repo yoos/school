@@ -44,7 +44,7 @@ void setup_death_ray(void)
 	pid_data_wheel_pos.last_val = 0;
 }
 
-void update_death_ray(float base_wheel_dc, float *dc)
+void update_death_ray(uint8_t enabled, float *dc)
 {
 	cur_wheel_period = MIN(2000, icu_get_period(5));   /* The 2000 here is arbitrary. */
 
@@ -60,7 +60,7 @@ void update_death_ray(float base_wheel_dc, float *dc)
 	det_startup(cur_wheel_period);
 
 	/* Controller */
-	if (base_wheel_dc < ESC_MIN_DC) {
+	if (enabled) {
 		/* Disabled */
 		dc[0] = ESC_MIN_DC;
 		pid_data_wheel_pos.I = 0;   /* Zero integral term. */
@@ -87,10 +87,9 @@ void update_death_ray(float base_wheel_dc, float *dc)
 	}
 }
 
-void death_ray_debug_output(float base_wheel_dc, uint8_t *buffer)
+void death_ray_debug_output(uint8_t *buffer)
 {
-	chsprintf(buffer, "ADC: %4d  Speed: %5d/%4d  Step: %6d  T: %8d\r\n",
-			(int) (base_wheel_dc*1000),
+	chsprintf(buffer, "Speed: %5d/%4d  Step: %6d  T: %8d\r\n",
 			(int) cur_wheel_period,
 			(int) ROT_PERIOD_ST,
 			(int) (ROT_SIZE*1000000),

@@ -22,14 +22,14 @@ void setup_death_ray(void);
  *
  * @output dc Array of duty cycles of death ray.
  */
-void update_death_ray(float base_wheel_dc, float *dc);
+void update_death_ray(uint8_t enabled, float *dc);
 
 /**
  * @brief Debug output
  *
  * @output buffer Output buffer.
  */
-void death_ray_debug_output(float base_wheel_dc, uint8_t *buffer);
+void death_ray_debug_output(uint8_t *buffer);
 
 #endif /* CB_DEATH_RAY_H */
 

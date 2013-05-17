@@ -25,7 +25,7 @@ void setup_linear_rail(void);
  * @output dir Direction of movement (0 or 1).
  * @output dc Duty cycle for linear rail motor.
  */
-void update_linear_rail(float base_wheel_dc, float *des_lin_pos, uint8_t *dir, float *dc);
+void update_linear_rail(uint8_t enabled, float *des_lin_pos, uint8_t *dir, float *dc);
 
 /**
  * @brief Debug output

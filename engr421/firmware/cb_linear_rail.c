@@ -30,7 +30,7 @@ void setup_linear_rail(void)
 	}
 }
 
-void update_linear_rail(float base_wheel_dc, float *des_lin_pos, uint8_t *dir, float *dc)
+void update_linear_rail(uint8_t enabled, float *des_lin_pos, uint8_t *dir, float *dc)
 {
 	uint8_t i;
 
@@ -40,7 +40,7 @@ void update_linear_rail(float base_wheel_dc, float *des_lin_pos, uint8_t *dir, f
 	_update_linear_rail_position(cur_lin_pos);
 
 	/* Controller */
-	if (base_wheel_dc < ESC_MIN_DC) {
+	if (enabled) {
 		/* Disabled */
 		for (i=0; i<2; i++) {
 			dc[i] = LINEAR_RAIL_DC_MIN;
