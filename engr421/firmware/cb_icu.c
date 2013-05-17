@@ -74,7 +74,7 @@ float icu_get_period(uint8_t icu_num)
 
 void icu2widthcb(ICUDriver *icup)
 {
-	palSetPad(GPIOD, 15);
+	//palSetPad(GPIOD, 15);
 	icu2_last_width = icuGetWidth(icup);
 }
 
@@ -86,7 +86,7 @@ void icu2periodcb(ICUDriver *icup)
 
 void icu3widthcb(ICUDriver *icup)
 {
-	palSetPad(GPIOD, 15);
+	//palSetPad(GPIOD, 15);
 	icu3_last_width = icuGetWidth(icup);
 }
 
@@ -98,7 +98,7 @@ void icu3periodcb(ICUDriver *icup)
 
 void icu4widthcb(ICUDriver *icup)
 {
-	palSetPad(GPIOD, 15);
+	//palSetPad(GPIOD, 15);
 	icu4_last_width = icuGetWidth(icup);
 }
 
@@ -110,7 +110,7 @@ void icu4periodcb(ICUDriver *icup)
 
 void icu5widthcb(ICUDriver *icup)
 {
-	palSetPad(GPIOD, 15);
+	//palSetPad(GPIOD, 15);
 	icu5_last_width = icuGetWidth(icup);
 }
 

@@ -48,25 +48,29 @@ static msg_t comm_thread(void *arg)
 		uartStopSend(&UARTD3);
 		uartStopReceive(&UARTD3);
 
-		command_t rc = packet_to_command(rxbuf, sizeof(rxbuf));
-		if (rc.new_command) {
-			lr_des_pos[0] = rc.one.linear_rail_pos;
-			lr_des_pos[1] = rc.two.linear_rail_pos;
-		}
+		///command_t rc = packet_to_command();
+		///if (rc.new_command) {
+		///	lr_des_pos[0] = rc.one.linear_rail_pos;
+		///	lr_des_pos[1] = rc.two.linear_rail_pos;
+		///}
 
 		/* Zero out buffer. TODO: Maybe check whether or not we've finished
 		 * transmitting? */
 		clear_buffer(txbuf);
 
 		//chsprintf(txbuf, "ICU: %6d %6d %6d %6d\r\n", (int) (icu_get_period(2)*1000), (int) (icu_get_period(3)*1000), (int) (icu_get_period(4)*1000), (int) (icu_get_period(5)*1000));
-		chsprintf(txbuf, "%u %6u %6u | %u %u\r\n", (int) rc.new_command, (uint8_t) (ABS(rc.one.linear_rail_pos)*255), (uint8_t) (ABS(rc.two.linear_rail_pos)*255), (uint8_t) (ABS(rc.one.death_ray_intensity*255)), (uint8_t) (ABS(rc.two.death_ray_intensity*255)));
-		dc[7] = rc.one.linear_rail_pos;
+		//chsprintf(txbuf, "%u %6u %6u | %u %u\r\n", (int) rc.new_command, (uint8_t) (ABS(rc.one.linear_rail_pos)*255), (uint8_t) (ABS(rc.two.linear_rail_pos)*255), (uint8_t) (ABS(rc.one.death_ray_intensity*255)), (uint8_t) (ABS(rc.two.death_ray_intensity*255)));
+		///comm_debug_output(txbuf);
+		///dc[7] = rc.one.linear_rail_pos;
+		lr_des_pos[0] = ((float)rxbuf[0]) / COMM_INPUT_MAX;
+
+		chsprintf(txbuf, "%u\r\n", (int)(lr_des_pos[0]*1000));
 
 		//death_ray_debug_output(base_wheel_dc, txbuf);
 		//chsprintf(txbuf, "%s", rxbuf);
 		uartStartSend(&UARTD3, sizeof(txbuf), txbuf);
 
-		clear_buffer(rxbuf);
+//		clear_buffer(rxbuf);
 		uartStartReceive(&UARTD3, sizeof(rxbuf), rxbuf);
 
 		palSetPad(GPIOD, 12);

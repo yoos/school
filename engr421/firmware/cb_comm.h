@@ -24,20 +24,23 @@ typedef struct {
  * This callback is invoked when a receive buffer has been completely written.
  */
 void rxend(UARTDriver *uartp);
+void rxchar(UARTDriver *uartp, uint16_t c);
 
 /*
  * Collect received bytes and try to extract valid commands.
  */
-command_t packet_to_command(uint8_t *buffer, uint16_t bufsize);
+command_t packet_to_command(void);
+
+void comm_debug_output(uint8_t *buffer);
 
 /*
  * USART3 configuration structure.
  */
 static const UARTConfig uart3cfg = {
-	NULL,          /* End of Transmission buffer callback               */
+	rxchar,          /* End of Transmission buffer callback               */
 	NULL,          /* Physical end of transmission callback             */
 	rxend,         /* Receive buffer filled callback                    */
-	NULL,          /* Char received while out of the UART_RECEIVE state */
+	NULL,        /* Char received while out of the UART_RECEIVE state */
 	NULL,          /* Receive error callback                            */
 	460800,        /* Baudrate                                          */
 	0,             /* cr1 register values                               */
