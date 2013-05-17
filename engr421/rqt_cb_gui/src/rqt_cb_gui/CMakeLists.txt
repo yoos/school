@@ -21,8 +21,8 @@ set(rqt_cb_gui_INCLUDE_DIRECTORIES
 qt4_wrap_cpp(rqt_cb_gui_MOCS ${rqt_cb_gui_HDRS})
 qt4_wrap_ui(rqt_cb_gui_UIS_H ${rqt_cb_gui_UIS})
 
-rosbuild_include(pluginlib hide_plugin_symbols)
-pluginlib_hide_plugin_symbols(rqt_cb_gui CBGUI)
+#rosbuild_include(pluginlib hide_plugin_symbols)
+#pluginlib_hide_plugin_symbols(rqt_cb_gui CBGUI)
 
 include_directories(${PROJECT_NAME} ${rqt_cb_gui_INCLUDE_DIRECTORIES})
 rosbuild_add_library(${PROJECT_NAME} ${rqt_cb_gui_SRCS} ${rqt_cb_gui_MOCS} ${rqt_cb_gui_UIS_H})
