@@ -4,10 +4,17 @@
 import serial
 from time import sleep
 
+# Set up node for ROS.
+import roslib; roslib.load_manifest("cb_vision")
+import rospy
+from cb_vision.msg import cb_puck_coordinates
+
 serialPort = '/dev/ttyUSB0'
 baudrate = '460800'
 header = chr(255)
 newlineChar = ''
+
+cmd = 0
 
 # Serial write.
 def serWrite(myStr):
@@ -17,9 +24,15 @@ def serWrite(myStr):
     except:
         print "Unable to send data. Check connection."
 
+def callback(pc):
+    cmd = pc.x[0]   # Target first puck.
 
 if __name__ == "__main__":
-    # =========================================================================
+    # Initialize ROS node.
+    rospy.init_node("cb_rectify", anonymous=False)
+    rospy.Subscriber("cb_rectify_sub", cb_puck_coordinates, callback)
+
+# =========================================================================
     # Try to initialize a serial connection. If serialPort is defined, try
     # opening that. If it is not defined, loop through a range of integers
     # starting from 0 and try to connect to /dev/ttyUSBX where X is the
