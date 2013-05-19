@@ -64,9 +64,9 @@ static msg_t comm_thread(void *arg)
 		///comm_debug_output(txbuf);
 		///dc[7] = rc.one.linear_rail_pos;
 		lr_des_pos[0] = ((float) (0x7f & rxbuf[0])) / 128;   // Use highest-order bit as enable signal.
-		enabled = 0x80 & rxbuf[0];
+		enabled = rxbuf[0] >> 7;
 
-		chsprintf(txbuf, "%u\r\n", (int)(lr_des_pos[0]*1000));
+		chsprintf(txbuf, "%u %u\r\n", enabled, (int)(lr_des_pos[0]*1000));
 
 		//death_ray_debug_output(base_wheel_dc, txbuf);
 		//chsprintf(txbuf, "%s", rxbuf);
