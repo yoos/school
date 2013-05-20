@@ -51,6 +51,11 @@ Four types:
     independent nodes (why acyclic?). This can be used to break up
     a probability of many factors into one with fewer factors.
   * D-separation (two special cases) used to determine conditional independence.
+  * Creating a Bayesian network by hand:
+    - Build causal, not diagnostic, models to generate smaller topologies.
+    - Range, distribution, expert, or study to generate parameters.
+  * Learning a Bayesian network from data:
+    - Evaluation function: how well does the network fit the data?
 
 Technical detail: "cost" functions need to be minimized. "utility" functions need to be maximized.
 
