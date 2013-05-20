@@ -1,7 +1,7 @@
 all:
-	pdflatex wa2.tex
-	pdflatex wa2.tex
+	pdflatex wa3.tex
+	pdflatex wa3.tex
 
 view:
-	evince wa2.pdf
+	evince wa3.pdf
 
