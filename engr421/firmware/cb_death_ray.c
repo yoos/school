@@ -46,7 +46,7 @@ void setup_death_ray(void)
 
 void update_death_ray(uint8_t enabled, float *dc)
 {
-	cur_wheel_period = MIN(2000, icu_get_period(5));   /* The 2000 here is arbitrary. */
+	cur_wheel_period = MIN(2000, icu_get_period(2));   /* The 2000 here is arbitrary. */
 
 	/*
 	 * The ICU spits out bogus values of 0 and 39 that could be interpreted as
@@ -60,7 +60,7 @@ void update_death_ray(uint8_t enabled, float *dc)
 	det_startup(cur_wheel_period);
 
 	/* Controller */
-	if (enabled) {
+	if (!enabled) {
 		/* Disabled */
 		dc[0] = ESC_MIN_DC;
 		pid_data_wheel_pos.I = 0;   /* Zero integral term. */

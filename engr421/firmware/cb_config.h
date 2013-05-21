@@ -51,7 +51,7 @@
 
 #define REVS_PER_LENGTH 9.9   // Number of revolutions encoder pulley spins as it moves from one end of the slide to the other.
 
-#define ESC_MIN_DC 0.485   // Minimum duty cycle for Mikrokopter ESCs.
+#define ESC_MIN_DC 0.475   // Minimum duty cycle for Mikrokopter ESCs.
 #define ESC_MAX_DC 0.83    // Maximum duty cycle for Mikrokopter ESCs.
 
 #endif /* CB_CONFIG_H */
