@@ -39,7 +39,81 @@
 \section*{Written Assignment \#3}
 
 \begin{enumerate}
-	\item 
+	\item
+		\begin{enumerate}
+			\item
+				\begin{tabular}{|c|c|} \hline
+					{\bf Toothache} & {\bf P(Toothache)} \\ \hline
+					true & 0.2 \\ \hline
+					false & 0.8 \\ \hline
+				\end{tabular}
+			\item
+				\begin{tabular}{|c|c|} \hline
+					{\bf Cavity} & {\bf P(Cavity)} \\ \hline
+					true & 0.2 \\ \hline
+					false & 0.8 \\ \hline
+				\end{tabular}
+			\item
+				\begin{tabular}{|c|c|} \hline
+					{\bf Toothache} & {\bf P(Toothache | Cavity)} \\ \hline
+					true & 0.6 \\ \hline
+					false & 0.4 \\ \hline
+				\end{tabular}
+		\end{enumerate}
+
+	\item
+		\begin{enumerate}
+			\item True. We see that \[P(a,b,c) = P(a|b,c)P(b|c)P(c)
+				= P(b|a,c)P(a|c)P(c).\] Since we are given \[P(a|b,c)
+				= P(b|a,c),\] \[P(a|c) = P(b|c),\] as desired.
+			\item False. Since $P(a|b,c)=P(a)$, $P(a)$ is independent of $b$
+				and $c$, but this does not tell us anything about the
+				relationship between $b$ and $c$. As a counterexample consider
+				the case when the antecedent is true and $P(b|c) \neq P(b)$.
+				Then (obviously) the consequent is false.
+			\item True. Since $P(a)$ is independent of $b$, we can simply
+				disregard it in $P(a|b,c)$, so $P(a|b,c)=P(a|c)$.
+		\end{enumerate}
+
+	\item The full joint probability distribution for the two tests are as follows:
+		\begin{table}[!h]
+			\centering
+			\begin{tabular}{|c|c|c|} \hline
+				{\bf V} & {\bf A} & {\bf P(A,V)} \\ \hline\hline
+				T & T & 0.0095 \\ \hline
+				T & F & 0.0005 \\ \hline
+				F & T & 0.099  \\ \hline
+				F & F & 0.891  \\ \hline
+			\end{tabular}
+			\hspace{1cm}
+			\begin{tabular}{|c|c|c|} \hline
+				{\bf V} & {\bf B} & {\bf P(B,V)} \\ \hline\hline
+				T & T & 0.009  \\ \hline
+				T & F & 0.001  \\ \hline
+				F & T & 0.0495 \\ \hline
+				F & F & 0.9405 \\ \hline
+			\end{tabular}
+		\end{table}
+		If Test A comes back positive, the probability that the person is
+		really carrying the virus is $\frac{0.0095}{0.0095+0.099} = 0.0876$. On
+		the other hand, if Test B comes back positive, that probability is
+		$\frac{0.009}{0.009+0.0495} = 0.1538$. Thus, $\boxed{\text{Test B}}$ is
+		more indicative of a person really carrying the virus.
+
+	\item
+		\begin{enumerate}
+			\item If the coin is fake, the probability that it flips to head is
+				$1$. Otherwise, the probability is $\frac12$. Since there is
+				only $1$ fake coin among $n$ coins, the probability that the
+				coin I picked is fake is
+				$\frac{\frac{1}{n}}{\frac{n-1}{n}\cdot\frac12}
+				= \boxed{\frac{2n}{n(n-1)}}$.
+			\item The probability that a real coin flips to head $k$ times out
+				of $k$ is $\frac{1}{2^k}$. Thus, after $k$ flips of $k$ heads,
+				the probability that the coin is fake is
+				$\frac{\frac{1}{n}}{\frac{n-1}{n}\cdot\frac{1}{2^k}}
+				= \boxed{\frac{2^kn}{n(n-1)}}$.
+		\end{enumerate}
 \end{enumerate}
 
 \end{document}

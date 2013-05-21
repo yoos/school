@@ -3,5 +3,5 @@ all:
 	pdflatex wa3.tex
 
 view:
-	evince wa3.pdf
+	xpdf wa3.pdf
 
