@@ -54,8 +54,30 @@ Class website: http://classes.engr.oregonstate.edu/~erwig/cs381
   * Access links useful for static scoping implementation.
   * Closure: function expression + environment. This allows the function to
     remember local variables after termination.
-  * Dynamic vs. static runtime stack -- look at slide 23 for (maybe) a higher-level explanation.
+  * Dynamic vs. static runtime stack -- look at slide 23 for (maybe)
+    a higher-level explanation.
 
+# Passing Parameters (05/21)
+  * Call-By-Value: pass in values. Local assignments are lost after function
+    return.
+  * Call-By-Reference: pass in variables only, put pointers on activation
+    stack.
+  * Call-By-Value-Result, aka copy-in, copy-out. Parameter passed into function
+    is modified upon function return. See Parameter Passing slide 15.
+  * Call-By-Name: parameters are not evaluated if not used in function, unlike
+    CBV, which always evaluates first. Every read access to a parameter
+    evaluates it anew. See slides 16 and 17.
+  * Call-By-Need: Like Call-By-Name, but expressions are replaced values (i.e.,
+    evaluated only once).
+  * Table of comparison on slide 20. Classification on slide 21.
+
+# Programming Paradigms (05/21)
+  * Model of computing.
+  * Imperative: computation is a transformation of states.
+  * Functional: computation is a function.
+  * Logic: computation is a relation. Unlike a function, a relation can be
+    one-to-many.
+  * Object-oriented: computation is a manipulation of objects (using methods).
 
 <!--
 vim: syntax=markdown
