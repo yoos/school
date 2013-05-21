@@ -1,4 +1,5 @@
 <launch>
+	<!-- See here for details: http://wiki.oz9aec.net/index.php/Gstreamer_cheat_sheet -->
 	<env name="GSCAM_CONFIG" value="v4l2src device=/dev/video1 ! video/x-raw-rgb,width=320,height=240,framerate=100/1 ! ffmpegcolorspace"/>
 
 	<node name="cb_gscam" pkg="gscam" type="gscam"/>
