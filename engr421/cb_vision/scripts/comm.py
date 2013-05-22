@@ -63,15 +63,15 @@ if __name__ == "__main__":
         if cmd == 'q':
             exit(0)
 
-        serWrite(header)
+        #serWrite(header)
 
         for each in cmd.split(' '):
             serWrite(chr(int(each)))
 
         sleep(0.005)
 
-        if ser.inWaiting() > 0:
-            print ser.read(ser.inWaiting())
+        #if ser.inWaiting() > 0:
+        #    print ser.read(ser.inWaiting())
 
 # vim: expandtab
 
