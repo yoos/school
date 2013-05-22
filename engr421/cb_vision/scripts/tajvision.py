@@ -16,8 +16,8 @@ import rospy
 ##
 def open_camera(cam_id = 0):
     cap = cv2.VideoCapture(cam_id)
-    cap.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, 600);
-    cap.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, 800);
+    cap.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, 240);
+    cap.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, 320);
     #cap.set(cv2.cv.CV_CAP_PROP_FPS, 30);
     return cap
 
@@ -109,7 +109,7 @@ if __name__ == "__main__":
     # Initialize ROS node.
     rospy.init_node("cb_rectify", anonymous=False)
 
-    cam_id = 0
+    cam_id = 1
     dev = open_camera(cam_id)
 
     # Get board corners.
