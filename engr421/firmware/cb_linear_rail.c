@@ -6,6 +6,15 @@ static float rot_pos_zero[2];   /* Zero position. Rail should be placed at end o
 static float cur_lin_pos[2];   /* Current position of linear rail. */
 static float cur_lin_vel[2];   /* Current velocity of linear rail. */
 
+// DEBUG
+static float cur_rot_pos;
+static float des_pos;
+static uint8_t des_dir;
+static float des_dc;
+static uint16_t dbg_dc_shift;
+static uint16_t pos_ctrl_output, vel_ctrl_output;
+static uint8_t dbg_q, dbg_r;
+
 void setup_linear_rail(void)
 {
 	uint8_t i;
@@ -43,6 +52,7 @@ void update_linear_rail(uint8_t enabled, float *des_lin_pos, uint8_t *dir, float
 	if (enabled) {
 		/* Disabled */
 		for (i=0; i<2; i++) {
+			dir[i] = 0;
 			dc[i] = LINEAR_RAIL_DC_MIN;
 
 			/* Zero integral terms. */
@@ -58,10 +68,10 @@ void update_linear_rail(uint8_t enabled, float *des_lin_pos, uint8_t *dir, float
 			pid_data_vel[i].I = MIN(LINEAR_RAIL_VEL_I_CAP, MAX(-LINEAR_RAIL_VEL_I_CAP, pid_data_vel[i].I));
 
 			/* Control */
-			linear_rail_position_controller(&pid_data_pos[i], cur_lin_pos[i], des_lin_pos[i], des_lin_vel[i]);
-			linear_rail_velocity_controller(&pid_data_vel[i], cur_lin_vel[i], des_lin_vel[i], dc_shift[i]);
+			des_lin_vel[i] = linear_rail_position_controller(&pid_data_pos[i], cur_lin_pos[i], des_lin_pos[i]);
+			dc_shift[i]    = linear_rail_velocity_controller(&pid_data_vel[i], cur_lin_vel[i], des_lin_vel[i]);
 
-			dir[i] = (dc_shift[i] < 0) ? 0 : 1;
+			dir[i] = (cur_lin_pos[i] > des_lin_pos[i]) ? 0 : 1;
 			if (dir[i] == 0) {
 				dc[i] = MIN(1.0, ABS(dc_shift[i]));
 			}
@@ -70,11 +80,17 @@ void update_linear_rail(uint8_t enabled, float *des_lin_pos, uint8_t *dir, float
 			}
 		}
 	}
+	des_pos = des_lin_pos[0];
+	des_dir = dir[0];
+	des_dc = dc[0];
+	dbg_dc_shift = (uint16_t) ABS(dc_shift[0] * 1000);
+	pos_ctrl_output = (uint16_t) (des_lin_vel[0] * 1000);
+
 }
 
 void linear_rail_debug_output(uint8_t *buffer)
 {
-	chsprintf(buffer, "LR\r\n");
+	chsprintf(buffer, "rot pos zero: %u  cur lin pos: %u  des lin pos: %u  cur rot pos: %u  des dir: %u  des dc: %u  dc_shift: %u  pos_ctrl_output: %u  q:  %u  r: %u\r\n", (uint16_t) (rot_pos_zero[0]*1000), (uint16_t) (cur_lin_pos[0]*1000), (uint16_t) (des_pos*1000), (uint16_t) (cur_rot_pos*1000), (uint8_t) des_dir, (uint16_t) (des_dc*1000), dbg_dc_shift, pos_ctrl_output, dbg_q, dbg_r);
 }
 
 void _update_linear_rail_position(float *lin_pos)
@@ -84,6 +100,8 @@ void _update_linear_rail_position(float *lin_pos)
 	float rot_pos[2];
 	rot_pos[0] = icu_get_duty_cycle(I_ICU_LINEAR_RAIL_0);
 	rot_pos[1] = icu_get_duty_cycle(I_ICU_LINEAR_RAIL_1);
+
+	cur_rot_pos = rot_pos[0];
 
 	/*
 	 * The ICU spits out bogus values of 0 and 39 that could be interpreted as
@@ -106,15 +124,18 @@ void _update_linear_rail_position(float *lin_pos)
 
 		/* Calculate rotation. */
 		float d_rot = rot_pos[i] - r[i];
-		if (d_rot > 0.5) {
+		if (d_rot > 0.7) {
 			d_rot -= 1.0;
 		}
-		else if (d_rot < -0.5) {
+		else if (d_rot < -0.7) {
 			d_rot += 1.0;
 		}
 
 		/* Calculate new position. */
 		lin_pos[i] += d_rot/REVS_PER_LENGTH;
 	}
+
+	dbg_q = q[0];
+	dbg_r = r[0];
 }
 

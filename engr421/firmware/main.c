@@ -66,7 +66,8 @@ static msg_t comm_thread(void *arg)
 		lr_des_pos[0] = ((float) (0x7f & rxbuf[0])) / 128;   // Use highest-order bit as enable signal.
 		enabled = rxbuf[0] >> 7;
 
-		chsprintf(txbuf, "%u %u\r\n", enabled, (int)(lr_des_pos[0]*1000));
+		//chsprintf(txbuf, "%u %u\r\n", enabled, (int)(lr_des_pos[0]*1000));
+		linear_rail_debug_output(txbuf);
 
 		//death_ray_debug_output(base_wheel_dc, txbuf);
 		//chsprintf(txbuf, "%s", rxbuf);
@@ -183,6 +184,10 @@ static msg_t control_thread(void *arg)
 	systime_t time = chTimeNow();
 
 	uint16_t k = 0;
+	uint8_t i;
+	for (i=0; i<8; i++) {
+		palSetPadMode(GPIOD, i, PAL_MODE_OUTPUT_PUSHPULL);
+	}
 
 	while (TRUE) {
 		time += MS2ST(1000*CONTROL_LOOP_DT);   // Next deadline in 1 ms.
@@ -236,6 +241,8 @@ int main(void)
 	setup_icu();
 
 	setup_motors();
+
+	chThdSleepMilliseconds(10);   /* Wait for initialization. */
 
 	setup_death_ray();
 
