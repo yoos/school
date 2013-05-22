@@ -124,10 +124,10 @@ void _update_linear_rail_position(float *lin_pos)
 
 		/* Calculate rotation. */
 		float d_rot = rot_pos[i] - r[i];
-		if (d_rot > 0.7) {
+		if (d_rot > 0.5) {
 			d_rot -= 1.0;
 		}
-		else if (d_rot < -0.7) {
+		else if (d_rot < -0.5) {
 			d_rot += 1.0;
 		}
 
