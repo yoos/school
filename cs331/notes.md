@@ -46,7 +46,7 @@
   * Keep tautologies out of the knowledge base.
   * Resolution.   <!-- TODO: Figure this out. -->
 
-# Bayesian Networks
+# Bayesian Networks (05/20)
   * Directed acyclic graph (i.e., cause and effect) of conditionally
     independent nodes (why acyclic?). This can be used to break up
     a probability of many factors into one with fewer factors.
@@ -56,6 +56,9 @@
     - Range, distribution, expert, or study to generate parameters.
   * Learning a Bayesian network from data:
     - Evaluation function: how well does the network fit the data?
+
+# Naive Bayes (05/22)
+  * Assume conditional independence.
 
 Technical detail: "cost" functions need to be minimized. "utility" functions need to be maximized.
 
