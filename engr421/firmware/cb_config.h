@@ -4,7 +4,7 @@
 /* Timesteps in seconds */
 #define CONTROL_LOOP_DT 0.001
 #define DEATH_RAY_DT    0.00125
-#define LINEAR_RAIL_DT  0.005
+#define LINEAR_RAIL_DT  0.002
 
 /* Controller parameters */
 #define DEATH_RAY_KP (-0.005)
@@ -15,15 +15,15 @@
 #define DEATH_RAY_STARTUP_COUNTER_MAX 200
 #define DEATH_RAY_STARTUP_DC 0.60
 
-#define LINEAR_RAIL_POS_KP (1000)
+#define LINEAR_RAIL_POS_KP (1)
 #define LINEAR_RAIL_POS_KI (0)
 #define LINEAR_RAIL_POS_KD (0)
-#define LINEAR_RAIL_VEL_KP (1000)
+#define LINEAR_RAIL_VEL_KP (4)
 #define LINEAR_RAIL_VEL_KI (0)
 #define LINEAR_RAIL_VEL_KD (0)
 
-#define LINEAR_RAIL_POS_I_CAP 0
-#define LINEAR_RAIL_VEL_I_CAP 0
+#define LINEAR_RAIL_POS_I_CAP 1
+#define LINEAR_RAIL_VEL_I_CAP 1
 #define LINEAR_RAIL_VEL_CAP 0.5   // In m/s.
 #define LINEAR_RAIL_DC_MIN 0.0   // Minimum duty cycle for linear rail motor controllers.
 #define LINEAR_RAIL_DC_MAX 1.0   // Maximum duty cycle for linear rail motor controllers.
@@ -49,7 +49,7 @@
 #define ROT_SPEED (BB_VEL/(WHEEL_DIA*M_PI))   // In rev/s
 #define ROT_PERIOD_ST (MS2ST(1000)/(ROT_SPEED*256))   // 256 quadrature pulses per revolution.
 
-#define REVS_PER_LENGTH 9.9   // Number of revolutions encoder pulley spins as it moves from one end of the slide to the other.
+#define REVS_PER_LENGTH 8.3   // Number of revolutions encoder pulley spins as it moves from one end of the slide to the other.
 
 #define ESC_MIN_DC 0.475   // Minimum duty cycle for Mikrokopter ESCs.
 #define ESC_MAX_DC 0.83    // Maximum duty cycle for Mikrokopter ESCs.
