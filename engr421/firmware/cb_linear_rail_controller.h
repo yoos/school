@@ -17,7 +17,7 @@
  *
  * @output des_vel Desired velocity.
  */
-void linear_rail_position_controller (pid_data_t *pid_data, float cur_pos, float des_pos, float des_vel);
+float linear_rail_position_controller (pid_data_t *pid_data, float cur_pos, float des_pos);
 
 /**
  * @brief Calculate shifts in individual duty cycles of motors baseed on
@@ -29,7 +29,7 @@ void linear_rail_position_controller (pid_data_t *pid_data, float cur_pos, float
  *
  * @output dc_shift Shift in duty cycle.
  */
-void linear_rail_velocity_controller (pid_data_t *pid_data, float cur_vel, float des_vel, float dc_shift);
+float linear_rail_velocity_controller (pid_data_t *pid_data, float cur_vel, float des_vel);
 
 /**
  * @brief Map input array to be within desired bounds.
