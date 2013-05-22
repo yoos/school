@@ -18,7 +18,7 @@ set(rqt_cb_gui_INCLUDE_DIRECTORIES
 	${PROJECT_SOURCE_DIR}/build/src
 )
 
-qt4_wrap_cpp(rqt_cb_gui_MOCS ${rqt_cb_gui_HDRS})
+qt4_wrap_cpp(rqt_cb_gui_MOCS ${rqt_cb_gui_HDRS} OPTIONS -DBOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)   # Boost 1.53 and Qt4 MOC don't play nicely without this options definition. See https://bugreports.qt-project.org/browse/QTBUG-22829.
 qt4_wrap_ui(rqt_cb_gui_UIS_H ${rqt_cb_gui_UIS})
 
 #rosbuild_include(pluginlib hide_plugin_symbols)
