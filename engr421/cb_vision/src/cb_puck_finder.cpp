@@ -48,6 +48,9 @@ CBPuckFinder::CBPuckFinder(ros::NodeHandle nh) : it(nh)
 	board_corner_3_x = 0;
 	board_corner_3_y = 0;
 
+	frame_height = 100;
+	frame_width = 100;
+
 	// Set up windows.
 	cvNamedWindow(RAW_WINDOW, 1);
 	cvMoveWindow(RAW_WINDOW, 50, 50);
@@ -67,23 +70,24 @@ void CBPuckFinder::rectify_board(Mat* image, Mat* rect_image)
 	}
 	get_parameters();   // Is it bad to call this every loop?
 
-	// Rectify image.
-	//perspectiveTransform(orig_image, rect_frame, getPerspectiveTransform(Point(0,40), Point(0,200)));
-	// Board size is 22.3125 x 45 inches.
-	int dpi = 20;
+	// Rectify image. Board size is 22.3125 x 45 inches.
+	int dpi = 10;
 	Point2f src[4], dst[4];
 	src[0] = Point2f(board_corner_0_x, board_corner_0_y);
 	src[1] = Point2f(board_corner_1_x, board_corner_1_y);
 	src[2] = Point2f(board_corner_2_x, board_corner_2_y);
 	src[3] = Point2f(board_corner_3_x, board_corner_3_y);
+
+	frame_height = 45*dpi;
+	frame_width = 22.3125*dpi;
+
 	dst[0] = Point2f(0, 0);
-	dst[1] = Point2f(0, 45*dpi);
-	dst[2] = Point2f(22.3125*dpi, 0);
-	dst[3] = Point2f(22.3125*dpi, 45*dpi);
+	dst[1] = Point2f(0, frame_height);
+	dst[2] = Point2f(frame_width, 0);
+	dst[3] = Point2f(frame_width, frame_height);
 
 	Mat trans = getPerspectiveTransform(src, dst);
-
-	perspectiveTransform(*image, *rect_image, trans);
+	warpPerspective(*image, *rect_image, trans, cvSize(frame_width, frame_height));
 }
 
 void CBPuckFinder::find_pucks(Mat* image, vector<vector<Point> >* pucks)
@@ -97,11 +101,11 @@ void CBPuckFinder::find_pucks(Mat* image, vector<vector<Point> >* pucks)
 
 	// Convert image to HSV space and save to hsv_image.
 	static Mat hsv_image;
-	cvtColor(*image, hsv_image, CV_BGR2HSV);
+	cvtColor(*image, debug_image_2, CV_BGR2HSV_FULL);
 
 	// Threshold image for color of pucks and save to bw_image.
 	static Mat bw_image;
-	inRange(hsv_image, Scalar(puck_hue_low, puck_sat_low, puck_val_low),
+	inRange(debug_image_2, Scalar(puck_hue_low, puck_sat_low, puck_val_low),
 			Scalar(puck_hue_high, puck_sat_high, puck_val_high), bw_image);
 
 	// Erode image to get sharper corners.
@@ -146,6 +150,9 @@ void CBPuckFinder::find_pucks(Mat* image, vector<vector<Point> >* pucks)
 
 void CBPuckFinder::image_cb(const sensor_msgs::ImageConstPtr& msg)
 {
+	debug_image_1 = Mat::zeros(240, 320, CV_8UC3);
+	debug_image_2 = Mat::zeros(frame_height, frame_width, CV_8UC4);
+
 	try {
 		cv_ptr = cv_bridge::toCvCopy(msg, enc::BGR8);
 	}
@@ -154,13 +161,13 @@ void CBPuckFinder::image_cb(const sensor_msgs::ImageConstPtr& msg)
 		return;
 	}
 
-	static Mat rectified_image;
+	static Mat rectified_image((&cv_ptr->image)->size(), (&cv_ptr->image)->type());
 	rectify_board(&cv_ptr->image, &rectified_image);
 
 	find_pucks(&rectified_image, &target_pucks);
 
 	// Draw puck locations.
-	Mat pucks_drawing = Mat::zeros(240, 320, CV_8UC3);
+	Mat pucks_drawing = Mat::zeros(frame_height, frame_width, CV_8UC3);
 	for (uint16_t i=0; i<target_pucks.size(); i++) {
 		Scalar color = Scalar(0, 255, 0);   // Green!
 		if (pucks_encircle_radii[i] > encircle_min_size && pucks_encircle_radii[i] < encircle_max_size) {
@@ -175,7 +182,7 @@ void CBPuckFinder::image_cb(const sensor_msgs::ImageConstPtr& msg)
 
 	// Show images.
 	imshow(RAW_WINDOW, cv_ptr->image);
-	imshow(BW_WINDOW, debug_image_1);
+	imshow(BW_WINDOW, debug_image_2);
 	imshow(PUCKS_WINDOW, pucks_drawing);
 
 	// Wait 2 ms for a keypress.

@@ -25,6 +25,7 @@ class CBPuckFinder
 	ros::NodeHandle nh_;
 
 	Mat debug_image_1;
+	Mat debug_image_2;
 
 	/**
 	 * Stuff to keep track of.
@@ -82,6 +83,9 @@ class CBPuckFinder
 			 board_corner_2_y,
 			 board_corner_3_x,
 			 board_corner_3_y;
+
+	// Final board display frame dimensions in pixels
+	uint16_t frame_height, frame_width;
 
 	cv_bridge::CvImagePtr cv_ptr;
 	cb_vision::cb_puck_coordinates pc;
