@@ -13,7 +13,7 @@ static uint8_t des_dir;
 static float des_dc;
 static uint16_t dbg_dc_shift;
 static uint16_t pos_ctrl_output, vel_ctrl_output;
-static uint8_t dbg_q, dbg_r;
+static uint16_t dbg_q, dbg_r;
 
 void setup_linear_rail(void)
 {
@@ -119,8 +119,8 @@ void _update_linear_rail_position(float *lin_pos)
 	float q[2];   /* Quotient */
 	float r[2];   /* Remainder. Effectively equals old rotational position. */
 	for (i=0; i<2; i++) {
-		q[i] = (int) (REVS_PER_LENGTH*lin_pos[i] - rot_pos_zero[i]);
-		r[i] = (REVS_PER_LENGTH*lin_pos[i] - rot_pos_zero[i] - q[i]);
+		q[i] = (int) (REVS_PER_LENGTH*lin_pos[i] + rot_pos_zero[i]);
+		r[i] = (REVS_PER_LENGTH*lin_pos[i] + rot_pos_zero[i] - q[i]);
 
 		/* Calculate rotation. */
 		float d_rot = rot_pos[i] - r[i];
@@ -136,6 +136,6 @@ void _update_linear_rail_position(float *lin_pos)
 	}
 
 	dbg_q = q[0];
-	dbg_r = r[0];
+	dbg_r = r[0]*1000;   /* This should equal current rotational position. */
 }
 
