@@ -43,7 +43,7 @@ static msg_t comm_thread(void *arg)
 	uint8_t rxbuf[200];
 
 	while (TRUE) {
-		time += MS2ST(20);
+		time += MS2ST(10);
 		counter++;
 
 		uartStopSend(&UARTD3);
@@ -63,8 +63,8 @@ static msg_t comm_thread(void *arg)
 		//chsprintf(txbuf, "%u %6u %6u | %u %u\r\n", (int) rc.new_command, (uint8_t) (ABS(rc.one.linear_rail_pos)*255), (uint8_t) (ABS(rc.two.linear_rail_pos)*255), (uint8_t) (ABS(rc.one.death_ray_intensity*255)), (uint8_t) (ABS(rc.two.death_ray_intensity*255)));
 		///comm_debug_output(txbuf);
 		///dc[7] = rc.one.linear_rail_pos;
-		lr_des_pos[0] = ((float) (0x7f & rxbuf[0])) / 128;   // Use highest-order bit as enable signal.
-		enabled = rxbuf[0] >> 7;
+		lr_des_pos[0] = ((float) (0x7f & rxbuf[0])) / 127;   // Use highest-order bit as enable signal.
+		enabled = (uint8_t) (rxbuf[0] >> 7);
 
 		//chsprintf(txbuf, "%u %u\r\n", enabled, (int)(lr_des_pos[0]*1000));
 		linear_rail_debug_output(txbuf);

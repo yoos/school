@@ -8,10 +8,10 @@ CBPuckFinder::CBPuckFinder(ros::NodeHandle nh) : it(nh)
 	cb_vision_params_sub = nh_.subscribe("cb_vision_params_in", 1, &CBPuckFinder::params_cb, this);
 	cb_vision_pub = nh_.advertise<cb_vision::cb_puck_coordinates>("cb_puck_coordinates", 1);
 
-	pc.x[0] = 0;
-	pc.y[0] = 0;
-	pc.x[1] = 0;
-	pc.y[1] = 0;
+	pc.x[1] = 0.0;
+	pc.y[0] = 0.0;
+	pc.x[1] = 0.0;
+	pc.y[1] = 0.0;
 
 	// Initialize HSV parameters rather arbitrarily. These will be updated from
 	// the ROS parameter server later.
@@ -71,7 +71,7 @@ void CBPuckFinder::rectify_board(Mat* image, Mat* rect_image)
 	get_parameters();   // Is it bad to call this every loop?
 
 	// Rectify image. Board size is 22.3125 x 45 inches.
-	int dpi = 10;
+	int dpi = 12;
 	Point2f src[4], dst[4];
 	src[0] = Point2f(board_corner_0_x, board_corner_0_y);
 	src[1] = Point2f(board_corner_1_x, board_corner_1_y);
@@ -101,20 +101,20 @@ void CBPuckFinder::find_pucks(Mat* image, vector<vector<Point> >* pucks)
 
 	// Convert image to HSV space and save to hsv_image.
 	static Mat hsv_image;
-	cvtColor(*image, debug_image_2, CV_BGR2HSV_FULL);
+	cvtColor(*image, hsv_image, CV_BGR2HSV_FULL);
 
 	// Threshold image for color of pucks and save to bw_image.
 	static Mat bw_image;
-	inRange(debug_image_2, Scalar(puck_hue_low, puck_sat_low, puck_val_low),
-			Scalar(puck_hue_high, puck_sat_high, puck_val_high), bw_image);
+	inRange(hsv_image, Scalar(puck_hue_low, puck_sat_low, puck_val_low),
+			Scalar(puck_hue_high, puck_sat_high, puck_val_high), debug_image_2);
 
 	// Erode image to get sharper corners.
-	static Mat eroded_image;
-	erode(bw_image, eroded_image, Mat(), Point(-1, -1), puck_erosion_iter);
+	//static Mat eroded_image;
+	//erode(bw_image, eroded_image, Mat(), Point(-1, -1), puck_erosion_iter);
 
 	// Find edges with Canny.
 	static Mat canny_image;
-	Canny(eroded_image, canny_image, puck_canny_lower_threshold, puck_canny_lower_threshold*2, 5);
+	Canny(debug_image_2, canny_image, puck_canny_lower_threshold, puck_canny_lower_threshold*2, 5);
 
 	// Find contours.
 	findContours(canny_image, pucks_contours, pucks_contours_hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
@@ -195,8 +195,8 @@ void CBPuckFinder::image_cb(const sensor_msgs::ImageConstPtr& msg)
 	}
 
 	for (int i=0; i<2; i++) {
-		pc.x[i] = pucks_encircle_centers[i].x;
-		pc.y[i] = pucks_encircle_centers[i].y;
+		pc.x[i] = ((float) pucks_encircle_centers[i].x) / frame_width;
+		pc.y[i] = ((float) pucks_encircle_centers[i].y) / frame_height;
 	}
 
 	cb_vision_pub.publish(pc);

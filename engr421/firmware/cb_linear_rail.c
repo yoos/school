@@ -7,6 +7,7 @@ static float cur_lin_pos[2];   /* Current position of linear rail. */
 static float cur_lin_vel[2];   /* Current velocity of linear rail. */
 
 // DEBUG
+static uint8_t dbg_enabled;
 static float cur_rot_pos;
 static float des_pos;
 static uint8_t des_dir;
@@ -43,13 +44,14 @@ void update_linear_rail(uint8_t enabled, float *des_lin_pos, uint8_t *dir, float
 {
 	uint8_t i;
 
+	dbg_enabled = enabled;
 	static float des_lin_vel[2];
 	static float dc_shift[2];
 
 	_update_linear_rail_position(cur_lin_pos);
 
 	/* Controller */
-	if (enabled) {
+	if (!enabled) {
 		/* Disabled */
 		for (i=0; i<2; i++) {
 			dir[i] = 0;
@@ -90,7 +92,7 @@ void update_linear_rail(uint8_t enabled, float *des_lin_pos, uint8_t *dir, float
 
 void linear_rail_debug_output(uint8_t *buffer)
 {
-	chsprintf(buffer, "rot pos zero: %u  cur lin pos: %u  des lin pos: %u  cur rot pos: %u  des dir: %u  des dc: %u  dc_shift: %u  pos_ctrl_output: %u  q:  %u  r: %u\r\n", (uint16_t) (rot_pos_zero[0]*1000), (uint16_t) (cur_lin_pos[0]*1000), (uint16_t) (des_pos*1000), (uint16_t) (cur_rot_pos*1000), (uint8_t) des_dir, (uint16_t) (des_dc*1000), dbg_dc_shift, pos_ctrl_output, dbg_q, dbg_r);
+	chsprintf(buffer, "%u  rot pos zero: %u  cur lin pos: %u  des lin pos: %u  cur rot pos: %u  des dir: %u  des dc: %u  dc_shift: %u  pos_ctrl_output: %u  q:  %u  r: %u\r\n", dbg_enabled, (uint16_t) (rot_pos_zero[0]*1000), (uint16_t) (cur_lin_pos[0]*1000), (uint16_t) (des_pos*1000), (uint16_t) (cur_rot_pos*1000), (uint8_t) des_dir, (uint16_t) (des_dc*1000), dbg_dc_shift, pos_ctrl_output, dbg_q, dbg_r);
 }
 
 void _update_linear_rail_position(float *lin_pos)
@@ -102,6 +104,10 @@ void _update_linear_rail_position(float *lin_pos)
 	rot_pos[1] = icu_get_duty_cycle(I_ICU_LINEAR_RAIL_1);
 
 	cur_rot_pos = rot_pos[0];
+
+	float old_lin_pos[2];
+	old_lin_pos[0] = lin_pos[0];
+	old_lin_pos[1] = lin_pos[1];
 
 	/*
 	 * The ICU spits out bogus values of 0 and 39 that could be interpreted as
@@ -133,6 +139,10 @@ void _update_linear_rail_position(float *lin_pos)
 
 		/* Calculate new position. */
 		lin_pos[i] += d_rot/REVS_PER_LENGTH;
+
+		if (lin_pos[i] > 20) {
+			lin_pos[i] = old_lin_pos[i];
+		}
 	}
 
 	dbg_q = q[0];

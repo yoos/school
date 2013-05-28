@@ -14,7 +14,7 @@ baudrate = '460800'
 header = chr(255)
 newlineChar = ''
 
-cmd = 0
+cmd = 0.0
 
 # Serial write.
 def serWrite(myStr):
@@ -25,12 +25,14 @@ def serWrite(myStr):
         print "Unable to send data. Check connection."
 
 def callback(pc):
+    global cmd
     cmd = pc.x[0]   # Target first puck.
 
 if __name__ == "__main__":
+    global cmd
     # Initialize ROS node.
-    rospy.init_node("cb_rectify", anonymous=False)
-    rospy.Subscriber("cb_rectify_sub", cb_puck_coordinates, callback)
+    rospy.init_node("cb_comm", anonymous=False)
+    rospy.Subscriber("cb_puck_coordinates", cb_puck_coordinates, callback, queue_size=1)
 
 # =========================================================================
     # Try to initialize a serial connection. If serialPort is defined, try
@@ -67,11 +69,13 @@ if __name__ == "__main__":
 
         for each in cmd.split(' '):
             serWrite(chr(int(each)))
+        #print "Commanding", str(cmd)
+        #serWrite(chr(int(128+cmd*127)))
 
         sleep(0.005)
 
         #if ser.inWaiting() > 0:
         #    print ser.read(ser.inWaiting())
 
-# vim: expandtab
+# vim: noexpandtab
 
