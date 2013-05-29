@@ -60,6 +60,13 @@
 # Naive Bayes (05/22)
   * Assume conditional independence.
 
+
+## Exercise on slide 25   <!-- I don't know what's going on here -->
+P(a=t, d=t, e=t | b=t, c=t)
+= P(a=t, d=t, e=t, b=t, c=t) / P(b=t, c=t)
+= P(a=t, b=t, c=t, d=t, e=t) / sumA(sumD(sumE(P(a=a, b=t, c=t, d=d, e=e))))
+= P(a=t)P(b=t|a=t)..P(e=t|d=t) / [sumA(P(a=a)P(b=t|a=a)P(c=t|a=a))sumD(P(d=d|b=t,c=t))sumE(P(e=e|c=t))]   <!-- push sums as far to the right as we can -->
+
 Technical detail: "cost" functions need to be minimized. "utility" functions need to be maximized.
 
 Try GA on PID tuning.
