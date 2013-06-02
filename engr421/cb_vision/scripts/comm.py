@@ -9,7 +9,7 @@ import roslib; roslib.load_manifest("cb_vision")
 import rospy
 from cb_vision.msg import cb_puck_coordinates
 
-serialPort = '/dev/ttyUSB0'
+#serialPort = '/dev/ttyUSB0'
 baudrate = '460800'
 header = chr(255)
 newlineChar = ''
@@ -47,7 +47,7 @@ if __name__ == "__main__":
     except serial.SerialException:
         print "Unable to open specified serial port! Exiting..."
         exit(1)
-    except AttributeError:
+    except NameError:
         for i in range(4):
             try:
                 ser = serial.Serial("/dev/ttyUSB"+str(i), baudrate, timeout=0)
@@ -59,16 +59,19 @@ if __name__ == "__main__":
                     print "No serial found. Giving up!"
                     exit(1)
 
+    sleep(1)
+
     while True:
         cmd = raw_input("Command to send: ")
 
-        if cmd == 'q':
-            exit(0)
+        #if cmd == 'q':
+        #    exit(0)
 
         #serWrite(header)
 
         for each in cmd.split(' '):
             serWrite(chr(int(each)))
+
         #print "Commanding", str(cmd)
         #serWrite(chr(int(128+cmd*127)))
 
