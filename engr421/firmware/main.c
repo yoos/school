@@ -8,6 +8,7 @@
 #include <cb_icu.h>   // ICU code
 #include <cb_motor.h>   // Motor control
 #include <cb_death_ray.h>   // Death ray control code
+#include <cb_hopper.h>   // Hopper control code
 #include <cb_linear_rail.h>   // Linear rail control code
 #include <cb_config.h>   // General configuration
 #include <cb_math.h>
@@ -124,19 +125,48 @@ static msg_t death_ray_thread(void *arg)
 	chRegSetThreadName("death ray");
 	systime_t time = chTimeNow();
 
+	float dr_dc[2];
+
 	while (TRUE) {
 		time += MS2ST(1000*DEATH_RAY_DT);
 
-		update_death_ray(enabled, dc);
+		update_death_ray(enabled, dr_dc);
 
-		// Hopper
-		digital_state[2] = enabled;
+		dc[I_PWM_DEATH_RAY_0] = dr_dc[0];
+		dc[I_PWM_DEATH_RAY_1] = dr_dc[1];
+
 		if (enabled) {
 			palSetPad(GPIOD, 15);
 		}
 		else {
 			palClearPad(GPIOD, 15);
 		}
+
+		chThdSleepUntil(time);
+	}
+
+	return 0;
+}
+
+/*
+ * Hopper loop
+ */
+static WORKING_AREA(wa_hopper_thread, 128);
+static msg_t hopper_thread(void *arg)
+{
+	(void) arg;
+	chRegSetThreadName("hopper");
+	systime_t time = chTimeNow();
+
+	float hopper_dc[2];   /* Duty cycle of hopper motor. */
+
+	while (TRUE) {
+		time += MS2ST(1000*HOPPER_DT);
+
+		update_hopper(enabled, hopper_dc);
+
+		dc[I_PWM_HOPPER_0] = hopper_dc[0];
+		dc[I_PWM_HOPPER_1] = hopper_dc[1];
 
 		chThdSleepUntil(time);
 	}
@@ -162,10 +192,10 @@ static msg_t linear_rail_thread(void *arg)
 
 		update_linear_rail(enabled, lr_des_pos, lr_dir, lr_dc);
 
-		dc[4] = lr_dc[0];
-		dc[5] = lr_dc[1];
-		digital_state[0] = lr_dir[0];
-		digital_state[1] = lr_dir[1];
+		dc[I_PWM_LINEAR_RAIL_0] = lr_dc[0];
+		dc[I_PWM_LINEAR_RAIL_1] = lr_dc[1];
+		digital_state[I_DIGITAL_LINEAR_RAIL_0] = lr_dir[0];
+		digital_state[I_DIGITAL_LINEAR_RAIL_1] = lr_dir[1];
 
 		chThdSleepUntil(time);
 	}
@@ -210,7 +240,7 @@ static msg_t control_thread(void *arg)
 		else if (k < MS2ST(200)) palSetPad  (GPIOD, 13);
 		else                     palClearPad(GPIOD, 13);
 
-		k = (k++) % MS2ST(1000);
+		k = (k+1) % MS2ST(1000);
 
 		chThdSleepUntil(time);
 	}
@@ -246,6 +276,8 @@ int main(void)
 
 	setup_death_ray();
 
+	setup_hopper();
+
 	setup_linear_rail();
 
 	/*
@@ -267,6 +299,11 @@ int main(void)
 	 * Create death ray thread.
 	 */
 	chThdCreateStatic(wa_death_ray_thread, sizeof(wa_death_ray_thread), HIGHPRIO, death_ray_thread, NULL);
+
+	/*
+	 * Create hopper thread.
+	 */
+	chThdCreateStatic(wa_hopper_thread, sizeof(wa_hopper_thread), HIGHPRIO, hopper_thread, NULL);
 
 	/*
 	 * Create linear rail thread.
