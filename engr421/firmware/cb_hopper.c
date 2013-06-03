@@ -1,7 +1,7 @@
 #include <cb_hopper.h>
 
 static uint16_t counter;
-const uint16_t COUNTER_MAX = ((uint16_t) (1.0/HOPPER_DT));
+const uint16_t COUNTER_MAX = ((uint16_t) (1.0/HOPPER_DT/HOPPER_PULSE_FREQUENCY));
 
 void setup_hopper(void)
 {
@@ -24,7 +24,7 @@ void update_hopper(uint8_t enabled, float *dc)
 		/* Enabled */
 		for (i=0; i<2; i++) {
 			/* Control */
-			if (counter < 0.8*COUNTER_MAX) {
+			if (counter < HOPPER_PULSE_DC * COUNTER_MAX) {
 				dc[i] = HOPPER_DC_MAX;
 			}
 			else {
