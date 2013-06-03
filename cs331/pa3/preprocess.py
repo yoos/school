@@ -45,7 +45,7 @@ num_train_reviews = len(raw_train_unflat)
 print num_clean_vocab, "in vocabulary after removing uncommon words."
 
 # Allocate meomory.
-feature_list = [[0] * num_clean_vocab + [i] for i in range(num_train_reviews)]
+feature_list = [[0] * num_clean_vocab + [i] for i in range(num_train_reviews)]   # Keep index element at end of each feature list.
 
 # Synchronized counter used to track progress.
 counter = multiprocessing.Value('i', 0)
@@ -59,6 +59,8 @@ def featurize(feature):
     for word in raw_train_unflat[review_num]:
         if word in clean_vocab:
             feature[clean_vocab.index(word)] = 1
+
+    feature.pop()   # Remove index element.
 
     print "Progress:", str(counter.value)+"/"+str(num_train_reviews)
     return feature
