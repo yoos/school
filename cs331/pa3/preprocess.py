@@ -5,7 +5,7 @@ import string
 import multiprocessing
 
 ### CONSTANTS ###
-NUM_PROC = 8
+NUM_PROC = 10
 
 # Read in files. Note that csv.reader will read in each line as a list of words.
 raw_vocab = [word for line in list(csv.reader(open('files/raw.vocabulary.txt', 'rU'), delimiter=',', quotechar='"')) for word in line]   # 47525 words
