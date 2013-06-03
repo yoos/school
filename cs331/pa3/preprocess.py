@@ -16,17 +16,20 @@ raw_vocab = [word for word in raw_vocab if word not in stoplist]   # 47026 words
 raw_vocab_dict = dict([(word, 0) for word in raw_vocab])
 
 # Count frequency of usage.
-for word in raw_train and raw_test:
-    try:
-        raw_vocab_dict[word] += 1
-    except KeyError:
-        pass
+for word in raw_train:
+    try: raw_vocab_dict[word] += 1
+    except KeyError: pass
+for word in raw_test:
+    try: raw_vocab_dict[word] += 1
+    except KeyError: pass
 
-# Remove uncommon (i.e., used <= 3 times) words. len(raw_vocab_dict) should be 5864 after this.
+# Remove uncommon (i.e., used <= 3 times) words. len(raw_vocab_dict) should be 17088 after this.
 for word in raw_vocab:
     if raw_vocab_dict[word] <= 3:
         del raw_vocab_dict[word]
 
+# Make clean vocab list in alphabetical order (raw_vocab is already in alphabetical order).
+clean_vocab = [word for word in raw_vocab if word in raw_vocab_dict]
 
 
 # vim: expandtab
