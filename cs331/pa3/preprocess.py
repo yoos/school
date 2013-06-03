@@ -34,14 +34,21 @@ for word in raw_vocab:
 # Make clean vocab list in alphabetical order (raw_vocab is already in alphabetical order).
 clean_vocab = [word for word in raw_vocab if word in raw_vocab_dict]
 
-# Featurize training data.
+# Count some stuff.
 num_clean_vocab   = len(clean_vocab)
 num_train_reviews = len(raw_train_unflat)
 
 print num_clean_vocab, "in vocabulary after removing uncommon words."
 
 # Allocate meomory.
-feature_list = [[0] * num_clean_vocab] * num_train_reviews
+feature_list = [[0] * num_clean_vocab for i in range(num_train_reviews)]
+
+# Featurize training data.
+for review_num in range(num_train_reviews):
+    for word in raw_train_unflat[review_num]:
+        if word in clean_vocab:
+            feature_list[review_num][clean_vocab.index(word)] = 1
+    print "Processed review", review_num
 
 
 out_file = open('training.txt', 'wb')
