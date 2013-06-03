@@ -2,6 +2,10 @@
 
 import csv
 import string
+import multiprocessing
+
+### CONSTANTS ###
+NUM_PROC = 8
 
 # Read in files. Note that csv.reader will read in each line as a list of words.
 raw_vocab = [word for line in list(csv.reader(open('files/raw.vocabulary.txt', 'rU'), delimiter=',', quotechar='"')) for word in line]   # 47525 words
@@ -41,16 +45,31 @@ num_train_reviews = len(raw_train_unflat)
 print num_clean_vocab, "in vocabulary after removing uncommon words."
 
 # Allocate meomory.
-feature_list = [[0] * num_clean_vocab for i in range(num_train_reviews)]
+feature_list = [[0] * num_clean_vocab + [i] for i in range(num_train_reviews)]
+
+# Synchronized counter used to track progress.
+counter = multiprocessing.Value('i', 0)
 
 # Featurize training data.
-for review_num in range(num_train_reviews):
+def featurize(feature):
+    global raw_train_unflat, clean_vocab, feature_list, counter
+    review_num = feature[-1]
+    counter.value += 1
+
     for word in raw_train_unflat[review_num]:
         if word in clean_vocab:
-            feature_list[review_num][clean_vocab.index(word)] = 1
-    print "Processed review", review_num
+            feature[clean_vocab.index(word)] = 1
+
+    print "Progress:", str(counter.value)+"/"+str(num_train_reviews)
+    return feature
+
+p = multiprocessing.Pool(NUM_PROC)
+feature_list = p.map(featurize, feature_list)
+p.close()
+p.join()
 
 
+# Write to file.
 out_file = open('training.txt', 'wb')
 writer = csv.writer(out_file, delimiter=',', quotechar='"')
 writer.writerow(clean_vocab)
