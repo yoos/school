@@ -10,9 +10,10 @@ NUM_PROC = 10
 # Read in files. Note that csv.reader will read in each line as a list of words.
 raw_vocab = [word for line in list(csv.reader(open('files/raw.vocabulary.txt', 'rU'), delimiter=',', quotechar='"')) for word in line]   # 47525 words
 stoplist  = [word for line in list(csv.reader(open('files/stoplist.txt', 'rU'),       delimiter=',', quotechar='"')) for word in line]
-raw_train_unflat = [line for line in list(csv.reader(open('files/raw.train.txt', 'rU'),      delimiter=' ', quotechar='"'))]
-raw_train = [word for word in line]
-raw_test  = [word for line in list(csv.reader(open('files/raw.test.txt', 'rU'),       delimiter=' ', quotechar='"')) for word in line]
+raw_train_unflat = [line for line in list(csv.reader(open('files/raw.train.txt', 'rU'), delimiter=' ', quotechar='"'))]
+raw_train        = [word for line in raw_train_unflat for word in line]
+raw_test_unflat  = [line for line in list(csv.reader(open('files/raw.test.txt', 'rU'), delimiter=' ', quotechar='"'))]
+raw_test         = [word for line in raw_test_unflat for word in line]
 
 # Remove stopwords from raw_vocab
 print len(raw_vocab), "in raw vocabulary."
@@ -41,8 +42,12 @@ clean_vocab = [word for word in raw_vocab if word in raw_vocab_dict]
 # Count some stuff.
 num_clean_vocab   = len(clean_vocab)
 num_train_reviews = len(raw_train_unflat)
+num_test_reviews  = len(raw_test_unflat)
 
 print num_clean_vocab, "in vocabulary after removing uncommon words."
+
+
+print "Processing training data."
 
 # Allocate meomory.
 feature_list = [[0] * num_clean_vocab + [i] for i in range(num_train_reviews)]   # Keep index element at end of each feature list.
@@ -70,9 +75,44 @@ feature_list = p.map(featurize, feature_list)
 p.close()
 p.join()
 
-
 # Write to file.
 out_file = open('training.txt', 'wb')
+writer = csv.writer(out_file, delimiter=',', quotechar='"')
+writer.writerow(clean_vocab)
+writer.writerows(feature_list)
+out_file.close()
+
+
+print "Processing testing data."
+
+# Allocate meomory.
+feature_list = [[0] * num_clean_vocab + [i] for i in range(num_test_reviews)]   # Keep index element at end of each feature list.
+
+# Synchronized counter used to track progress.
+counter = multiprocessing.Value('i', 0)
+
+# Featurize testing data.
+def featurize(feature):
+    global raw_test_unflat, clean_vocab, feature_list, counter
+    review_num = feature[-1]
+    counter.value += 1
+
+    for word in raw_test_unflat[review_num]:
+        if word in clean_vocab:
+            feature[clean_vocab.index(word)] = 1
+
+    feature.pop()   # Remove index element.
+
+    print "Progress:", str(counter.value)+"/"+str(num_test_reviews)
+    return feature
+
+p = multiprocessing.Pool(NUM_PROC)
+feature_list = p.map(featurize, feature_list)
+p.close()
+p.join()
+
+# Write to file.
+out_file = open('testing.txt', 'wb')
 writer = csv.writer(out_file, delimiter=',', quotechar='"')
 writer.writerow(clean_vocab)
 writer.writerows(feature_list)
