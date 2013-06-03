@@ -1,7 +1,12 @@
-all:
-	pdflatex wa3.tex
-	pdflatex wa3.tex
+TARGET=wa4
 
-view:
-	xpdf wa3.pdf
+all:
+	pdflatex $(TARGET).tex
+	pdflatex $(TARGET).tex
+
+view: all
+	xpdf $(TARGET).pdf
+
+clean:
+	rm $(TARGET).{aux,log,out,pdf}
 
