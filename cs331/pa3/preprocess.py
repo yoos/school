@@ -89,8 +89,8 @@ print "Processing testing data."
 # Allocate meomory.
 feature_list = [[0] * num_clean_vocab + [i] for i in range(num_test_reviews)]   # Keep index element at end of each feature list.
 
-# Synchronized counter used to track progress.
-progress = multiprocessing.Value('i', 1)
+# Reset counter.
+progress.value = 1
 
 # Featurize testing data.
 def featurize(feature):
