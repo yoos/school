@@ -1,0 +1,83 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{fancyhdr}
+\usepackage[utf8]{inputenc}
+\usepackage{palatino}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage[hang,bf,small,margin=2cm]{caption}
+\usepackage{amsmath,amssymb,amsthm}
+
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{1em}
+
+\hypersetup{colorlinks,
+	linkcolor = black,
+	citecolor = black,
+	urlcolor  = black}
+\urlstyle{same}
+
+\begin{document}
+
+\begin{titlepage}
+	\vspace*{4cm}
+	\begin{flushright}
+	{\huge
+		Programming Assignment \#3 \\ [3cm]
+	}
+	{\large
+		CS 331
+	}
+	\end{flushright}
+
+	\begin{flushright}
+		3 June 2013 \\
+		Soo-Hyun Yoo
+	\end{flushright}
+\end{titlepage}
+
+\section*{Programming Assignment \#3}
+
+\subsection*{Results}
+
+The classifier was negatively biased when only the words found within the
+reviews were used as parameters. This was much improved when all vocabulary
+words were taken into account even in their absence. The difference is shown in
+the two tables below.
+
+\begin{table}[!h]
+	\centering
+	\begin{tabular}{|c|c|c|} \hline
+		Classification & Training & Testing \\ \hline\hline
+		Positive       & 0.885    & 0.645   \\ \hline
+		Negative       & 0.999    & 0.939   \\ \hline
+	\end{tabular}
+	\caption{Accuracy of classifier when using only words found in reviews as parameters, on training and testing data sets.}
+\end{table}
+
+\begin{table}[!h]
+	\centering
+	\begin{tabular}{|c|c|c|} \hline
+		Classification & Training & Testing \\ \hline\hline
+		Positive       & 0.990    & 0.865   \\ \hline
+		Negative       & 0.911    & 0.770   \\ \hline
+	\end{tabular}
+	\caption{Accuracy of classifier when using all words in vocabulary as parameters, on training and testing data sets.}
+\end{table}
+
+
+\subsection*{Discussion}
+
+I had originally expected at least 80\% accuracy for both positive and negative
+reviews, so the fact that the classifier's percent accuracy descended down to
+only the upper 70's (at least, when using all vocabulary words) feels
+satisfactory.
+
+One thing that bothers me is that whether or not the classifier uses the whole
+vocabulary, its bias is the same between the training and testing data sets.
+This suggests to me that the classification process is working correctly, but
+something might be awry in the preprocessing or training procedures.
+
+\end{document}
+
