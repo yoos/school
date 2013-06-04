@@ -166,13 +166,19 @@ print "\nClassification done.\n"
 # Calculate accuracy.
 pos_accuracy = 0.0
 neg_accuracy = 0.0
+num_pos_predict = 0
+num_neg_predict = 0
 for i in range(num_data):
-    if review_list[i][0] == label[i] == "pos":
-        pos_accuracy += 1.0
-    elif review_list[i][0] == label[i] == "neg":
-        neg_accuracy += 1.0
-pos_accuracy /= num_pos
-neg_accuracy /= num_neg
+    if review_list[i][0] == "pos":
+        num_pos_predict += 1
+        if label[i] == "pos":
+            pos_accuracy += 1.0
+    elif review_list[i][0] ==  "neg":
+        num_neg_predict += 1
+        if label[i] == "neg":
+            neg_accuracy += 1.0
+pos_accuracy /= num_pos_predict
+neg_accuracy /= num_neg_predict
 
 print "Positive accuracy:", pos_accuracy
 print "Negative accuracy:", neg_accuracy
