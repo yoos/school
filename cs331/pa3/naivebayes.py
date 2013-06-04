@@ -5,8 +5,9 @@ import csv
 import multiprocessing
 from math import log, e
 
-### CONSTANTS ###
+### CONFIGURABLES ###
 NUM_PROC = 10
+DATASET_TO_CLASSIFY = "training"   # "testing" or "training"
 
 if len(sys.argv) < 5:
     print "Not enough arguments"
@@ -72,7 +73,7 @@ def train(parameter):
     vocab_num = parameter[-1]
 
     # Start obfuscation so multiprocessing will work.
-    in_review_count = 0
+    in_review_count = 0   # In how many of the reviews is the word contained?
     for i in range(num_train_data):
         if train_data[i][vocab_num] == '1':   # If the word is in the review (i.e., feature = 1)..
             in_review_count += 1
@@ -104,25 +105,38 @@ p.join()
 print "\nTraining done.\n"
 
 
-print "Classifying testing data."
+if DATASET_TO_CLASSIFY == "training":
+    data = train_data
+    num_data = num_train_data
+    label = train_label
+    num_pos = num_train_pos
+    num_neg = num_train_neg
+elif DATASET_TO_CLASSIFY == "testing":
+    data = test_data
+    num_data = num_test_data
+    label = test_label
+    num_pos = num_test_pos
+    num_neg = num_test_neg
 
-# Allocate memory for testing data classifications.
-review_list = [["unknown", i] for i in range(num_test_data)]
+print "Classifying %s data." % (DATASET_TO_CLASSIFY)
+
+# Allocate memory for data classifications.
+review_list = [["unknown", i] for i in range(num_data)]
 
 # Reset counter.
 progress.value = 1
 
-# Classify.
+# Classify data.
 def classify(review):
     review_idx = review[-1]
 
     # Use logs so we're not comparing zeros.
     score_pos = log(prob_review_pos)
-    score_neg = log(1-prob_review_pos)
+    score_neg = log(1.0-prob_review_pos)
 
     # Consider each word.
     for i in range(num_vocab):
-        if test_data[review_idx][i] == '1':   # If the word is in the review (i.e., feature = 1)..
+        if data[review_idx][i] == '1':   # If the word is in the review (i.e., feature = 1)..
             score_pos += log(parameter_list[i][3] + e) - 1.0
             score_neg += log(parameter_list[i][2] + e) - 1.0
 
@@ -135,7 +149,7 @@ def classify(review):
 
     with lock:
         sys.stdout.flush()
-        sys.stdout.write("Progress: %3d/%3d\r" % (progress.value, num_test_data))
+        sys.stdout.write("Progress: %3d/%3d\r" % (progress.value, num_data))
         progress.value += 1
     return review
 
@@ -149,13 +163,15 @@ print "\nClassification done.\n"
 # Calculate accuracy.
 pos_accuracy = 0.0
 neg_accuracy = 0.0
-for i in range(num_test_data):
-    if review_list[i][0] == test_label[i] == "pos":
+for i in range(num_data):
+    if review_list[i][0] == label[i] == "pos":
         pos_accuracy += 1.0
-    elif review_list[i][0] == test_label[i] == "neg":
+    elif review_list[i][0] == label[i] == "neg":
         neg_accuracy += 1.0
-pos_accuracy /= num_test_pos
-neg_accuracy /= num_test_neg
+    else:
+        print review_list[i][0], label[i]
+pos_accuracy /= num_pos
+neg_accuracy /= num_neg
 
 print "Positive accuracy:", pos_accuracy
 print "Negative accuracy:", neg_accuracy
