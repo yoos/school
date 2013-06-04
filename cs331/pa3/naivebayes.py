@@ -49,10 +49,11 @@ test_neg  = num_test_data  - test_pos
 
 print "Training Bayes classifier."
 
-# Allocate memory for parameters. Elements in the innermost list in the nested
-# list below are ordered according to (word-in-review, positive-review) = [(F,
-# F), (F, T), (T, F), (T, T)].
-parameter_list = [[0.0] * 4 + [i] for i in range(num_vocab)]
+# Allocate memory for parameters, initializing each parameters with Dirichlet
+# priors. Elements in the innermost list in the nested list below are ordered
+# according to (word-in-review, positive-review) = [(F, F), (F, T), (T, F), (T,
+# T)].
+parameter_list = [[1.0/num_vocab] * 4 + [i] for i in range(num_vocab)]
 
 # Synchronized counter used to track progress.
 progress = multiprocessing.Value('i', 1)
@@ -82,9 +83,4 @@ p = multiprocessing.Pool(NUM_PROC)
 parameter_list = p.map(train, parameter_list)
 p.close()
 p.join()
-
-
-for i in range(10):
-    print parameter_list[i]
-
 
