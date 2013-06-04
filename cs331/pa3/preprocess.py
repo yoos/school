@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import sys
 import csv
 import string
 import multiprocessing
@@ -44,10 +45,10 @@ num_clean_vocab   = len(clean_vocab)
 num_train_reviews = len(raw_train_unflat)
 num_test_reviews  = len(raw_test_unflat)
 
-print num_clean_vocab, "in vocabulary after removing uncommon words."
+print num_clean_vocab, "in vocabulary after removing uncommon words.\n"
 
 
-print "Processing training data."
+print "Featurizing training data."
 
 # Allocate meomory.
 feature_list = [[0] * num_clean_vocab + [i] for i in range(num_train_reviews)]   # Keep index element at end of each feature list.
@@ -66,8 +67,9 @@ def featurize(feature):
 
     feature.pop()   # Remove index element.
 
-    print "Progress:", str(progress.value)+"/"+str(num_train_reviews)
     with lock:
+        sys.stdout.flush()
+        sys.stdout.write("Progress: %4d/%4d\r" % (progress.value, num_train_reviews))
         progress.value += 1
     return feature
 
@@ -83,8 +85,10 @@ writer.writerow(clean_vocab)
 writer.writerows(feature_list)
 out_file.close()
 
+print "\nDone featurizing training data.\n"
 
-print "Processing testing data."
+
+print "Featurizing testing data."
 
 # Allocate meomory.
 feature_list = [[0] * num_clean_vocab + [i] for i in range(num_test_reviews)]   # Keep index element at end of each feature list.
@@ -102,8 +106,9 @@ def featurize(feature):
 
     feature.pop()   # Remove index element.
 
-    print "Progress:", str(progress.value)+"/"+str(num_test_reviews)
     with lock:
+        sys.stdout.flush()
+        sys.stdout.write("Progress: %3d/%3d\r" % (progress.value, num_test_reviews))
         progress.value += 1
     return feature
 
@@ -111,6 +116,9 @@ p = multiprocessing.Pool(NUM_PROC)
 feature_list = p.map(featurize, feature_list)
 p.close()
 p.join()
+
+print "\nDone featurizing testing data.\n"
+
 
 # Write to file.
 out_file = open('testing.txt', 'wb')

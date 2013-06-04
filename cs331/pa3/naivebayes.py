@@ -90,9 +90,9 @@ def train(parameter):
 
     parameter.pop()   # Remove the index element.
 
-    sys.stdout.flush()
-    sys.stdout.write("Progress: %5d/%5d\r" % (progress.value, num_vocab))
     with lock:
+        sys.stdout.flush()
+        sys.stdout.write("Progress: %5d/%5d\r" % (progress.value, num_vocab))
         progress.value += 1
     return parameter
 
@@ -133,9 +133,9 @@ def classify(review):
     else:
         review[0] = "neg"
 
-    sys.stdout.flush()
-    sys.stdout.write("Progress: %3d/%3d\r" % (progress.value, num_test_data))
     with lock:
+        sys.stdout.flush()
+        sys.stdout.write("Progress: %3d/%3d\r" % (progress.value, num_test_data))
         progress.value += 1
     return review
 
