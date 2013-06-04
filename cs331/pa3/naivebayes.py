@@ -3,7 +3,7 @@
 import sys
 import csv
 import multiprocessing
-from math import log
+from math import log, e
 
 ### CONSTANTS ###
 NUM_PROC = 10
@@ -90,7 +90,7 @@ def train(parameter):
 
     parameter.pop()   # Remove the index element.
 
-    print "Progress:", str(progress.value)+"/"+str(num_vocab), parameter, in_review_count
+    print "Progress:", str(progress.value)+"/"+str(num_vocab)
     with lock:
         progress.value += 1
     return parameter
@@ -114,23 +114,23 @@ def classify(review):
     review_idx = review[-1]
 
     # Use logs so we're not comparing zeros.
-    prob_pos = log(prob_review_pos)
-    prob_neg = log(1-prob_review_pos)
+    score_pos = log(prob_review_pos)
+    score_neg = log(1-prob_review_pos)
 
     # Consider each word.
     for i in range(num_vocab):
         if test_data[review_idx][i] == '1':   # If the word is in the review (i.e., feature = 1)..
-            prob_pos += log(parameter_list[i][3]+1e-100)
-            prob_neg += log(parameter_list[i][2]+1e-100)
+            score_pos += log(parameter_list[i][3] + e) - 1.0
+            score_neg += log(parameter_list[i][2] + e) - 1.0
 
     review.pop()   # Remove the index element.
 
-    if prob_pos > prob_neg:
+    if score_pos > score_neg:
         review[0] = "pos"
     else:
         review[0] = "neg"
 
-    print "Progress:", str(progress.value)+"/"+str(num_test_data), prob_pos, prob_neg, review[0], test_label[review_idx]
+    print "Progress:", str(progress.value)+"/"+str(num_test_data), score_pos, score_neg, review[0], test_label[review_idx]
     with lock:
         progress.value += 1
     return review
@@ -142,11 +142,19 @@ p.join()
 
 
 # Calculate accuracy.
-num_accurate = 0.0
+pos_accuracy = 0.0
+neg_accuracy = 0.0
 for i in range(num_test_data):
-    if review_list[i][0] == test_label[i]:
-        num_accurate += 1.0
-accuracy = num_accurate/num_test_data
+    if review_list[i][0] == test_label[i] == "pos":
+        pos_accuracy += 1.0
+    elif review_list[i][0] == test_label[i] == "neg":
+        neg_accuracy += 1.0
+pos_accuracy /= num_test_pos
+neg_accuracy /= num_test_neg
 
-print "Accuracy:", accuracy
+print "Positive accuracy:", pos_accuracy
+print "Negative accuracy:", neg_accuracy
+
+
+exit(0)
 
