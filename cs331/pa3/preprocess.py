@@ -53,13 +53,12 @@ print "Processing training data."
 feature_list = [[0] * num_clean_vocab + [i] for i in range(num_train_reviews)]   # Keep index element at end of each feature list.
 
 # Synchronized counter used to track progress.
-counter = multiprocessing.Value('i', 0)
+progress = multiprocessing.Value('i', 1)
+lock = multiprocessing.Lock()
 
 # Featurize training data.
 def featurize(feature):
-    global raw_train_unflat, clean_vocab, feature_list, counter
     review_num = feature[-1]
-    counter.value += 1
 
     for word in raw_train_unflat[review_num]:
         if word in clean_vocab:
@@ -67,7 +66,9 @@ def featurize(feature):
 
     feature.pop()   # Remove index element.
 
-    print "Progress:", str(counter.value)+"/"+str(num_train_reviews)
+    print "Progress:", str(progress.value)+"/"+str(num_train_reviews)
+    with lock:
+        progress.value += 1
     return feature
 
 p = multiprocessing.Pool(NUM_PROC)
@@ -89,13 +90,11 @@ print "Processing testing data."
 feature_list = [[0] * num_clean_vocab + [i] for i in range(num_test_reviews)]   # Keep index element at end of each feature list.
 
 # Synchronized counter used to track progress.
-counter = multiprocessing.Value('i', 0)
+progress = multiprocessing.Value('i', 1)
 
 # Featurize testing data.
 def featurize(feature):
-    global raw_test_unflat, clean_vocab, feature_list, counter
     review_num = feature[-1]
-    counter.value += 1
 
     for word in raw_test_unflat[review_num]:
         if word in clean_vocab:
@@ -103,7 +102,9 @@ def featurize(feature):
 
     feature.pop()   # Remove index element.
 
-    print "Progress:", str(counter.value)+"/"+str(num_test_reviews)
+    print "Progress:", str(progress.value)+"/"+str(num_test_reviews)
+    with lock:
+        progress.value += 1
     return feature
 
 p = multiprocessing.Pool(NUM_PROC)
