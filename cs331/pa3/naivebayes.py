@@ -7,7 +7,7 @@ from math import log, e
 
 ### CONFIGURABLES ###
 NUM_PROC = 10
-DATASET_TO_CLASSIFY = "training"   # "testing" or "training"
+DATASET_TO_CLASSIFY = "testing"   # "testing" or "training"
 
 if len(sys.argv) < 5:
     print "Not enough arguments"
@@ -139,6 +139,9 @@ def classify(review):
         if data[review_idx][i] == '1':   # If the word is in the review (i.e., feature = 1)..
             score_pos += log(parameter_list[i][3] + e) - 1.0
             score_neg += log(parameter_list[i][2] + e) - 1.0
+        else:   # Take into account the absence of words. This skews the scores towards the negative, for some reason.
+            score_pos += log(parameter_list[i][1] + e) - 1.0
+            score_neg += log(parameter_list[i][0] + e) - 1.0
 
     review.pop()   # Remove the index element.
 
@@ -168,8 +171,6 @@ for i in range(num_data):
         pos_accuracy += 1.0
     elif review_list[i][0] == label[i] == "neg":
         neg_accuracy += 1.0
-    else:
-        print review_list[i][0], label[i]
 pos_accuracy /= num_pos
 neg_accuracy /= num_neg
 
