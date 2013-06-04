@@ -67,7 +67,7 @@
 /* Constants */
 #define M_PI 3.14159
 #define WHEEL_DIA 0.05842   // In m (2.3 in)
-#define BB_VEL 3.048   // In m/s (10 ft/s)
+#define BB_VEL 4.048   // In m/s (10 ft/s, plus a little extra because reality.)
 
 #define ROT_SIZE ((BB_VEL * CONTROL_LOOP_DT) / (WHEEL_DIA * M_PI))
 #define ROT_SPEED (BB_VEL/(WHEEL_DIA*M_PI))   // In rev/s
