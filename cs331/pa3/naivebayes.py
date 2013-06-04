@@ -90,7 +90,8 @@ def train(parameter):
 
     parameter.pop()   # Remove the index element.
 
-    print "Progress:", str(progress.value)+"/"+str(num_vocab)
+    sys.stdout.flush()
+    sys.stdout.write("Progress: %5d/%5d\r" % (progress.value, num_vocab))
     with lock:
         progress.value += 1
     return parameter
@@ -99,6 +100,8 @@ p = multiprocessing.Pool(NUM_PROC)
 parameter_list = p.map(train, parameter_list)
 p.close()
 p.join()
+
+print "\nTraining done.\n"
 
 
 print "Classifying testing data."
@@ -130,7 +133,8 @@ def classify(review):
     else:
         review[0] = "neg"
 
-    print "Progress:", str(progress.value)+"/"+str(num_test_data), score_pos, score_neg, review[0], test_label[review_idx]
+    sys.stdout.flush()
+    sys.stdout.write("Progress: %3d/%3d\r" % (progress.value, num_test_data))
     with lock:
         progress.value += 1
     return review
@@ -140,6 +144,7 @@ review_list = p.map(classify, review_list)
 p.close()
 p.join()
 
+print "\nClassification done.\n"
 
 # Calculate accuracy.
 pos_accuracy = 0.0
