@@ -49,10 +49,14 @@ test_neg  = num_test_data  - test_pos
 
 print "Training Bayes classifier."
 
-# Allocate memory for parameters, initializing each parameters with Dirichlet
-# priors. Elements in the innermost list in the nested list below are ordered
-# according to (word-in-review, positive-review) = [(F, F), (F, T), (T, F), (T,
-# T)].
+# Allocate memory for parameters. Elements in the innermost list in the nested
+# list below are ordered according to (word-in-review, positive-review) = [(F,
+# F), (F, T), (T, F), (T, T)].
+#
+# Note that each parameter is initialized as a Dirichlet Prior. This means that
+# each value of the parameter is equally likely in the absence of data (i.e.,
+# we're assuming prior knowledge). As data is collected, the prior term is
+# dominated.
 parameter_list = [[1.0/num_vocab] * 4 + [i] for i in range(num_vocab)]
 
 # Synchronized counter used to track progress.
