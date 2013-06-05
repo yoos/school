@@ -7,6 +7,17 @@ icucnt_t icu5_last_width, icu5_last_period;
 
 void setup_icu(void)
 {
+	/* Initialize variables to something arbitrary so we don't do bad math. */
+	icu2_last_width = 2000;
+	icu3_last_width = 2000;
+	icu4_last_width = 2000;
+	icu5_last_width = 2000;
+	icu2_last_period = 2000;
+	icu3_last_period = 2000;
+	icu4_last_period = 2000;
+	icu5_last_period = 2000;
+
+	/* Start and enable ICU. */
 	icuStart(&ICUD2, &icu2cfg);
 	palSetPadMode(GPIOA, 5, PAL_MODE_INPUT_PULLDOWN | PAL_MODE_ALTERNATE(1));   /* This needs to be 1, not 2? WTF. */
 	icuEnable(&ICUD2);
