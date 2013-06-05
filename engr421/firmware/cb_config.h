@@ -8,7 +8,7 @@
 #define LINEAR_RAIL_DT  0.002
 
 /* Controller parameters */
-#define DEATH_RAY_KP (-0.005)
+#define DEATH_RAY_KP (-0.008)
 #define DEATH_RAY_KI (-0.005)
 #define DEATH_RAY_KD (-0.000)
 
