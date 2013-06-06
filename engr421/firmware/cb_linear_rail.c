@@ -8,7 +8,7 @@ static float cur_lin_vel[2];   /* Current velocity of linear rail. */
 
 // DEBUG
 static uint8_t dbg_enabled;
-static float cur_rot_pos;
+static float cur_rot_pos[2];
 static float des_pos;
 static uint8_t des_dir;
 static float des_dc;
@@ -22,21 +22,22 @@ void setup_linear_rail(void)
 
 	rot_pos_zero[0] = icu_get_duty_cycle(I_ICU_LINEAR_RAIL_0);
 	rot_pos_zero[1] = icu_get_duty_cycle(I_ICU_LINEAR_RAIL_1);
+	cur_lin_pos[0] = 0.0;
+	cur_lin_pos[1] = 1.0;
 
 	for (i=0; i<2; i++) {
+		cur_lin_vel[i] = 0;
+
 		pid_data_pos[i].Kp = LINEAR_RAIL_POS_KP;
 		pid_data_pos[i].Ki = LINEAR_RAIL_POS_KI;
 		pid_data_pos[i].Kd = LINEAR_RAIL_POS_KD;
 		pid_data_pos[i].dt = LINEAR_RAIL_DT;
-		pid_data_pos[i].last_val = 0;
+		pid_data_pos[i].last_val = cur_lin_pos[i];
 		pid_data_vel[i].Kp = LINEAR_RAIL_VEL_KP;
 		pid_data_vel[i].Ki = LINEAR_RAIL_VEL_KI;
 		pid_data_vel[i].Kd = LINEAR_RAIL_VEL_KD;
 		pid_data_vel[i].dt = LINEAR_RAIL_DT;
-		pid_data_vel[i].last_val = 0;
-
-		cur_lin_pos[i] = 0;
-		cur_lin_vel[i] = 0;
+		pid_data_vel[i].last_val = cur_lin_vel[i];
 	}
 }
 
@@ -48,7 +49,13 @@ void update_linear_rail(uint8_t enabled, float *des_lin_pos, uint8_t *dir, float
 	static float des_lin_vel[2];
 	static float dc_shift[2];
 
-	_update_linear_rail_position(cur_lin_pos);
+	_update_linear_rail_position(dir, cur_lin_pos);
+
+	/* Hack to fix weird initialization of shooter 1. TODO: Fix this later.
+	 * Remember it has something to do with the fact that REVS_PER_LENGTH isn't
+	 * an integer. */
+	static bool calib = false;
+	if (!calib) cur_lin_pos[1] += 0.037;
 
 	/* Controller */
 	if (!enabled) {
@@ -87,27 +94,23 @@ void update_linear_rail(uint8_t enabled, float *des_lin_pos, uint8_t *dir, float
 	des_dc = dc[0];
 	dbg_dc_shift = (uint16_t) ABS(dc_shift[0] * 1000);
 	pos_ctrl_output = (uint16_t) (des_lin_vel[0] * 1000);
-
 }
 
 void linear_rail_debug_output(uint8_t *buffer)
 {
-	chsprintf(buffer, "%u  rot pos zero: %u  cur lin pos: %u  des lin pos: %u  cur rot pos: %u  des dir: %u  des dc: %u  dc_shift: %u  pos_ctrl_output: %u  q:  %u  r: %u\r\n", dbg_enabled, (uint16_t) (rot_pos_zero[0]*1000), (uint16_t) (cur_lin_pos[0]*1000), (uint16_t) (des_pos*1000), (uint16_t) (cur_rot_pos*1000), (uint8_t) des_dir, (uint16_t) (des_dc*1000), dbg_dc_shift, pos_ctrl_output, dbg_q, dbg_r);
+	chsprintf(buffer, "%u  lin 0: %u  lin 1: %u  rot 0: %u  rot 1: %u  des dc: %u  dc_shift: %u  q:  %u  r: %u\r\n", dbg_enabled, (uint16_t) (cur_lin_pos[0]*1000), (uint16_t) (cur_lin_pos[1]*1000), (uint16_t) (cur_rot_pos[0]*1000), (uint16_t) (cur_rot_pos[1]*1000), (uint16_t) (des_dc*1000), dbg_dc_shift, dbg_q, dbg_r);
 }
 
-void _update_linear_rail_position(float *lin_pos)
+void _update_linear_rail_position(uint8_t *dir, float *lin_pos)
 {
 	uint8_t i;
 
-	float rot_pos[2];
+	static float rot_pos[2];
 	rot_pos[0] = icu_get_duty_cycle(I_ICU_LINEAR_RAIL_0);
 	rot_pos[1] = icu_get_duty_cycle(I_ICU_LINEAR_RAIL_1);
 
-	cur_rot_pos = rot_pos[0];
-
-	float old_lin_pos[2];
-	old_lin_pos[0] = lin_pos[0];
-	old_lin_pos[1] = lin_pos[1];
+	cur_rot_pos[0] = rot_pos[0];
+	cur_rot_pos[1] = rot_pos[1];
 
 	/*
 	 * The ICU spits out bogus values of 0 and 39 that could be interpreted as
@@ -122,14 +125,16 @@ void _update_linear_rail_position(float *lin_pos)
 	// 	}
 	// }
 
-	float q[2];   /* Quotient */
-	float r[2];   /* Remainder. Effectively equals old rotational position. */
+	static float q[2];   /* Quotient */
+	static float r[2];   /* Remainder. Effectively equals old rotational position. */
+	static float d_rot;
 	for (i=0; i<2; i++) {
-		q[i] = (int) (REVS_PER_LENGTH*lin_pos[i] + rot_pos_zero[i]);
-		r[i] = (REVS_PER_LENGTH*lin_pos[i] + rot_pos_zero[i] - q[i]);
+		q[i] = (int) (REVS_PER_LENGTH*lin_pos[i]);
+		r[i] = REVS_PER_LENGTH*lin_pos[i] - q[i];
 
-		/* Calculate rotation. */
-		float d_rot = rot_pos[i] - r[i];
+		/* Calculate rotation. TODO: Make this work for 90% full rotation per
+		 * timestep. */
+		d_rot = rot_pos[i] - rot_pos_zero[i] - r[i];
 		if (d_rot > 0.5) {
 			d_rot -= 1.0;
 		}
@@ -139,13 +144,9 @@ void _update_linear_rail_position(float *lin_pos)
 
 		/* Calculate new position. */
 		lin_pos[i] += d_rot/REVS_PER_LENGTH;
-
-		if (lin_pos[i] > 20) {
-			lin_pos[i] = old_lin_pos[i];
-		}
 	}
 
-	dbg_q = q[0];
-	dbg_r = r[0]*1000;   /* This should equal current rotational position. */
+	dbg_q = q[1];
+	dbg_r = r[1]*1000;   /* This should equal current rotational position. */
 }
 

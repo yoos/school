@@ -40,11 +40,14 @@ void linear_rail_debug_output(uint8_t *buffer);
  *
  * A given rotational positon of the encoder will fit into certain "slots" in
  * the linear position of the rail. We assume that this position will not
- * change by more than a half rotation between any two timesteps.
+ * change by more than 90% of full rotation between any two timesteps. There is
+ * a 10% buffer in the opposite direction of desired movement to counter any
+ * bumps.
  *
+ * @param dir Commanded direction of movement.
  * @output lin_pos Linear position of rail. Also used as an input.
  */
-void _update_linear_rail_position(float *lin_pos);
+void _update_linear_rail_position(uint8_t *dir, float *lin_pos);
 
 #endif /* CB_LINEAR_RAIL_H */
 
