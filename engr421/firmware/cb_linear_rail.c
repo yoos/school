@@ -7,7 +7,7 @@ static float cur_lin_pos[2];   /* Current position of linear rail. */
 static float cur_lin_vel[2];   /* Current velocity of linear rail. */
 
 // DEBUG
-static uint8_t dbg_enabled;
+static uint8_t dbg_status;
 static float cur_rot_pos[2];
 static float des_pos[2];
 static uint8_t des_dir;
@@ -41,11 +41,11 @@ void setup_linear_rail(void)
 	}
 }
 
-void update_linear_rail(uint8_t enabled, float *des_lin_pos, uint8_t *dir, float *dc)
+void update_linear_rail(uint8_t status, float *des_lin_pos, uint8_t *dir, float *dc)
 {
 	uint8_t i;
 
-	dbg_enabled = enabled;
+	dbg_status = status;
 	static float des_lin_vel[2];
 	static float dc_shift[2];
 
@@ -66,7 +66,7 @@ void update_linear_rail(uint8_t enabled, float *des_lin_pos, uint8_t *dir, float
 	}
 
 	/* Controller */
-	if (!enabled) {
+	if (status == DISABLED) {
 		/* Disabled */
 		for (i=0; i<2; i++) {
 			dir[i] = 0;
@@ -78,7 +78,7 @@ void update_linear_rail(uint8_t enabled, float *des_lin_pos, uint8_t *dir, float
 		}
 	}
 	else {
-		/* Enabled */
+		/* Standing by or playing */
 		for (i=0; i<2; i++) {
 			/* Cap I term. */
 			pid_data_pos[i].I = MIN(LINEAR_RAIL_POS_I_CAP, MAX(-LINEAR_RAIL_POS_I_CAP, pid_data_pos[i].I));
@@ -107,7 +107,7 @@ void update_linear_rail(uint8_t enabled, float *des_lin_pos, uint8_t *dir, float
 
 void linear_rail_debug_output(uint8_t *buffer)
 {
-	chsprintf(buffer, "%u  lin pos: %u, %u  rot: %u, %u  des dc: %u  dc_shift: %u  q:  %u  r: %u  des lin: %u, %u\r\n", dbg_enabled, (uint16_t) (cur_lin_pos[0]*1000), (uint16_t) (cur_lin_pos[1]*1000), (uint16_t) (cur_rot_pos[0]*1000), (uint16_t) (cur_rot_pos[1]*1000), (uint16_t) (des_dc*1000), dbg_dc_shift, dbg_q, dbg_r, (uint16_t) des_pos[0], (uint16_t) des_pos[1]);
+	chsprintf(buffer, "%u  lin pos: %u, %u  rot: %u, %u  des dc: %u  dc_shift: %u  q:  %u  r: %u  des lin: %u, %u\r\n", dbg_status, (uint16_t) (cur_lin_pos[0]*1000), (uint16_t) (cur_lin_pos[1]*1000), (uint16_t) (cur_rot_pos[0]*1000), (uint16_t) (cur_rot_pos[1]*1000), (uint16_t) (des_dc*1000), dbg_dc_shift, dbg_q, dbg_r, (uint16_t) des_pos[0], (uint16_t) des_pos[1]);
 }
 
 void _update_linear_rail_position(uint8_t *dir, float *lin_pos)

@@ -18,11 +18,11 @@ void setup_death_ray(void);
  * @brief Update death ray velocity and stuff.
  *
  * @param base_wheel_dc An inappropriately named variable that determines
- * enable state.
+ * status.
  *
  * @output dc Array of duty cycles of death ray.
  */
-void update_death_ray(uint8_t enabled, float *dc);
+void update_death_ray(uint8_t status, float *dc);
 
 /**
  * @brief Debug output

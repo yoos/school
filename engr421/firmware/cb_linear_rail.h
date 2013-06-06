@@ -19,13 +19,13 @@ void setup_linear_rail(void);
  * @brief Update linear rail velocity and stuff.
  *
  * @param base_wheel_dc Duty cycle of death ray. Used here just to determine
- * enable status. TODO: Do this properly.
+ * status.
  * @param des_lin_pos Desired linear position.
  *
  * @output dir Direction of movement (0 or 1).
  * @output dc Duty cycle for linear rail motor.
  */
-void update_linear_rail(uint8_t enabled, float *des_lin_pos, uint8_t *dir, float *dc);
+void update_linear_rail(uint8_t status, float *des_lin_pos, uint8_t *dir, float *dc);
 
 /**
  * @brief Debug output

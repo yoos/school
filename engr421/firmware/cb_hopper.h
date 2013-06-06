@@ -16,11 +16,11 @@ void setup_hopper(void);
 /**
  * @brief Update hopper velocity and stuff.
  *
- * @parak enabled Status byte indicating whether or not the robot is enabled.
+ * @param status Status byte indicating play state.
  *
  * @output dc Duty cycle for hopper motor.
  */
-void update_hopper(uint8_t enabled, float *dc);
+void update_hopper(uint8_t status, float *dc);
 
 /**
  * @brief Debug output

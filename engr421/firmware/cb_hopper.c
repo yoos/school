@@ -8,20 +8,20 @@ void setup_hopper(void)
 	counter = 0;
 }
 
-void update_hopper(uint8_t enabled, float *dc)
+void update_hopper(uint8_t status, float *dc)
 {
 	uint8_t i;
 
 	/* Controller */
-	if (!enabled) {
-		/* Disabled */
+	if (status == DISABLED || status == STANDBY) {
+		/* Disabled or standing by */
 		for (i=0; i<2; i++) {
 			counter = 0;
 			dc[i] = HOPPER_DC_MIN;
 		}
 	}
 	else {
-		/* Enabled */
+		/* Beating Daniel Miller */
 		for (i=0; i<2; i++) {
 			/* Control */
 			if (counter < HOPPER_PULSE_DC * COUNTER_MAX) {

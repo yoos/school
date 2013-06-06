@@ -19,7 +19,7 @@ float base_wheel_dc = 0;
 float dc[8];
 float lr_des_pos[2];   /* Desired linear rail position from serial input. */
 uint8_t digital_state[8];
-uint8_t enabled = 0;
+uint8_t status = 0;
 
 void clear_buffer(uint8_t *buffer)
 {
@@ -64,10 +64,10 @@ static msg_t comm_thread(void *arg)
 		//chsprintf(txbuf, "%u %6u %6u | %u %u\r\n", (int) rc.new_command, (uint8_t) (ABS(rc.one.linear_rail_pos)*255), (uint8_t) (ABS(rc.two.linear_rail_pos)*255), (uint8_t) (ABS(rc.one.death_ray_intensity*255)), (uint8_t) (ABS(rc.two.death_ray_intensity*255)));
 		///comm_debug_output(txbuf);
 		///dc[7] = rc.one.linear_rail_pos;
-		lr_des_pos[0] = ((float) (0x7f & rxbuf[0])) / 127;   // Use highest-order bit as enable signal.
-		enabled = (uint8_t) (rxbuf[0] >> 7);
+		lr_des_pos[(uint8_t) (rxbuf[0] >> 7)] = ((float) (0x7f & rxbuf[0])) / 127;   // Use highest-order bit to specify which rail to control.
+		status = 1;
 
-		//chsprintf(txbuf, "%u %u\r\n", enabled, (int)(lr_des_pos[0]*1000));
+		//chsprintf(txbuf, "%u %u\r\n", status, (int)(lr_des_pos[0]*1000));
 		linear_rail_debug_output(txbuf);
 
 		//death_ray_debug_output(base_wheel_dc, txbuf);
@@ -130,12 +130,12 @@ static msg_t death_ray_thread(void *arg)
 	while (TRUE) {
 		time += MS2ST(1000*DEATH_RAY_DT);
 
-		update_death_ray(enabled, dr_dc);
+		update_death_ray(status, dr_dc);
 
 		dc[I_PWM_DEATH_RAY_0] = dr_dc[0];
 		dc[I_PWM_DEATH_RAY_1] = dr_dc[1];
 
-		if (enabled) {
+		if (status) {
 			palSetPad(GPIOD, 15);
 		}
 		else {
@@ -163,7 +163,7 @@ static msg_t hopper_thread(void *arg)
 	while (TRUE) {
 		time += MS2ST(1000*HOPPER_DT);
 
-		update_hopper(enabled, hopper_dc);
+		update_hopper(status, hopper_dc);
 
 		dc[I_PWM_HOPPER_0] = hopper_dc[0];
 		dc[I_PWM_HOPPER_1] = hopper_dc[1];
@@ -190,7 +190,7 @@ static msg_t linear_rail_thread(void *arg)
 	while (TRUE) {
 		time += MS2ST(1000*LINEAR_RAIL_DT);
 
-		update_linear_rail(enabled, lr_des_pos, lr_dir, lr_dc);
+		update_linear_rail(status, lr_des_pos, lr_dir, lr_dc);
 
 		dc[I_PWM_LINEAR_RAIL_0] = lr_dc[0];
 		dc[I_PWM_LINEAR_RAIL_1] = lr_dc[1];

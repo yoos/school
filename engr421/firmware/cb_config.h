@@ -41,6 +41,11 @@
 #define COMM_RECEIVE_BUFFER_LENGTH 50   // Size of circular buffer used to store received bytes.
 #define COMM_INPUT_MAX 250   // Highest valid command byte value (lowest is 0).
 
+/* Status values */
+#define DISABLED           0
+#define STANDBY            1
+#define BEAT_DANIEL_MILLER 2
+
 /* Indices */
 #define I_ADC_0 0
 #define I_ADC_1 1
