@@ -14,8 +14,6 @@ baudrate = '460800'
 header = chr(255)
 newlineChar = ''
 
-cmd = 0.0
-
 # Serial write.
 def serWrite(myStr):
     try:
@@ -25,11 +23,12 @@ def serWrite(myStr):
         print "Unable to send data. Check connection."
 
 def callback(pc):
-    global cmd
-    cmd = pc.x[0]   # Target first puck.
+    cmd = chr(int(pc.x[0]*127)) + chr(128+int(pc.x[1]*127))
+
+    print "Commanding", pc.x[0], pc.x[1]
+    serWrite(cmd)
 
 if __name__ == "__main__":
-    global cmd
     # Initialize ROS node.
     rospy.init_node("cb_comm", anonymous=False)
     rospy.Subscriber("cb_puck_coordinates", cb_puck_coordinates, callback, queue_size=1)
@@ -51,34 +50,15 @@ if __name__ == "__main__":
         for i in range(4):
             try:
                 ser = serial.Serial("/dev/ttyUSB"+str(i), baudrate, timeout=0)
-                print "Opened serial port at /dev/ttyUSB%d.", i
+                print "Opened serial port at /dev/ttyUSB%d." % i
                 break
             except serial.SerialException:
-                print "No serial at /dev/ttyUSB%d.", i
+                print "No serial at /dev/ttyUSB%d." % i
                 if i == 3:
                     print "No serial found. Giving up!"
                     exit(1)
 
-    sleep(1)
-
-    while True:
-        cmd = raw_input("Command to send: ")
-
-        #if cmd == 'q':
-        #    exit(0)
-
-        #serWrite(header)
-
-        for each in cmd.split(' '):
-            serWrite(chr(int(each)))
-
-        #print "Commanding", str(cmd)
-        #serWrite(chr(int(128+cmd*127)))
-
-        sleep(0.005)
-
-        #if ser.inWaiting() > 0:
-        #    print ser.read(ser.inWaiting())
+    rospy.spin()
 
 # vim: noexpandtab
 
