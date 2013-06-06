@@ -272,6 +272,9 @@ int main(void)
 
 	setup_motors();
 
+	lr_des_pos[0] = 0.0;
+	lr_des_pos[1] = 1.0;
+
 	chThdSleepMilliseconds(10);   /* Wait for initialization. */
 
 	setup_death_ray();
