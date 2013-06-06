@@ -9,7 +9,7 @@ static float cur_lin_vel[2];   /* Current velocity of linear rail. */
 // DEBUG
 static uint8_t dbg_enabled;
 static float cur_rot_pos[2];
-static float des_pos;
+static float des_pos[2];
 static uint8_t des_dir;
 static float des_dc;
 static uint16_t dbg_dc_shift;
@@ -97,7 +97,8 @@ void update_linear_rail(uint8_t enabled, float *des_lin_pos, uint8_t *dir, float
 			}
 		}
 	}
-	des_pos = des_lin_pos[1]*1000;
+	des_pos[0] = des_lin_pos[0]*1000;
+	des_pos[1] = des_lin_pos[1]*1000;
 	des_dir = dir[0];
 	des_dc = dc[0];
 	dbg_dc_shift = (uint16_t) ABS(dc_shift[0] * 1000);
@@ -106,7 +107,7 @@ void update_linear_rail(uint8_t enabled, float *des_lin_pos, uint8_t *dir, float
 
 void linear_rail_debug_output(uint8_t *buffer)
 {
-	chsprintf(buffer, "%u  lin 0: %u  lin 1: %u  rot 0: %u  rot 1: %u  des dc: %u  dc_shift: %u  q:  %u  r: %u  des lin: %u\r\n", dbg_enabled, (uint16_t) (cur_lin_pos[0]*1000), (uint16_t) (cur_lin_pos[1]*1000), (uint16_t) (cur_rot_pos[0]*1000), (uint16_t) (cur_rot_pos[1]*1000), (uint16_t) (des_dc*1000), dbg_dc_shift, dbg_q, dbg_r, (uint16_t) des_pos);
+	chsprintf(buffer, "%u  lin pos: %u, %u  rot: %u, %u  des dc: %u  dc_shift: %u  q:  %u  r: %u  des lin: %u, %u\r\n", dbg_enabled, (uint16_t) (cur_lin_pos[0]*1000), (uint16_t) (cur_lin_pos[1]*1000), (uint16_t) (cur_rot_pos[0]*1000), (uint16_t) (cur_rot_pos[1]*1000), (uint16_t) (des_dc*1000), dbg_dc_shift, dbg_q, dbg_r, (uint16_t) des_pos[0], (uint16_t) des_pos[1]);
 }
 
 void _update_linear_rail_position(uint8_t *dir, float *lin_pos)
