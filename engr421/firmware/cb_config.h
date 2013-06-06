@@ -28,6 +28,7 @@
 #define LINEAR_RAIL_VEL_KI (0)
 #define LINEAR_RAIL_VEL_KD (0)
 
+#define LINEAR_RAIL_MIN_SEPARATION 0.112
 #define LINEAR_RAIL_POS_I_CAP 1
 #define LINEAR_RAIL_VEL_I_CAP 1
 #define LINEAR_RAIL_VEL_CAP 0.5   // In m/s.
@@ -60,7 +61,7 @@
 #define I_PWM_DEATH_RAY_0 0
 #define I_PWM_DEATH_RAY_1 6   // This would be 1, but there's some sort of coupling going on between 0 and 1.
 #define I_PWM_LINEAR_RAIL_0 2
-#define I_PWM_LINEAR_RAIL_1 3
+#define I_PWM_LINEAR_RAIL_1 7
 #define I_PWM_HOPPER_0 4
 #define I_PWM_HOPPER_1 5
 
