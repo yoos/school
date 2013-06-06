@@ -57,6 +57,14 @@ void update_linear_rail(uint8_t enabled, float *des_lin_pos, uint8_t *dir, float
 	static bool calib = false;
 	if (!calib) cur_lin_pos[1] += 0.037;
 
+	/* Sanity and safety check des_lin_pos.*/
+	if (des_lin_pos[0] > 1.0 - LINEAR_RAIL_MIN_SEPARATION) {
+		des_lin_pos[0] = 1.0 - LINEAR_RAIL_MIN_SEPARATION;
+	}
+	if (des_lin_pos[1] - des_lin_pos[0] < LINEAR_RAIL_MIN_SEPARATION) {
+		des_lin_pos[1] = des_lin_pos[0] + LINEAR_RAIL_MIN_SEPARATION;
+	}
+
 	/* Controller */
 	if (!enabled) {
 		/* Disabled */
@@ -89,7 +97,7 @@ void update_linear_rail(uint8_t enabled, float *des_lin_pos, uint8_t *dir, float
 			}
 		}
 	}
-	des_pos = des_lin_pos[0];
+	des_pos = des_lin_pos[1]*1000;
 	des_dir = dir[0];
 	des_dc = dc[0];
 	dbg_dc_shift = (uint16_t) ABS(dc_shift[0] * 1000);
@@ -98,7 +106,7 @@ void update_linear_rail(uint8_t enabled, float *des_lin_pos, uint8_t *dir, float
 
 void linear_rail_debug_output(uint8_t *buffer)
 {
-	chsprintf(buffer, "%u  lin 0: %u  lin 1: %u  rot 0: %u  rot 1: %u  des dc: %u  dc_shift: %u  q:  %u  r: %u\r\n", dbg_enabled, (uint16_t) (cur_lin_pos[0]*1000), (uint16_t) (cur_lin_pos[1]*1000), (uint16_t) (cur_rot_pos[0]*1000), (uint16_t) (cur_rot_pos[1]*1000), (uint16_t) (des_dc*1000), dbg_dc_shift, dbg_q, dbg_r);
+	chsprintf(buffer, "%u  lin 0: %u  lin 1: %u  rot 0: %u  rot 1: %u  des dc: %u  dc_shift: %u  q:  %u  r: %u  des lin: %u\r\n", dbg_enabled, (uint16_t) (cur_lin_pos[0]*1000), (uint16_t) (cur_lin_pos[1]*1000), (uint16_t) (cur_rot_pos[0]*1000), (uint16_t) (cur_rot_pos[1]*1000), (uint16_t) (des_dc*1000), dbg_dc_shift, dbg_q, dbg_r, (uint16_t) des_pos);
 }
 
 void _update_linear_rail_position(uint8_t *dir, float *lin_pos)
