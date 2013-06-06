@@ -58,7 +58,7 @@
 #define I_DIGITAL_6 6
 #define I_DIGITAL_7 7
 #define I_PWM_DEATH_RAY_0 0
-#define I_PWM_DEATH_RAY_1 1
+#define I_PWM_DEATH_RAY_1 6   // This would be 1, but there's some sort of coupling going on between 0 and 1.
 #define I_PWM_LINEAR_RAIL_0 2
 #define I_PWM_LINEAR_RAIL_1 3
 #define I_PWM_HOPPER_0 4
