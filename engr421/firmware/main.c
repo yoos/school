@@ -65,7 +65,6 @@ static msg_t comm_thread(void *arg)
 		///comm_debug_output(txbuf);
 		///dc[7] = rc.one.linear_rail_pos;
 		lr_des_pos[(uint8_t) (rxbuf[0] >> 7)] = ((float) (0x7f & rxbuf[0])) / 127;   // Use highest-order bit to specify which rail to control.
-		status = 1;
 
 		//chsprintf(txbuf, "%u %u\r\n", status, (int)(lr_des_pos[0]*1000));
 		linear_rail_debug_output(txbuf);
@@ -215,9 +214,11 @@ static msg_t control_thread(void *arg)
 
 	uint16_t k = 0;
 	uint8_t i;
-	for (i=0; i<8; i++) {
+	for (i=0; i<6; i++) {
 		palSetPadMode(GPIOD, i, PAL_MODE_OUTPUT_PUSHPULL);
 	}
+	palSetPadMode(GPIOD, 6, PAL_MODE_INPUT_PULLUP);   /* Enable */
+	palSetPadMode(GPIOD, 7, PAL_MODE_INPUT_PULLUP);   /* Arbiter */
 
 	while (TRUE) {
 		time += MS2ST(1000*CONTROL_LOOP_DT);   // Next deadline in 1 ms.
@@ -225,7 +226,7 @@ static msg_t control_thread(void *arg)
 		update_motors(dc);
 
 		uint8_t j;
-		for (j=0; j<8; j++) {
+		for (j=0; j<6; j++) {
 			if (digital_state[j] == 1) {
 				palSetPad(GPIOD, j);
 			}
@@ -233,6 +234,9 @@ static msg_t control_thread(void *arg)
 				palClearPad(GPIOD, j);
 			}
 		}
+		if      (palReadPad(GPIOD, 7) == PAL_LOW) status = BEAT_DANIEL_MILLER;
+		else if (palReadPad(GPIOD, 6) == PAL_LOW) status = STANDBY;
+		else                                      status = DISABLED;
 
 		/* Blink status LED. */
 		if      (k < MS2ST(50))  palSetPad  (GPIOD, 13);
