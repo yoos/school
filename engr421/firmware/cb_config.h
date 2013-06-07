@@ -8,8 +8,8 @@
 #define LINEAR_RAIL_DT  0.002
 
 /* Controller parameters */
-#define DEATH_RAY_KP (-0.008)
-#define DEATH_RAY_KI (-0.005)
+#define DEATH_RAY_KP (-0.018)
+#define DEATH_RAY_KI (-0.006)
 #define DEATH_RAY_KD (-0.000)
 
 #define DEATH_RAY_I_CAP 15   // I term cap. The right value here can minimize positive overshoot.
@@ -73,11 +73,16 @@
 /* Constants */
 #define M_PI 3.14159
 #define WHEEL_DIA 0.05842   // In m (2.3 in)
-#define BB_VEL 5.248   // In m/s (10 ft/s, plus a little extra because reality. 5.248 is competition speed!)
+#define BB_VEL_0 3.948   // In m/s (10 ft/s, plus a little extra because reality. 5.248 is competition speed!)
+#define BB_VEL_1 4.548   // In m/s (10 ft/s, plus a little extra because reality. 5.248 is competition speed!)
 
-#define ROT_SIZE ((BB_VEL * CONTROL_LOOP_DT) / (WHEEL_DIA * M_PI))
-#define ROT_SPEED (BB_VEL/(WHEEL_DIA*M_PI))   // In rev/s
-#define ROT_PERIOD_ST (MS2ST(1000)/(ROT_SPEED*256))   // 256 quadrature pulses per revolution.
+#define ROT_SIZE_0 ((BB_VEL_0 * CONTROL_LOOP_DT) / (WHEEL_DIA * M_PI))
+#define ROT_SPEED_0 (BB_VEL_0/(WHEEL_DIA*M_PI))   // In rev/s
+#define ROT_PERIOD_ST_0 (MS2ST(1000)/(ROT_SPEED_0*256))   // 256 quadrature pulses per revolution.
+
+#define ROT_SIZE_1 ((BB_VEL_1 * CONTROL_LOOP_DT) / (WHEEL_DIA * M_PI))
+#define ROT_SPEED_1 (BB_VEL_1/(WHEEL_DIA*M_PI))   // In rev/s
+#define ROT_PERIOD_ST_1 (MS2ST(1000)/(ROT_SPEED_1*256))   // 256 quadrature pulses per revolution.
 
 #define REVS_PER_LENGTH 8.3   // Number of revolutions encoder pulley spins as it moves from one end of the slide to the other.
 

@@ -19,19 +19,20 @@ static uint16_t startup_counter[2];
 static void det_startup(float per, uint8_t i)
 {
 	/* Update counter and cap. */
-	if (per < ROT_PERIOD_ST) {
-		startup_counter[i] = MIN(DEATH_RAY_STARTUP_COUNTER_MAX, ++startup_counter[i]);
-	}
-	else {
-		startup_counter[i] = MAX(0, --startup_counter[i]);
-	}
+	//if (per < ROT_PERIOD_ST) {
+	//	startup_counter[i] = MIN(DEATH_RAY_STARTUP_COUNTER_MAX, ++startup_counter[i]);
+	//}
+	//else {
+	//	startup_counter[i] = MAX(0, --startup_counter[i]);
+	//}
 
-	if (startup_counter[i] == DEATH_RAY_STARTUP_COUNTER_MAX) {
-		up_to_speed[i] = true;
-	}
-	else if (startup_counter[i] == 0) {
-		up_to_speed[i] = false;
-	}
+	//if (startup_counter[i] == DEATH_RAY_STARTUP_COUNTER_MAX) {
+	//	up_to_speed[i] = true;
+	//}
+	//else if (startup_counter[i] == 0) {
+	//	up_to_speed[i] = false;
+	//}
+	up_to_speed[i] = true;
 }
 
 void setup_death_ray(void)
@@ -84,8 +85,9 @@ void update_death_ray(uint8_t status, float *dc)
 				pid_data_wheel_pos[i].I = MAX(-DEATH_RAY_I_CAP, pid_data_wheel_pos[i].I);
 				pid_data_wheel_pos[i].I = MIN( DEATH_RAY_I_CAP, pid_data_wheel_pos[i].I);
 
-				/* PID control */
-				dc[i] = MIN(ESC_MAX_DC, (ESC_MIN_DC + MAX(0, calculate_pid(cur_wheel_period[i], ROT_PERIOD_ST, &pid_data_wheel_pos[i]))));
+				/* PID control. Silly flywheels want different target speeds. */
+				if (i==0) dc[i] = MIN(ESC_MAX_DC, (ESC_MIN_DC + MAX(0, calculate_pid(cur_wheel_period[i], ROT_PERIOD_ST_0, &pid_data_wheel_pos[i]))));
+				if (i==1) dc[i] = MIN(ESC_MAX_DC, (ESC_MIN_DC + MAX(0, calculate_pid(cur_wheel_period[i], ROT_PERIOD_ST_1, &pid_data_wheel_pos[i]))));
 			}
 		}
 	}
@@ -93,11 +95,12 @@ void update_death_ray(uint8_t status, float *dc)
 
 void death_ray_debug_output(uint8_t *buffer)
 {
-	chsprintf(buffer, "Speed: %5d, %5d / %4d  Step: %6d  T: %8d\r\n",
+	chsprintf(buffer, "Speed: %5d/%4d, %5d/%4d  Step: %6d  T: %8d\r\n",
 			(int) cur_wheel_period[0],
+			(int) ROT_PERIOD_ST_0,
 			(int) cur_wheel_period[1],
-			(int) ROT_PERIOD_ST,
-			(int) (ROT_SIZE*1000000),
+			(int) ROT_PERIOD_ST_1,
+			(int) (ROT_SIZE_0*1000000),
 			(int) chTimeNow());
 }
 
