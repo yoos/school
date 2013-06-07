@@ -67,7 +67,7 @@ static msg_t comm_thread(void *arg)
 		lr_des_pos[(uint8_t) (rxbuf[0] >> 7)] = ((float) (0x7f & rxbuf[0])) / 127;   // Use highest-order bit to specify which rail to control.
 
 		//chsprintf(txbuf, "%u %u\r\n", status, (int)(lr_des_pos[0]*1000));
-		linear_rail_debug_output(txbuf);
+		death_ray_debug_output(txbuf);
 
 		//death_ray_debug_output(base_wheel_dc, txbuf);
 		//chsprintf(txbuf, "%s", rxbuf);
@@ -134,7 +134,7 @@ static msg_t death_ray_thread(void *arg)
 		dc[I_PWM_DEATH_RAY_0] = dr_dc[0];
 		dc[I_PWM_DEATH_RAY_1] = dr_dc[1];
 
-		if (status) {
+		if (status != DISABLED) {
 			palSetPad(GPIOD, 15);
 		}
 		else {
