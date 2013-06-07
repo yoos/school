@@ -353,7 +353,7 @@
                 <number>255</number>
                </property>
                <property name="value">
-                <number>170</number>
+                <number>210</number>
                </property>
               </widget>
              </item>
@@ -391,7 +391,7 @@
                 <number>100</number>
                </property>
                <property name="value">
-                <number>10</number>
+                <number>12</number>
                </property>
               </widget>
              </item>
@@ -408,7 +408,7 @@
                 <number>100</number>
                </property>
                <property name="value">
-                <number>14</number>
+                <number>18</number>
                </property>
               </widget>
              </item>
@@ -452,8 +452,11 @@
                <property name="maximum">
                 <double>1.000000000000000</double>
                </property>
+               <property name="number">
+                <double>0.300000000000000</double>
+               </property>
                <property name="singleStep">
-                <double>0.001000000000000</double>
+                <double>0.201000000000000</double>
                </property>
               </widget>
              </item>
