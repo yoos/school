@@ -39,6 +39,7 @@ static msg_t comm_thread(void *arg)
 	chRegSetThreadName("communications");
 	systime_t time = chTimeNow();
 	int counter = 0;
+	uint8_t i;
 
 	uint8_t txbuf[200];
 	uint8_t rxbuf[200];
@@ -50,27 +51,20 @@ static msg_t comm_thread(void *arg)
 		uartStopSend(&UARTD3);
 		uartStopReceive(&UARTD3);
 
-		///command_t rc = packet_to_command();
-		///if (rc.new_command) {
-		///	lr_des_pos[0] = rc.one.linear_rail_pos;
-		///	lr_des_pos[1] = rc.two.linear_rail_pos;
-		///}
-
 		/* Zero out buffer. TODO: Maybe check whether or not we've finished
 		 * transmitting? */
 		clear_buffer(txbuf);
 
-		//chsprintf(txbuf, "ICU: %6d %6d %6d %6d\r\n", (int) (icu_get_period(2)*1000), (int) (icu_get_period(3)*1000), (int) (icu_get_period(4)*1000), (int) (icu_get_period(5)*1000));
-		//chsprintf(txbuf, "%u %6u %6u | %u %u\r\n", (int) rc.new_command, (uint8_t) (ABS(rc.one.linear_rail_pos)*255), (uint8_t) (ABS(rc.two.linear_rail_pos)*255), (uint8_t) (ABS(rc.one.death_ray_intensity*255)), (uint8_t) (ABS(rc.two.death_ray_intensity*255)));
-		///comm_debug_output(txbuf);
-		///dc[7] = rc.one.linear_rail_pos;
-		lr_des_pos[(uint8_t) (rxbuf[0] >> 7)] = ((float) (0x7f & rxbuf[0])) / 127;   // Use highest-order bit to specify which rail to control.
+		/* Read in two bytes, since the computer will alternate between
+		 * commanding the left and right rails. */
+		for (i=0; i<2; i++) {
+			lr_des_pos[(uint8_t) (rxbuf[i] >> 7)] = ((float) (0x7f & rxbuf[i])) / 127;   /* MSB specifies which rail to control. */
+		}
 
-		//chsprintf(txbuf, "%u %u\r\n", status, (int)(lr_des_pos[0]*1000));
+		/* Fill transmit buffer with debug string */
 		death_ray_debug_output(txbuf);
 
-		//death_ray_debug_output(base_wheel_dc, txbuf);
-		//chsprintf(txbuf, "%s", rxbuf);
+		/* Transmit */
 		uartStartSend(&UARTD3, sizeof(txbuf), txbuf);
 
 //		clear_buffer(rxbuf);
