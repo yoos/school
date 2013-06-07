@@ -11,8 +11,6 @@ from cb_vision.msg import cb_puck_coordinates
 
 #serialPort = '/dev/ttyUSB0'
 baudrate = '460800'
-header = chr(255)
-newlineChar = ''
 
 # Serial write.
 def serWrite(myStr):
@@ -23,9 +21,14 @@ def serWrite(myStr):
         print "Unable to send data. Check connection."
 
 def callback(pc):
-    cmd = chr(int(pc.x[0]*127)) + chr(128+int(pc.x[1]*127))
+    if pc.x[0] < pc.x[1]:
+        left, right = pc.x[0], pc.x[1]
+    else:
+        left, right = pc.x[1], pc.x[0]
 
-    print "Commanding", pc.x[0], pc.x[1]
+    cmd = chr(int(left*127)) + chr(128+int(right*127))
+
+    print "Commanding", left, right
     serWrite(cmd)
 
 if __name__ == "__main__":
