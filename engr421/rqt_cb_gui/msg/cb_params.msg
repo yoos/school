@@ -5,8 +5,6 @@ uint8 board_sat_high
 uint8 board_val_low
 uint8 board_val_high
 uint16 board_min_size
-uint8 board_erosion_iter
-uint8 board_dilation_iter
 uint8 board_canny_lower_threshold
 
 uint8 puck_hue_low
@@ -17,7 +15,6 @@ uint8 puck_val_low
 uint8 puck_val_high
 uint16 encircle_min_size
 uint16 encircle_max_size
-uint8 puck_erosion_iter
 float32 puckiness_min_ratio
 uint8 puck_canny_lower_threshold
 

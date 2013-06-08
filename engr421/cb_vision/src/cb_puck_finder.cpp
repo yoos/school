@@ -21,8 +21,6 @@ CBPuckFinder::CBPuckFinder(ros::NodeHandle nh) : it(nh)
 	board_sat_high = 80;
 	board_val_low  = 60;
 	board_val_high = 255;
-	board_erosion_iter = 0;
-	board_dilation_iter = 0;
 	board_canny_lower_threshold = 0;
 
 	puck_hue_low  = 100;
@@ -33,7 +31,6 @@ CBPuckFinder::CBPuckFinder(ros::NodeHandle nh) : it(nh)
 	puck_val_high = 255;
 	encircle_min_size = 0;
 	encircle_max_size = 1000;
-	puck_erosion_iter = 0;
 	puckiness_min_ratio = 0.0;
 	puck_canny_lower_threshold = 0;
 
@@ -74,7 +71,7 @@ void CBPuckFinder::rectify_board(Mat* image, Mat* rect_image)
 		get_parameters();   // Is it bad to call this every loop?
 
 		// Rectify image. Board size is 22.3125 x 45 inches.
-		static int dpi = 12;
+		static int dpi = 32;
 		Point2f src[4], dst[4];
 		src[0] = Point2f(board_corner_0_x, board_corner_0_y);
 		src[1] = Point2f(board_corner_1_x, board_corner_1_y);
@@ -112,10 +109,6 @@ void CBPuckFinder::find_pucks(Mat* image, vector<vector<Point> >* pucks)
 	static Mat bw_image;
 	inRange(hsv_image, Scalar(puck_hue_low, puck_sat_low, puck_val_low),
 			Scalar(puck_hue_high, puck_sat_high, puck_val_high), debug_image_2);
-
-	// Erode image to get sharper corners.
-	//static Mat eroded_image;
-	//erode(bw_image, eroded_image, Mat(), Point(-1, -1), puck_erosion_iter);
 
 	// Find edges with Canny.
 	static Mat canny_image;
@@ -218,8 +211,6 @@ void CBPuckFinder::params_cb(const rqt_cb_gui::cb_params& msg)
 	board_val_low  = msg.board_val_low;
 	board_val_high = msg.board_val_high;
 	board_min_size = msg.board_min_size;
-	board_erosion_iter  = msg.board_erosion_iter;
-	board_dilation_iter = msg.board_dilation_iter;
 	board_canny_lower_threshold = msg.board_canny_lower_threshold;
 
 	// Puck-related parameters.
@@ -231,7 +222,6 @@ void CBPuckFinder::params_cb(const rqt_cb_gui::cb_params& msg)
 	puck_val_high = msg.puck_val_high;
 	encircle_min_size = msg.encircle_min_size;
 	encircle_max_size = msg.encircle_max_size;
-	puck_erosion_iter  = msg.puck_erosion_iter;
 	puckiness_min_ratio = msg.puckiness_min_ratio;
 	puck_canny_lower_threshold = msg.puck_canny_lower_threshold;
 }
