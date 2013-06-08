@@ -35,9 +35,14 @@ private:
 	ros::Timer pub_timer;
 
 	void pub_cb(const ros::TimerEvent& event);   // Publisher callback.
+	void cattlebattle(void);
+	void set_parameters(void);
+	void get_parameters(void);
 
 protected slots:
 	virtual void onEditingFinished(void);
+	void save_parameters(void);
+	void load_parameters(void);
 };
 } // namespace
 #endif // rqt_cb_gui__CBGUI_H

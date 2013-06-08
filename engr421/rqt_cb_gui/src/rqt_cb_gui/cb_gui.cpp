@@ -57,6 +57,8 @@ void CBGUI::initPlugin(qt_gui_cpp::PluginContext& context)
 	connect(ui_.puck_erosion_iter_spinBox, SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
 	connect(ui_.puckiness_min_ratio_doubleSpinBox, SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
 	connect(ui_.puck_canny_lower_threshold_spinBox, SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
+	connect(ui_.save_params_pushButton, SIGNAL(clicked(void)), this, SLOT(save_parameters(void)));
+	connect(ui_.load_params_pushButton, SIGNAL(clicked(void)), this, SLOT(load_parameters(void)));
 
 	// Call editingFinished() once at beginning to get the values out there.
 	onEditingFinished();
@@ -110,6 +112,92 @@ void CBGUI::onEditingFinished(void)
 	cb_params_msg.puck_erosion_iter  = ui_.puck_erosion_iter_spinBox->value();
 	cb_params_msg.puckiness_min_ratio = ui_.puckiness_min_ratio_doubleSpinBox->value();
 	cb_params_msg.puck_canny_lower_threshold = ui_.puck_canny_lower_threshold_spinBox->value();
+}
+
+void CBGUI::save_parameters(void)
+{
+	set_parameters();
+
+	int rosparamPID = fork();
+	if (rosparamPID == 0) {   // Child process
+		execlp("rosparam", "rosparam", "dump", "/opt/ros/workspace/engr421/cb_vision/gui_config.yaml", "/cb_board", NULL);
+		exit(127);   // Exit code 127 if command not found.
+	}
+
+	ROS_INFO("GUI: Saved GUI settings.");
+}
+
+void CBGUI::load_parameters(void)
+{
+	int rosparamPID = fork();
+	if (rosparamPID == 0) {   // Child process
+		execlp("rosparam", "rosparam", "load", "/opt/ros/workspace/engr421/cb_vision/gui_config.yaml", "/cb_board", NULL);
+		exit(127);   // Exit code 127 if command not found.
+	}
+
+	// Once parameters are loaded, get them and update GUI.
+	while(nh_.hasParam("cb_board"));
+
+	get_parameters();
+
+	ROS_INFO("GUI: Loaded GUI settings.");
+}
+
+void CBGUI::set_parameters(void)
+{
+	nh_.setParam("/cb_board/puck_hue_low", cb_params_msg.puck_hue_low);
+	nh_.setParam("/cb_board/puck_hue_high", cb_params_msg.puck_hue_high);
+	nh_.setParam("/cb_board/puck_sat_low", cb_params_msg.puck_sat_low);
+	nh_.setParam("/cb_board/puck_sat_high", cb_params_msg.puck_sat_high);
+	nh_.setParam("/cb_board/puck_val_low", cb_params_msg.puck_val_low);
+	nh_.setParam("/cb_board/puck_val_high", cb_params_msg.puck_val_high);
+	nh_.setParam("/cb_board/encircle_min_size", cb_params_msg.encircle_min_size);
+	nh_.setParam("/cb_board/encircle_max_size", cb_params_msg.encircle_max_size);
+	nh_.setParam("/cb_board/puck_erosion_iter", cb_params_msg.puck_erosion_iter);
+	nh_.setParam("/cb_board/puckiness_min_ratio", cb_params_msg.puckiness_min_ratio);
+	nh_.setParam("/cb_board/puck_canny_lower_threshold", cb_params_msg.puck_canny_lower_threshold);
+}
+
+void CBGUI::get_parameters(void)
+{
+	// Temporary variables of ROS-compatible types.
+	int puck_hue_low               = cb_params_msg.puck_hue_low;
+	int puck_hue_high              = cb_params_msg.puck_hue_high;
+	int puck_sat_low               = cb_params_msg.puck_sat_low;
+	int puck_sat_high              = cb_params_msg.puck_sat_high;
+	int puck_val_low               = cb_params_msg.puck_val_low;
+	int puck_val_high              = cb_params_msg.puck_val_high;
+	int encircle_min_size          = cb_params_msg.encircle_min_size;
+	int encircle_max_size          = cb_params_msg.encircle_max_size;
+	int puck_erosion_iter          = cb_params_msg.puck_erosion_iter;
+	double puckiness_min_ratio     = cb_params_msg.puckiness_min_ratio;
+	int puck_canny_lower_threshold = cb_params_msg.puck_canny_lower_threshold;
+
+	// Get parameters.
+	nh_.getParam("/cb_board/puck_hue_low",               puck_hue_low);
+	nh_.getParam("/cb_board/puck_hue_high",              puck_hue_high);
+	nh_.getParam("/cb_board/puck_sat_low",               puck_sat_low);
+	nh_.getParam("/cb_board/puck_sat_high",              puck_sat_high);
+	nh_.getParam("/cb_board/puck_val_low",               puck_val_low);
+	nh_.getParam("/cb_board/puck_val_high",              puck_val_high);
+	nh_.getParam("/cb_board/encircle_min_size",          encircle_min_size);
+	nh_.getParam("/cb_board/encircle_max_size",          encircle_max_size);
+	nh_.getParam("/cb_board/puck_erosion_iter",          puck_erosion_iter);
+	nh_.getParam("/cb_board/puckiness_min_ratio",        puckiness_min_ratio);
+	nh_.getParam("/cb_board/puck_canny_lower_threshold", puck_canny_lower_threshold);
+
+	// Set GUI fields.
+	ui_.puck_hue_low_spinBox->setValue(cb_params_msg.puck_hue_low);
+	ui_.puck_hue_high_spinBox->setValue(cb_params_msg.puck_hue_high);
+	ui_.puck_sat_low_spinBox->setValue(cb_params_msg.puck_sat_low);
+	ui_.puck_sat_high_spinBox->setValue(cb_params_msg.puck_sat_high);
+	ui_.puck_val_low_spinBox->setValue(cb_params_msg.puck_val_low);
+	ui_.puck_val_high_spinBox->setValue(cb_params_msg.puck_val_high);
+	ui_.encircle_min_size_spinBox->setValue(cb_params_msg.encircle_min_size);
+	ui_.encircle_min_size_spinBox->setValue(cb_params_msg.encircle_max_size);
+	ui_.puck_erosion_iter_spinBox->setValue(cb_params_msg.puck_erosion_iter);
+	ui_.puckiness_min_ratio_doubleSpinBox->setValue(cb_params_msg.puckiness_min_ratio);
+	ui_.puck_canny_lower_threshold_spinBox->setValue(cb_params_msg.puck_canny_lower_threshold);
 }
 
 /*bool hasConfiguration() const
