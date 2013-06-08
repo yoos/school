@@ -47,6 +47,7 @@ CBPuckFinder::CBPuckFinder(ros::NodeHandle nh) : it(nh)
 	board_corner_2_y = 0;
 	board_corner_3_x = 0;
 	board_corner_3_y = 0;
+	transform_up_to_date = false;
 
 	frame_height = 100;
 	frame_width = 100;
@@ -64,29 +65,33 @@ CBPuckFinder::CBPuckFinder(ros::NodeHandle nh) : it(nh)
 
 void CBPuckFinder::rectify_board(Mat* image, Mat* rect_image)
 {
-	// Wait for the user to select board corners.
-	while (!nh_.hasParam("/cb_board/corner0")) {
-		ros::Duration(0.2).sleep();
+	static Mat trans;
+	if (!transform_up_to_date) {
+		// Wait for the user to select board corners.
+		while (!nh_.hasParam("/cb_board/corner0")) {
+			ros::Duration(0.2).sleep();
+		}
+		get_parameters();   // Is it bad to call this every loop?
+
+		// Rectify image. Board size is 22.3125 x 45 inches.
+		static int dpi = 12;
+		Point2f src[4], dst[4];
+		src[0] = Point2f(board_corner_0_x, board_corner_0_y);
+		src[1] = Point2f(board_corner_1_x, board_corner_1_y);
+		src[2] = Point2f(board_corner_2_x, board_corner_2_y);
+		src[3] = Point2f(board_corner_3_x, board_corner_3_y);
+
+		frame_height = 45*dpi;
+		frame_width = 22.3125*dpi;
+
+		dst[0] = Point2f(0, 0);
+		dst[1] = Point2f(0, frame_height);
+		dst[2] = Point2f(frame_width, 0);
+		dst[3] = Point2f(frame_width, frame_height);
+
+		trans = getPerspectiveTransform(src, dst);
 	}
-	get_parameters();   // Is it bad to call this every loop?
 
-	// Rectify image. Board size is 22.3125 x 45 inches.
-	int dpi = 12;
-	Point2f src[4], dst[4];
-	src[0] = Point2f(board_corner_0_x, board_corner_0_y);
-	src[1] = Point2f(board_corner_1_x, board_corner_1_y);
-	src[2] = Point2f(board_corner_2_x, board_corner_2_y);
-	src[3] = Point2f(board_corner_3_x, board_corner_3_y);
-
-	frame_height = 45*dpi;
-	frame_width = 22.3125*dpi;
-
-	dst[0] = Point2f(0, 0);
-	dst[1] = Point2f(0, frame_height);
-	dst[2] = Point2f(frame_width, 0);
-	dst[3] = Point2f(frame_width, frame_height);
-
-	Mat trans = getPerspectiveTransform(src, dst);
 	warpPerspective(*image, *rect_image, trans, cvSize(frame_width, frame_height));
 }
 

@@ -83,6 +83,7 @@ class CBPuckFinder
 			 board_corner_2_y,
 			 board_corner_3_x,
 			 board_corner_3_y;
+	bool transform_up_to_date;   // Has the perspective transform been generated from the latest board corner locations?
 
 	// Final board display frame dimensions in pixels
 	uint16_t frame_height, frame_width;
