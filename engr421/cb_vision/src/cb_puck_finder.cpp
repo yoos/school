@@ -172,7 +172,8 @@ void CBPuckFinder::image_cb(const sensor_msgs::ImageConstPtr& msg)
 	find_pucks(&rectified_image, &target_pucks);
 
 	// Draw puck locations.
-	Mat pucks_drawing = Mat::zeros(frame_height, frame_width, CV_8UC3);
+	static Mat pucks_drawing;
+	pucks_drawing = Mat::zeros(frame_height, frame_width, CV_8UC3);
 	for (uint16_t i=0; i<target_pucks.size(); i++) {
 		Scalar color = Scalar(0, 255, 0);   // Green!
 		if (pucks_encircle_radii[i] > encircle_min_size && pucks_encircle_radii[i] < encircle_max_size) {
@@ -182,7 +183,7 @@ void CBPuckFinder::image_cb(const sensor_msgs::ImageConstPtr& msg)
 	}
 
 	// Draw the board.
-	Scalar board_color = Scalar(0, 0, 255);   // Red.
+	static Scalar board_color = Scalar(0, 0, 255);   // Red.
 	drawContours(pucks_drawing, board_closed_contours, 0, board_color, 1, 8, vector<Vec4i>(), 0, Point());
 
 	// Show images.
@@ -190,8 +191,8 @@ void CBPuckFinder::image_cb(const sensor_msgs::ImageConstPtr& msg)
 	imshow(BW_WINDOW, debug_image_2);
 	imshow(PUCKS_WINDOW, pucks_drawing);
 
-	// Wait 2 ms for a keypress.
-	int c = waitKey(2);
+	// Wait 1 ms for a keypress.
+	int c = waitKey(1);
 	// Exit if the spacebar is pressed. NOTE: killing the program with
 	// Ctrl+C sometimes stops OpenCV at a bad place and effects a kernel
 	// panic! If you really like Ctrl+C, do so at your own risk.
