@@ -65,7 +65,7 @@ CBPuckFinder::CBPuckFinder(ros::NodeHandle nh) : it(nh)
 void CBPuckFinder::rectify_board(Mat* image, Mat* rect_image)
 {
 	// Wait for the user to select board corners.
-	while (!nh_.hasParam("corner0/x")) {
+	while (!nh_.hasParam("/cb_board/corner0")) {
 		ros::Duration(0.2).sleep();
 	}
 	get_parameters();   // Is it bad to call this every loop?
@@ -232,13 +232,13 @@ void CBPuckFinder::params_cb(const rqt_cb_gui::cb_params& msg)
 
 void CBPuckFinder::get_parameters(void)
 {
-	nh_.getParam("corner0/x", board_corner_0_x);
-	nh_.getParam("corner0/y", board_corner_0_y);
-	nh_.getParam("corner1/x", board_corner_1_x);
-	nh_.getParam("corner1/y", board_corner_1_y);
-	nh_.getParam("corner2/x", board_corner_2_x);
-	nh_.getParam("corner2/y", board_corner_2_y);
-	nh_.getParam("corner3/x", board_corner_3_x);
-	nh_.getParam("corner3/y", board_corner_3_y);
+	nh_.getParam("/cb_board/corner0/x", board_corner_0_x);
+	nh_.getParam("/cb_board/corner0/y", board_corner_0_y);
+	nh_.getParam("/cb_board/corner1/x", board_corner_1_x);
+	nh_.getParam("/cb_board/corner1/y", board_corner_1_y);
+	nh_.getParam("/cb_board/corner2/x", board_corner_2_x);
+	nh_.getParam("/cb_board/corner2/y", board_corner_2_y);
+	nh_.getParam("/cb_board/corner3/x", board_corner_3_x);
+	nh_.getParam("/cb_board/corner3/y", board_corner_3_y);
 }
 

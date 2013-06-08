@@ -93,14 +93,14 @@ def get_board_corners(dev):
     cv2.destroyWindow("Calibrate")
 
     # Put corner coordinates on ROS parameter server.
-    rospy.set_param("corner0/x", corner_point_list[0][0])
-    rospy.set_param("corner0/y", corner_point_list[0][1])
-    rospy.set_param("corner1/x", corner_point_list[1][0])
-    rospy.set_param("corner1/y", corner_point_list[1][1])
-    rospy.set_param("corner2/x", corner_point_list[2][0])
-    rospy.set_param("corner2/y", corner_point_list[2][1])
-    rospy.set_param("corner3/x", corner_point_list[3][0])
-    rospy.set_param("corner3/y", corner_point_list[3][1])
+    rospy.set_param("/cb_board/corner0/x", corner_point_list[0][0])
+    rospy.set_param("/cb_board/corner0/y", corner_point_list[0][1])
+    rospy.set_param("/cb_board/corner1/x", corner_point_list[1][0])
+    rospy.set_param("/cb_board/corner1/y", corner_point_list[1][1])
+    rospy.set_param("/cb_board/corner2/x", corner_point_list[2][0])
+    rospy.set_param("/cb_board/corner2/y", corner_point_list[2][1])
+    rospy.set_param("/cb_board/corner3/x", corner_point_list[3][0])
+    rospy.set_param("/cb_board/corner3/y", corner_point_list[3][1])
  
 
 ##################################################### 
