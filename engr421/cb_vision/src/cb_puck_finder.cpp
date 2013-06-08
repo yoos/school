@@ -8,7 +8,7 @@ CBPuckFinder::CBPuckFinder(ros::NodeHandle nh) : it(nh)
 	cb_vision_params_sub = nh_.subscribe("cb_vision_params_in", 1, &CBPuckFinder::params_cb, this);
 	cb_vision_pub = nh_.advertise<cb_vision::cb_puck_coordinates>("cb_puck_coordinates", 1);
 
-	pc.x[1] = 0.0;
+	pc.x[0] = 0.0;
 	pc.y[0] = 0.0;
 	pc.x[1] = 0.0;
 	pc.y[1] = 0.0;
