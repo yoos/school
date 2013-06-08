@@ -13,6 +13,8 @@ CBPuckFinder::CBPuckFinder(ros::NodeHandle nh) : it(nh)
 	pc.x[1] = 0.0;
 	pc.y[1] = 0.0;
 
+	pucks_found = false;
+
 	// Initialize HSV parameters rather arbitrarily. These will be updated from
 	// the ROS parameter server later.
 	board_hue_low  = 100;
@@ -146,6 +148,11 @@ void CBPuckFinder::find_pucks(Mat* image, vector<vector<Point> >* pucks)
 	}
 }
 
+void CBPuckFinder::track_pucks(Mat* image, Point pucks[2])
+{
+	// TODO
+}
+
 void CBPuckFinder::image_cb(const sensor_msgs::ImageConstPtr& msg)
 {
 	debug_image_1 = Mat::zeros(240, 320, CV_8UC3);
@@ -162,7 +169,15 @@ void CBPuckFinder::image_cb(const sensor_msgs::ImageConstPtr& msg)
 	static Mat rectified_image((&cv_ptr->image)->size(), (&cv_ptr->image)->type());
 	rectify_board(&cv_ptr->image, &rectified_image);
 
-	find_pucks(&rectified_image, &target_pucks);
+	static Point pucks_to_track[2];
+	if (!pucks_found) {
+		find_pucks(&rectified_image, &target_pucks);
+		// TODO: Do more stuff and use the NBP to get pucks, then:
+		cb_nbp.get_puckiest_pucks(pucks_to_track);
+	}
+	else {
+		track_pucks(&rectified_image, pucks_to_track);
+	}
 
 	// Draw puck locations.
 	static Mat pucks_drawing;
@@ -224,6 +239,13 @@ void CBPuckFinder::params_cb(const rqt_cb_gui::cb_params& msg)
 	encircle_max_size = msg.encircle_max_size;
 	puckiness_min_ratio = msg.puckiness_min_ratio;
 	puck_canny_lower_threshold = msg.puck_canny_lower_threshold;
+
+	// Update the puckifier.
+	static puck_features pf;
+	pf.encircle_size = (encircle_min_size + encircle_max_size) / 2;
+	pf.puck_encircle_ratio = (puckiness_min_ratio + 1.0) / 2;
+	pf.dist_last_closest_puck = 0.0;   // TODO
+	cb_nbp.set_ideal_puck_features(pf);
 }
 
 void CBPuckFinder::get_parameters(void)

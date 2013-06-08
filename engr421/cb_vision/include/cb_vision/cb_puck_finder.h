@@ -10,6 +10,7 @@
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
 #include <cb_vision/cb_puck_coordinates.h>
+#include <cb_vision/cb_puck_nbc.h>   // Naive Bayes Classifier for pucks.
 #include <rqt_cb_gui/cb_params.h>
 
 
@@ -44,6 +45,7 @@ class CBPuckFinder
 	vector<vector<Point> > target_pucks;   // Pucks to shoot at.
 	vector<Point2f> pucks_encircle_centers;   // Centers of minimum enclosing circles around pucks.
 	vector<float> pucks_encircle_radii;   // Radii of enclosing circles.
+	bool pucks_found;   // Have the pucks been found? (We need to find them before we lock onto them and start tracking them.)
 
 	/**
 	 * Thresholds.
@@ -92,6 +94,7 @@ class CBPuckFinder
 	image_transport::Subscriber cb_vision_sub;
 	ros::Subscriber cb_vision_params_sub;
 	ros::Publisher cb_vision_pub;
+	CBNaiveBayesPuckifier cb_nbp;
 
 	/**
 	 * Rectify the board. Takes orig_image as input and outputs to rect_image.
@@ -99,9 +102,22 @@ class CBPuckFinder
 	void rectify_board(Mat* image, Mat* rect_image);
 
 	/**
-	 * Find pucks in input image and output vector of puck coordinates.
+	 * Find pucks in input image and output vector of puck coordinates. The
+	 * pucks identified by this function may not be the actual pucks, so it
+	 * will be called multiple times when system initialization is requested by
+	 * the GUI, and a naive Bayes classifier will determine the location of the
+	 * actual pucks.
 	 */
 	void find_pucks(Mat* image, vector<vector<Point> >* pucks);
+
+	/**
+	 * Track pucks found within ROIs. This is used once the two pucks have been
+	 * located and we wish to keep a realtime lock on the pucks.
+	 *
+	 * @param image Image of rectified board.
+	 * @param pucks Location of pucks to lock onto.
+	 */
+	void track_pucks(Mat* image, Point pucks[2]);
 
 	/**
 	 * Callback for input video.
