@@ -73,7 +73,7 @@ void CBPuckFinder::rectify_board(Mat* image, Mat* rect_image)
 		get_parameters();   // Is it bad to call this every loop?
 
 		// Rectify image. Board size is 22.3125 x 45 inches.
-		static int dpi = 32;
+		static int dpi = 12;
 		Point2f src[4], dst[4];
 		src[0] = Point2f(board_corner_0_x, board_corner_0_y);
 		src[1] = Point2f(board_corner_1_x, board_corner_1_y);
