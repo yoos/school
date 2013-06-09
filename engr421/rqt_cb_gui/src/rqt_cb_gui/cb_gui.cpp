@@ -187,7 +187,7 @@ void CBGUI::get_parameters(void)
 	ui_.puck_val_low_spinBox->setValue(puck_val_low);
 	ui_.puck_val_high_spinBox->setValue(puck_val_high);
 	ui_.encircle_min_size_spinBox->setValue(encircle_min_size);
-	ui_.encircle_min_size_spinBox->setValue(encircle_max_size);
+	ui_.encircle_max_size_spinBox->setValue(encircle_max_size);
 	ui_.puckiness_min_ratio_doubleSpinBox->setValue(puckiness_min_ratio);
 	ui_.puck_canny_lower_threshold_spinBox->setValue(puck_canny_lower_threshold);
 }
