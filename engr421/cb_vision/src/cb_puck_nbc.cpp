@@ -23,23 +23,27 @@ void CBNaiveBayesPuckifier::add_potential_puck(Point2f loc, puck_features pf)
 
 	new_pp.puckiness = new_pp.prob.encircle_size * new_pp.prob.puck_encircle_ratio * new_pp.prob.dist_last_closest_puck;
 
-	// Keep track of all the potential pucks, just in case. I might remove this
-	// later.
-	pp.push_back(new_pp);
-
 	// Keep track of the two puckiest pucks.
 	if (new_pp.puckiness > puckiest_pucks[0].puckiness) {
+		ROS_INFO("Puck at %f with score %f takes first place over %f", new_pp.loc.x, new_pp.puckiness, puckiest_pucks[0].puckiness);
 		puckiest_pucks[1] = puckiest_pucks[0];
 		puckiest_pucks[0] = new_pp;
 	}
 	else if (new_pp.puckiness > puckiest_pucks[1].puckiness) {
+		ROS_INFO("Puck at %f with score %f takes second place over %f", new_pp.loc.x, new_pp.puckiness, puckiest_pucks[1].puckiness);
 		puckiest_pucks[1] = new_pp;
 	}
+
+	// Keep track of all the potential pucks, just in case. I might remove this
+	// later.
+	pp.push_back(new_pp);
 }
 
 void CBNaiveBayesPuckifier::get_puckiest_pucks(Point2f pucks[2])
 {
 	pucks[0] = puckiest_pucks[0].loc;
 	pucks[1] = puckiest_pucks[1].loc;
+
+	pp.clear();
 }
 

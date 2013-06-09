@@ -74,7 +74,7 @@ class CBPuckFinder
 
 	// Board corner locations. Should be grabbed later from ROS parameter
 	// server.
-	int board_corner_0_x,
+	double board_corner_0_x,
 			 board_corner_0_y,
 			 board_corner_1_x,
 			 board_corner_1_y,

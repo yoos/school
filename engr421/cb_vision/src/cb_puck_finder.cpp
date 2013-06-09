@@ -38,18 +38,19 @@ CBPuckFinder::CBPuckFinder(ros::NodeHandle nh) : it(nh)
 
 	// Board corner locations. Should be grabbed later from ROS parameter
 	// server.
-	board_corner_0_x = 0;
-	board_corner_0_y = 0;
-	board_corner_1_x = 0;
-	board_corner_1_y = 0;
-	board_corner_2_x = 0;
-	board_corner_2_y = 0;
-	board_corner_3_x = 0;
-	board_corner_3_y = 0;
+	board_corner_0_x = 0.0;
+	board_corner_0_y = 0.0;
+	board_corner_1_x = 0.0;
+	board_corner_1_y = 0.0;
+	board_corner_2_x = 0.0;
+	board_corner_2_y = 0.0;
+	board_corner_3_x = 0.0;
+	board_corner_3_y = 0.0;
 	transform_up_to_date = false;
 
-	frame_height = 100;
-	frame_width = 100;
+	static int dpi = 12;
+	frame_height = 45*dpi;
+	frame_width = 22.3125*dpi;
 
 	// Set up windows.
 	cvNamedWindow(RAW_WINDOW, 1);
@@ -72,16 +73,13 @@ void CBPuckFinder::rectify_board(Mat* image, Mat* rect_image)
 		}
 		get_parameters();   // Is it bad to call this every loop?
 
-		// Rectify image. Board size is 22.3125 x 45 inches.
-		static int dpi = 12;
+		// Rectify image. Source image size is 320x240 pixels. Board size is
+		// 22.3125 x 45 inches.
 		Point2f src[4], dst[4];
-		src[0] = Point2f(board_corner_0_x, board_corner_0_y);
-		src[1] = Point2f(board_corner_1_x, board_corner_1_y);
-		src[2] = Point2f(board_corner_2_x, board_corner_2_y);
-		src[3] = Point2f(board_corner_3_x, board_corner_3_y);
-
-		frame_height = 45*dpi;
-		frame_width = 22.3125*dpi;
+		src[0] = Point2f(board_corner_0_x*320, board_corner_0_y*240);
+		src[1] = Point2f(board_corner_1_x*320, board_corner_1_y*240);
+		src[2] = Point2f(board_corner_2_x*320, board_corner_2_y*240);
+		src[3] = Point2f(board_corner_3_x*320, board_corner_3_y*240);
 
 		dst[0] = Point2f(0, 0);
 		dst[1] = Point2f(0, frame_height);
@@ -170,20 +168,21 @@ void CBPuckFinder::image_cb(const sensor_msgs::ImageConstPtr& msg)
 	rectify_board(&cv_ptr->image, &rectified_image);
 
 	static Point2f pucks_to_track[2];
+	static Point2f pp;
+	static puck_features pf;
 	if (!pucks_found) {
 		find_pucks(&rectified_image, &target_pucks);
 		for (uint16_t i=0; i<target_pucks.size(); i++) {
 
-			static Point2f pp = pucks_encircle_centers[i];
-			static puck_features pf;
+			pp = pucks_encircle_centers[i];
 			pf.encircle_size = pucks_encircle_radii[i];
 			pf.puck_encircle_ratio = fabs(contourArea(Mat(pucks_closed_contours[i]))) / (3.14159*pucks_encircle_radii[i]*pucks_encircle_radii[i]);
-			pf.dist_last_closest_puck = 0.0;
+			pf.dist_last_closest_puck = 1.0;
 			cb_nbp.add_potential_puck(pp, pf);
-
-			cb_nbp.get_puckiest_pucks(pucks_to_track);
 		}
-		ROS_INFO("Classifying %d potential pucks. %f", target_pucks.size(), pucks_to_track[0].x);
+
+		cb_nbp.get_puckiest_pucks(pucks_to_track);
+		ROS_INFO("Classifying %d potential pucks. Most promising puck at %f", target_pucks.size(), pucks_to_track[0].x);
 	}
 	else {
 		track_pucks(&rectified_image, pucks_to_track);
@@ -193,10 +192,14 @@ void CBPuckFinder::image_cb(const sensor_msgs::ImageConstPtr& msg)
 	static Mat pucks_drawing;
 	pucks_drawing = Mat::zeros(frame_height, frame_width, CV_8UC3);
 	for (uint16_t i=0; i<target_pucks.size(); i++) {
-		Scalar color = Scalar(0, 255, 0);   // Green!
+		Scalar blue  = Scalar(225, 0, 0);
+		Scalar green = Scalar(0, 255, 0);
+		Scalar red   = Scalar(0, 0, 255);
 		if (pucks_encircle_radii[i] > encircle_min_size && pucks_encircle_radii[i] < encircle_max_size) {
-			drawContours(pucks_drawing, target_pucks, i, color, 1, 8, vector<Vec4i>(), 0, Point());
-			circle(pucks_drawing, pucks_encircle_centers[i], (int) pucks_encircle_radii[i], color, 2, 8, 0);
+			drawContours(pucks_drawing, target_pucks, i, green, 1, 8, vector<Vec4i>(), 0, Point());
+			circle(pucks_drawing, pucks_encircle_centers[i], (int) pucks_encircle_radii[i], green, 2, 8, 0);
+
+			rectangle(pucks_drawing, Point(pucks_to_track[0].x-50, pucks_to_track[0].y-50), Point(pucks_to_track[0].x+50, pucks_to_track[0].y+50), blue);
 		}
 	}
 
@@ -254,7 +257,7 @@ void CBPuckFinder::params_cb(const rqt_cb_gui::cb_params& msg)
 	static puck_features pf;
 	pf.encircle_size = (encircle_min_size + encircle_max_size) / 2;
 	pf.puck_encircle_ratio = (puckiness_min_ratio + 1.0) / 2;
-	pf.dist_last_closest_puck = 0.0;   // TODO
+	pf.dist_last_closest_puck = 1.0;   // TODO
 	cb_nbp.set_ideal_puck_features(pf);
 }
 
