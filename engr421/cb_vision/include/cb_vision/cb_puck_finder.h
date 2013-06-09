@@ -117,7 +117,7 @@ class CBPuckFinder
 	 * @param image Image of rectified board.
 	 * @param pucks Location of pucks to lock onto.
 	 */
-	void track_pucks(Mat* image, Point pucks[2]);
+	void track_pucks(Mat* image, Point2f pucks[2]);
 
 	/**
 	 * Callback for input video.

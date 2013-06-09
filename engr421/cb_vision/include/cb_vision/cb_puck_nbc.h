@@ -22,7 +22,7 @@ typedef struct {
 
 typedef struct
 {
-	Point              loc;   // Location of puck so we can use it later.
+	Point2f            loc;   // Location of puck so we can use it later.
 	puck_probabilities prob;
 	float              puckiness;   // Probability from 0.0 to 1.0 that this is a puck.
 } puck_parameter;
@@ -38,8 +38,8 @@ public:
 	CBNaiveBayesPuckifier(void);
 
 	void set_ideal_puck_features(puck_features pf);
-	void add_potential_puck(Point loc, puck_features pf);
-	void get_puckiest_pucks(Point pucks[2]);
+	void add_potential_puck(Point2f loc, puck_features pf);
+	void get_puckiest_pucks(Point2f pucks[2]);
 };
 
 #endif // CB_PUCK_NBC_H

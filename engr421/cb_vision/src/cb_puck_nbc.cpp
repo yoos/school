@@ -12,7 +12,7 @@ void CBNaiveBayesPuckifier::set_ideal_puck_features(puck_features pf)
 	ipf.dist_last_closest_puck = pf.dist_last_closest_puck;
 }
 
-void CBNaiveBayesPuckifier::add_potential_puck(Point loc, puck_features pf)
+void CBNaiveBayesPuckifier::add_potential_puck(Point2f loc, puck_features pf)
 {
 	puck_parameter new_pp;
 	new_pp.loc = loc;
@@ -37,7 +37,7 @@ void CBNaiveBayesPuckifier::add_potential_puck(Point loc, puck_features pf)
 	}
 }
 
-void CBNaiveBayesPuckifier::get_puckiest_pucks(Point pucks[2])
+void CBNaiveBayesPuckifier::get_puckiest_pucks(Point2f pucks[2])
 {
 	pucks[0] = puckiest_pucks[0].loc;
 	pucks[1] = puckiest_pucks[1].loc;

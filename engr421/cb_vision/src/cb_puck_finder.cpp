@@ -148,7 +148,7 @@ void CBPuckFinder::find_pucks(Mat* image, vector<vector<Point> >* pucks)
 	}
 }
 
-void CBPuckFinder::track_pucks(Mat* image, Point pucks[2])
+void CBPuckFinder::track_pucks(Mat* image, Point2f pucks[2])
 {
 	// TODO
 }
@@ -169,11 +169,21 @@ void CBPuckFinder::image_cb(const sensor_msgs::ImageConstPtr& msg)
 	static Mat rectified_image((&cv_ptr->image)->size(), (&cv_ptr->image)->type());
 	rectify_board(&cv_ptr->image, &rectified_image);
 
-	static Point pucks_to_track[2];
+	static Point2f pucks_to_track[2];
 	if (!pucks_found) {
 		find_pucks(&rectified_image, &target_pucks);
-		// TODO: Do more stuff and use the NBP to get pucks, then:
-		cb_nbp.get_puckiest_pucks(pucks_to_track);
+		for (uint16_t i=0; i<target_pucks.size(); i++) {
+
+			static Point2f pp = pucks_encircle_centers[i];
+			static puck_features pf;
+			pf.encircle_size = pucks_encircle_radii[i];
+			pf.puck_encircle_ratio = fabs(contourArea(Mat(pucks_closed_contours[i]))) / (3.14159*pucks_encircle_radii[i]*pucks_encircle_radii[i]);
+			pf.dist_last_closest_puck = 0.0;
+			cb_nbp.add_potential_puck(pp, pf);
+
+			cb_nbp.get_puckiest_pucks(pucks_to_track);
+		}
+		ROS_INFO("Classifying %d potential pucks. %f", target_pucks.size(), pucks_to_track[0].x);
 	}
 	else {
 		track_pucks(&rectified_image, pucks_to_track);
