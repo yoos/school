@@ -16,8 +16,8 @@ import rospy
 ##
 def open_camera(cam_id = 0):
     cap = cv2.VideoCapture(cam_id)
-    cap.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, 240);
-    cap.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, 320);
+    cap.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, 480);
+    cap.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, 640);
     #cap.set(cv2.cv.CV_CAP_PROP_FPS, 30);
     return cap
 
@@ -58,7 +58,7 @@ corner_point_list = []
 def mouse_click_callback(event, x, y, flags, param):
     if event == cv2.EVENT_LBUTTONDOWN:
         print "Click at (%d,%d)" % (x,y)
-        corner_point_list.append( (x,y) )
+        corner_point_list.append( [x,y] )
  
 ##
 # Prompt user to select the four corners of the board.
@@ -91,6 +91,11 @@ def get_board_corners(dev):
  
     # Close the calibration window:
     cv2.destroyWindow("Calibrate")
+
+    # Map corner coordinates to [0.0, 1.0].
+    for i in range(4):
+        corner_point_list[i][0] = float(corner_point_list[i][0]) / 640
+        corner_point_list[i][1] = float(corner_point_list[i][1]) / 480
 
     # Put corner coordinates on ROS parameter server.
     rospy.set_param("/cb_board/corner0/x", corner_point_list[0][0])
