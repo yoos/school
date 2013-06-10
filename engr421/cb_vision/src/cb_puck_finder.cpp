@@ -192,7 +192,7 @@ void CBPuckFinder::image_cb(const sensor_msgs::ImageConstPtr& msg)
 	static Mat pucks_drawing;
 	pucks_drawing = Mat::zeros(frame_height, frame_width, CV_8UC3);
 	for (uint16_t i=0; i<target_pucks.size(); i++) {
-		Scalar blue  = Scalar(225, 0, 0);
+		Scalar blue  = Scalar(255, 0, 0);
 		Scalar green = Scalar(0, 255, 0);
 		Scalar red   = Scalar(0, 0, 255);
 		if (pucks_encircle_radii[i] > encircle_min_size && pucks_encircle_radii[i] < encircle_max_size) {
