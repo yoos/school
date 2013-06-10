@@ -54,6 +54,7 @@ void CBGUI::initPlugin(qt_gui_cpp::PluginContext& context)
 	connect(ui_.encircle_max_size_spinBox, SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
 	connect(ui_.puckiness_min_ratio_doubleSpinBox, SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
 	connect(ui_.puck_canny_lower_threshold_spinBox, SIGNAL(editingFinished(void)), this, SLOT(onEditingFinished(void)));
+	connect(ui_.find_pucks_pushButton,  SIGNAL(clicked(void)), this, SLOT(find_pucks(void)));
 	connect(ui_.save_params_pushButton, SIGNAL(clicked(void)), this, SLOT(save_parameters(void)));
 	connect(ui_.load_params_pushButton, SIGNAL(clicked(void)), this, SLOT(load_parameters(void)));
 
@@ -83,6 +84,8 @@ instance_settings)
 void CBGUI::pub_cb(const ros::TimerEvent& event)
 {
 	cb_gui_pub.publish(cb_params_msg);
+
+	cb_params_msg.find_pucks = false;
 }
 
 void CBGUI::onEditingFinished(void)
@@ -106,6 +109,11 @@ void CBGUI::onEditingFinished(void)
 	cb_params_msg.encircle_max_size = ui_.encircle_max_size_spinBox->value();
 	cb_params_msg.puckiness_min_ratio = ui_.puckiness_min_ratio_doubleSpinBox->value();
 	cb_params_msg.puck_canny_lower_threshold = ui_.puck_canny_lower_threshold_spinBox->value();
+}
+
+void CBGUI::find_pucks(void)
+{
+	cb_params_msg.find_pucks = true;
 }
 
 void CBGUI::save_parameters(void)

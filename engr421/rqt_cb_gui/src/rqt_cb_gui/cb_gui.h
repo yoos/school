@@ -41,6 +41,7 @@ private:
 
 protected slots:
 	virtual void onEditingFinished(void);
+	void find_pucks(void);
 	void save_parameters(void);
 	void load_parameters(void);
 };

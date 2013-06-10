@@ -18,3 +18,5 @@ uint16 encircle_max_size
 float32 puckiness_min_ratio
 uint8 puck_canny_lower_threshold
 
+bool find_pucks
+
