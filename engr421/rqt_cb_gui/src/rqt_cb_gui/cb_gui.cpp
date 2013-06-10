@@ -85,7 +85,7 @@ void CBGUI::pub_cb(const ros::TimerEvent& event)
 {
 	cb_gui_pub.publish(cb_params_msg);
 
-	cb_params_msg.find_pucks = false;
+	cb_params_msg.find_pucks = 0;
 }
 
 void CBGUI::onEditingFinished(void)
@@ -113,7 +113,7 @@ void CBGUI::onEditingFinished(void)
 
 void CBGUI::find_pucks(void)
 {
-	cb_params_msg.find_pucks = true;
+	cb_params_msg.find_pucks = 20;   // TODO: Maybe make this more configurable?
 }
 
 void CBGUI::save_parameters(void)
