@@ -9,8 +9,14 @@ import roslib; roslib.load_manifest("cb_vision")
 import rospy
 from cb_vision.msg import cb_puck_coordinates
 
+
 #serialPort = '/dev/ttyUSB0'
 baudrate = '460800'
+
+### RAIL CONFIG ###
+RAIL_OFFSET = [0.0, 0.0]
+RAIL_MIN_SEPARATION = 0.112   # This should agree with the firmware value in cb_config.h.
+
 
 # Serial write.
 def serWrite(myStr):
@@ -21,14 +27,21 @@ def serWrite(myStr):
         print "Unable to send data. Check connection."
 
 def callback(pc):
-    if pc.x[0] < pc.x[1]:
-        left, right = pc.x[0], pc.x[1]
-    else:
-        left, right = pc.x[1], pc.x[0]
+    if pc.puck_count == 2:   # One shooter per puck.
+        if pc.x[0] < pc.x[1]:
+            left, right = pc.x[0], pc.x[1]
+        else:
+            left, right = pc.x[1], pc.x[0]
+    elif pc.puck_count == 1:   # Both shooters on one puck.
+        left  = max(0.0, pc.x[0] - RAIL_MIN_SEPARATION/2)
+        right = min(1.0, pc.x[0] + RAIL_MIN_SEPARATION/2)
+    else:   # Standby stance.
+        left  = 0.0
+        right = 1.0
 
-    cmd = chr(int(left*127)) + chr(128+int(right*127))
-
+    # Send command.
     print "Commanding", left, right
+    cmd = chr(int(left*127)) + chr(128+int(right*127))
     serWrite(cmd)
 
 if __name__ == "__main__":
@@ -63,5 +76,5 @@ if __name__ == "__main__":
 
     rospy.spin()
 
-# vim: noexpandtab
+# vim: expandtab
 
