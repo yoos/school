@@ -9,9 +9,13 @@ import roslib; roslib.load_manifest("cb_vision")
 import rospy
 from cb_vision.msg import cb_puck_coordinates
 
+# Import strategies.
+import strategies as s
+
 
 #serialPort = '/dev/ttyUSB0'
 baudrate = '460800'
+strategy = s.two_on_one
 
 ### RAIL CONFIG ###
 RAIL_OFFSET = [0.0, 0.0]
@@ -27,17 +31,7 @@ def serWrite(myStr):
         print "Unable to send data. Check connection."
 
 def callback(pc):
-    if pc.puck_count == 2:   # One shooter per puck.
-        if pc.x[0] < pc.x[1]:
-            left, right = pc.x[0], pc.x[1]
-        else:
-            left, right = pc.x[1], pc.x[0]
-    elif pc.puck_count == 1:   # Both shooters on one puck.
-        left  = max(0.0, pc.x[0] - RAIL_MIN_SEPARATION/2)
-        right = min(1.0, pc.x[0] + RAIL_MIN_SEPARATION/2)
-    else:   # Standby stance.
-        left  = 0.0
-        right = 1.0
+    left, right = strategy(pc)
 
     # Send command.
     print "Commanding", left, right
