@@ -21,17 +21,17 @@
 #define HOPPER_PULSE_DC 0.5
 #define HOPPER_PULSE_FREQUENCY 2
 
-#define LINEAR_RAIL_POS_KP (1)
+#define LINEAR_RAIL_POS_KP (5)
 #define LINEAR_RAIL_POS_KI (0)
 #define LINEAR_RAIL_POS_KD (0)
-#define LINEAR_RAIL_VEL_KP (4)
-#define LINEAR_RAIL_VEL_KI (0)
+#define LINEAR_RAIL_VEL_KP (8)
+#define LINEAR_RAIL_VEL_KI (0)   // 1 is a good value here, but it increases power consumption without a target deadzone, so 0 for now.
 #define LINEAR_RAIL_VEL_KD (0)
 
 #define LINEAR_RAIL_MIN_SEPARATION 0.112
-#define LINEAR_RAIL_POS_I_CAP 1
-#define LINEAR_RAIL_VEL_I_CAP 1
-#define LINEAR_RAIL_VEL_CAP 0.5   // In m/s.
+#define LINEAR_RAIL_POS_I_CAP 2
+#define LINEAR_RAIL_VEL_I_CAP 2
+#define LINEAR_RAIL_VEL_CAP 1.0   // In m/s.
 #define LINEAR_RAIL_DC_MIN 0.0   // Minimum duty cycle for linear rail motor controllers.
 #define LINEAR_RAIL_DC_MAX 1.0   // Maximum duty cycle for linear rail motor controllers.
 
