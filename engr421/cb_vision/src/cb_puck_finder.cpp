@@ -245,6 +245,7 @@ void CBPuckFinder::image_cb(const sensor_msgs::ImageConstPtr& msg)
 		return;
 	}
 
+	pc.puck_count = 2;   // TODO. Maybe update this above while finding/tracking pucks.
 	for (int i=0; i<2; i++) {
 		pc.x[i] = ((float) pucks_encircle_centers[i].x) / frame_width;
 		pc.y[i] = ((float) pucks_encircle_centers[i].y) / frame_height;

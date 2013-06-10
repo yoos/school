@@ -11,6 +11,7 @@ from cb_vision.msg import cb_puck_coordinates
 
 # Import strategies.
 import strategies as s
+import cb_math as m
 
 
 #serialPort = '/dev/ttyUSB0'
@@ -31,12 +32,28 @@ def serWrite(myStr):
         print "Unable to send data. Check connection."
 
 def callback(pc):
+    # Apply calibration offsets.
+#    pc.x[0] += m.transform((pc.x[0], pc.y[0]), calib_x, calib_y)
+
+    # Run strategy.
     left, right = strategy(pc)
 
     # Send command.
     print "Commanding", left, right
     cmd = chr(int(left*127)) + chr(128+int(right*127))
     serWrite(cmd)
+
+# Calibrate puck locations by placing a triangle puck at each corner
+# successively. This allows us to be a bit careless with the initial board
+# calibration.
+calib_x = [0.0] * 4
+calib_y = [0.0] * 4
+def calibrate_corners():
+    global calib_x, calib_y
+    for i in range(4):
+        calib_x[i] = pc.x[0]
+        calib_y[i] = pc.y[0]
+
 
 if __name__ == "__main__":
     # Initialize ROS node.
@@ -67,6 +84,8 @@ if __name__ == "__main__":
                 if i == 3:
                     print "No serial found. Giving up!"
                     exit(1)
+
+#    calibrate_corners()
 
     rospy.spin()
 
