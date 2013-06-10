@@ -35,6 +35,7 @@ CBPuckFinder::CBPuckFinder(ros::NodeHandle nh) : it(nh)
 	encircle_max_size = 1000;
 	puckiness_min_ratio = 0.0;
 	puck_canny_lower_threshold = 0;
+	find_pucks_iter = 1;   // TODO: If I don't run this at beginning, things crash for some reason.
 
 	// Board corner locations. Should be grabbed later from ROS parameter
 	// server.
@@ -146,11 +147,6 @@ void CBPuckFinder::find_pucks(Mat* image, vector<vector<Point> >* pucks)
 	}
 }
 
-void CBPuckFinder::track_pucks(Mat* image, Point2f pucks[2])
-{
-	// TODO
-}
-
 void CBPuckFinder::image_cb(const sensor_msgs::ImageConstPtr& msg)
 {
 	debug_image_1 = Mat::zeros(240, 320, CV_8UC3);
@@ -170,22 +166,50 @@ void CBPuckFinder::image_cb(const sensor_msgs::ImageConstPtr& msg)
 	static Point2f pucks_to_track[2];
 	static Point2f pp;
 	static puck_features pf;
-	if (!pucks_found) {
-		find_pucks(&rectified_image, &target_pucks);
-		for (uint16_t i=0; i<target_pucks.size(); i++) {
+	static Point roi_origin;
+	static Rect roi_rect;
+	static Mat roi;
+	static Point puck_in_roi;
 
+	if (find_pucks_iter > 0) {
+		find_pucks(&rectified_image, &target_pucks);   // Find potential pucks.
+
+		// For every potential puck, populate features and feed to the Naive Bayes Puckifier.
+		for (uint16_t i=0; i<target_pucks.size(); i++) {
+			// Get center location of puck.
 			pp = pucks_encircle_centers[i];
+
+			// Populate features.
 			pf.encircle_size = pucks_encircle_radii[i];
 			pf.puck_encircle_ratio = fabs(contourArea(Mat(pucks_closed_contours[i]))) / (3.14159*pucks_encircle_radii[i]*pucks_encircle_radii[i]);
 			pf.dist_last_closest_puck = 1.0;
+
+			// Feed the puckifier.
 			cb_nbp.add_potential_puck(pp, pf);
 		}
 
+		ROS_INFO("Classifying %d potential pucks. Most promising puck at %f", (int) target_pucks.size(), (float) pucks_to_track[0].x);
+
+		find_pucks_iter--;
+	}
+	else if (find_pucks_iter == 0) {
 		cb_nbp.get_puckiest_pucks(pucks_to_track);
-		ROS_INFO("Classifying %d potential pucks. Most promising puck at %f", target_pucks.size(), pucks_to_track[0].x);
 	}
 	else {
-		track_pucks(&rectified_image, pucks_to_track);
+		// Update locations of both pucks.
+		for (int i=0; i<2; i++) {
+			roi_origin = Point(pucks_to_track[i].x-ROI_SIZE/2, pucks_to_track[i].y-ROI_SIZE/2);   // Set ROI origin for convenience.
+			roi_rect = Rect(roi_origin.x, roi_origin.y, roi_origin.x+ROI_SIZE, roi_origin.y+ROI_SIZE);   // Determine ROI.
+			roi = rectified_image(roi_rect);
+			find_pucks(&roi, &target_pucks);   // Find pucks within ROI.
+
+			// Hopefully, find_pucks will find us a puckworthy shape. If not,
+			// don't update the tracking location lest it show up again.
+			if (target_pucks.size() > 0) {
+				puck_in_roi = pucks_encircle_centers[0];   // TODO: Rethink how this is organized. Currently, this is a global variable. Later on this is used to (incorrectly) draw the circumcircles. Etc.
+				pucks_to_track[i] = Point2f(puck_in_roi.x+roi_origin.x, puck_in_roi.y+roi_origin.y);
+			}
+		}
 	}
 
 	// Draw puck locations.
@@ -252,6 +276,7 @@ void CBPuckFinder::params_cb(const rqt_cb_gui::cb_params& msg)
 	encircle_max_size = msg.encircle_max_size;
 	puckiness_min_ratio = msg.puckiness_min_ratio;
 	puck_canny_lower_threshold = msg.puck_canny_lower_threshold;
+	find_pucks_iter = msg.find_pucks;
 
 	// Update the puckifier.
 	static puck_features pf;

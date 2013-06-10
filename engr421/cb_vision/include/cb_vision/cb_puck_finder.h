@@ -13,6 +13,8 @@
 #include <cb_vision/cb_puck_nbc.h>   // Naive Bayes Classifier for pucks.
 #include <rqt_cb_gui/cb_params.h>
 
+#define ROI_SIZE 100   // Side length of square ROI used to track pucks.
+
 
 namespace enc = sensor_msgs::image_encodings;
 using namespace cv;
@@ -71,6 +73,7 @@ class CBPuckFinder
 	uint16_t encircle_max_size;   // Minimum size of the enclosing circle around contours.
 	float puckiness_min_ratio;   // Minimum ratio of contour-to-enclosing-circle. This helps us filter out noise.
 	uint8_t puck_canny_lower_threshold;
+	int16_t find_pucks_iter;
 
 	// Board corner locations. Should be grabbed later from ROS parameter
 	// server.
@@ -109,15 +112,6 @@ class CBPuckFinder
 	 * actual pucks.
 	 */
 	void find_pucks(Mat* image, vector<vector<Point> >* pucks);
-
-	/**
-	 * Track pucks found within ROIs. This is used once the two pucks have been
-	 * located and we wish to keep a realtime lock on the pucks.
-	 *
-	 * @param image Image of rectified board.
-	 * @param pucks Location of pucks to lock onto.
-	 */
-	void track_pucks(Mat* image, Point2f pucks[2]);
 
 	/**
 	 * Callback for input video.
