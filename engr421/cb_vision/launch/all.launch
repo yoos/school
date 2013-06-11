@@ -3,6 +3,6 @@
 
 	<node name="cb_gui" pkg="rqt_cb_gui" type="rqt_cb_gui" respawn="false" output="screen" />
 
-	<node name="cb_comm" pkg="cb_vision" type="comm.py" respawn="false" output="screen" />
+	<!--<node name="cb_comm" pkg="cb_vision" type="comm.py" respawn="false" output="screen" />-->
 </launch>
 
