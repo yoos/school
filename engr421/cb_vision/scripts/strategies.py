@@ -1,4 +1,5 @@
 import cb_config as cfg
+
 def two_on_one(puck_count, puck_loc):
     if puck_count >= 2:   # One shooter per puck.
         if puck_loc[0][0] < puck_loc[1][0]:
