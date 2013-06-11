@@ -14,7 +14,7 @@ import cb_config as cfg
 
 
 puck_count_filtered = [2, cfg.PUCK_COUNT_CONFIRM]   # How many pucks last detected, and how many times we need to confirm.
-puck_loc_filtered = [[0.0] * 2] * 2
+puck_loc_filtered = [[0.0, 0.0], [0.0, 0.0]]
 
 
 # Serial write.
@@ -42,13 +42,13 @@ def callback(pc):
         puck_count_filtered[1] = cfg.PUCK_COUNT_CONFIRM
 
     # Filter puck locations.
-    #puck_loc_filtered = m.filter_puck_loc(puck_loc_filtered, calib_loc)
+    puck_loc_filtered = m.filter_puck_loc(puck_loc_filtered, calib_loc)
 
     # Run strategy.
-    left, right = cfg.strategy(puck_count_filtered[0], calib_loc)
+    left, right = cfg.strategy(puck_count_filtered[0], puck_loc_filtered)
 
     # Send command.
-    print "Found", pc.puck_count, "pucks at", (pc.x[0], pc.y[0]), "and", (pc.x[1], pc.y[1]), ". Commanding", left, right
+    print "Found %2d pucks at %5f and %5f. Commanding %5f %5f. Filter %d %d" % (pc.puck_count, pc.x[0], pc.x[1], left, right, m.puck_loc_filter_count[0], m.puck_loc_filter_count[1])
     cmd = chr(int(left*127)) + chr(128+int(right*127))
     serWrite(cmd)
 
