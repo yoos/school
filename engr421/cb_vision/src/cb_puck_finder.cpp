@@ -215,6 +215,7 @@ void CBPuckFinder::image_cb(const sensor_msgs::ImageConstPtr& msg)
 
 	// TODO: TEMPORARY BECAUSE I CAN'T GET ROIS TO WORK
 	find_pucks(&rectified_image, &target_pucks);   // Find potential pucks.
+	pc.puck_count = target_pucks.size();
 
 	// Draw puck locations.
 	static Mat pucks_drawing;
@@ -249,7 +250,6 @@ void CBPuckFinder::image_cb(const sensor_msgs::ImageConstPtr& msg)
 		return;
 	}
 
-	pc.puck_count = 2;   // TODO. Maybe update this above while finding/tracking pucks.
 	for (int i=0; i<2; i++) {
 		pc.x[i] = ((float) pucks_encircle_centers[i].x) / frame_width;
 		pc.y[i] = ((float) pucks_encircle_centers[i].y) / frame_height;
