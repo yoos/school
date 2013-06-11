@@ -1,10 +1,10 @@
 import cb_config as cfg
 
-def transform(pc_coord, calib_x):
-    calib_loc = [[0.0] * 2] * 2
+def transform(puck_loc, calib_x):
+    calib_loc = [[0.0, 0.0], [0.0, 0.0]]
     for i in range(2):
-        calib_loc[i][0] = (pc_coord[i][0] - calib_x[0]) / (calib_x[1] - calib_x[0])
-        calib_loc[i][1] = pc_coord[i][1]
+        calib_loc[i][0] = (puck_loc[i][0] - calib_x[0]) / (calib_x[1] - calib_x[0])
+        calib_loc[i][1] = puck_loc[i][1]
 
     return calib_loc
 

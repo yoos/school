@@ -10,5 +10,6 @@ PUCK_MAX_MOVEMENT_STEP = 0.1
 
 ### RAIL CONFIG ###
 RAIL_OFFSET = [0.045, 0.945]
+#RAIL_OFFSET = [0.0, 1.0]
 RAIL_MIN_SEPARATION = 0.112   # This should agree with the firmware value in cb_config.h.
 
