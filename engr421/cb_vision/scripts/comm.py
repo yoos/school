@@ -19,7 +19,7 @@ baudrate = '460800'
 strategy = s.two_on_one
 
 ### RAIL CONFIG ###
-RAIL_OFFSET = [0.0, 0.0]
+RAIL_OFFSET = [0.045, 0.945]
 RAIL_MIN_SEPARATION = 0.112   # This should agree with the firmware value in cb_config.h.
 
 
@@ -32,14 +32,15 @@ def serWrite(myStr):
         print "Unable to send data. Check connection."
 
 def callback(pc):
-    # Apply calibration offsets.
+    # Apply calibration offsets to puck locations.
 #    pc.x[0] += m.transform((pc.x[0], pc.y[0]), calib_x, calib_y)
+    calib_loc = m.transform([pc.x[0], pc.x[1]], RAIL_OFFSET)
 
     # Run strategy.
-    left, right = strategy(pc)
+    left, right = strategy(pc.puck_count, calib_loc)
 
     # Send command.
-    print "Commanding", left, right
+    print "Found", pc.puck_count, "pucks. Commanding", left, right
     cmd = chr(int(left*127)) + chr(128+int(right*127))
     serWrite(cmd)
 
