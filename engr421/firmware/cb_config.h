@@ -21,10 +21,10 @@
 #define HOPPER_PULSE_DC 0.5
 #define HOPPER_PULSE_FREQUENCY 2
 
-#define LINEAR_RAIL_POS_KP (5)
-#define LINEAR_RAIL_POS_KI (0)
+#define LINEAR_RAIL_POS_KP (4)
+#define LINEAR_RAIL_POS_KI (0.1)
 #define LINEAR_RAIL_POS_KD (0)
-#define LINEAR_RAIL_VEL_KP (8)
+#define LINEAR_RAIL_VEL_KP (5)
 #define LINEAR_RAIL_VEL_KI (0)   // 1 is a good value here, but it increases power consumption without a target deadzone, so 0 for now.
 #define LINEAR_RAIL_VEL_KD (0)
 
@@ -84,7 +84,7 @@
 #define ROT_SPEED_1 (BB_VEL_1/(WHEEL_DIA*M_PI))   // In rev/s
 #define ROT_PERIOD_ST_1 (MS2ST(1000)/(ROT_SPEED_1*256))   // 256 quadrature pulses per revolution.
 
-#define REVS_PER_LENGTH 8.3   // Number of revolutions encoder pulley spins as it moves from one end of the slide to the other.
+#define REVS_PER_LENGTH 8.2   // Number of revolutions encoder pulley spins as it moves from one end of the slide to the other.
 
 #define ESC_MIN_DC 0.45   // Minimum duty cycle for Mikrokopter ESCs.
 #define ESC_MAX_DC 0.83    // Maximum duty cycle for Mikrokopter ESCs.
