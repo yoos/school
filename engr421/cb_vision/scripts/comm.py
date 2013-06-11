@@ -9,18 +9,12 @@ import roslib; roslib.load_manifest("cb_vision")
 import rospy
 from cb_vision.msg import cb_puck_coordinates
 
-# Import strategies.
-import strategies as s
 import cb_math as m
+import cb_config as cfg
 
 
-#serialPort = '/dev/ttyUSB0'
-baudrate = '460800'
-strategy = s.two_on_one
-
-### RAIL CONFIG ###
-RAIL_OFFSET = [0.045, 0.945]
-RAIL_MIN_SEPARATION = 0.112   # This should agree with the firmware value in cb_config.h.
+puck_count_filtered = [2, cfg.PUCK_COUNT_CONFIRM]   # How many pucks last detected, and how many times we need to confirm.
+puck_loc_filtered = [[0.0] * 2] * 2
 
 
 # Serial write.
@@ -32,15 +26,29 @@ def serWrite(myStr):
         print "Unable to send data. Check connection."
 
 def callback(pc):
+    global puck_loc_filtered
     # Apply calibration offsets to puck locations.
 #    pc.x[0] += m.transform((pc.x[0], pc.y[0]), calib_x, calib_y)
-    calib_loc = m.transform([pc.x[0], pc.x[1]], RAIL_OFFSET)
+    calib_loc = m.transform([[pc.x[0], pc.y[0]], [pc.x[1], pc.y[1]]], cfg.RAIL_OFFSET)
+
+    # Confirm puck count.
+    if pc.puck_count != puck_count_filtered[0]:
+        if puck_count_filtered[1] > 0:
+            puck_count_filtered[1] -= 1
+        else:
+            puck_count_filtered[0] = pc.puck_count
+            puck_count_filtered[1] = cfg.PUCK_COUNT_CONFIRM
+    else:
+        puck_count_filtered[1] = cfg.PUCK_COUNT_CONFIRM
+
+    # Filter puck locations.
+    #puck_loc_filtered = m.filter_puck_loc(puck_loc_filtered, calib_loc)
 
     # Run strategy.
-    left, right = strategy(pc.puck_count, calib_loc)
+    left, right = cfg.strategy(puck_count_filtered[0], calib_loc)
 
     # Send command.
-    print "Found", pc.puck_count, "pucks. Commanding", left, right
+    print "Found", pc.puck_count, "pucks at", (pc.x[0], pc.y[0]), "and", (pc.x[1], pc.y[1]), ". Commanding", left, right
     cmd = chr(int(left*127)) + chr(128+int(right*127))
     serWrite(cmd)
 
@@ -70,14 +78,14 @@ if __name__ == "__main__":
     # TODO: This needs to be made more concise.
     # =========================================================================
     try:
-        ser = serial.Serial(serialPort, baudrate, timeout=0)
+        ser = serial.Serial(serialPort, cfg.baudrate, timeout=0)
     except serial.SerialException:
         print "Unable to open specified serial port! Exiting..."
         exit(1)
     except NameError:
         for i in range(4):
             try:
-                ser = serial.Serial("/dev/ttyUSB"+str(i), baudrate, timeout=0)
+                ser = serial.Serial("/dev/ttyUSB"+str(i), cfg.baudrate, timeout=0)
                 print "Opened serial port at /dev/ttyUSB%d." % i
                 break
             except serial.SerialException:
