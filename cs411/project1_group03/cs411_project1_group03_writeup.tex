@@ -1,0 +1,146 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{fancyhdr}
+\usepackage[utf8]{inputenc}
+\usepackage{palatino}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{lastpage}
+\usepackage[hang,small]{caption}
+\usepackage{titlesec}
+\usepackage{amsmath,amssymb}
+\usepackage{multirow}
+\usepackage{amsthm}
+
+\usepackage{alltt}
+\usepackage{float}
+\usepackage{color}
+
+\usepackage{balance}
+\usepackage[TABBOTCAP, tight]{subfigure}
+\usepackage{enumitem}
+\usepackage{pstricks, pst-node, pst-tree}
+\usepackage{geometry}
+
+\renewcommand{\headrulewidth}{0pt}
+\fancyhead{}
+\fancyfoot{}
+\fancyfoot[C]{\sf Page \thepage\ of \pageref{LastPage}}
+\pagestyle{fancy}
+
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{0.8em}
+                                                                                   
+\captionsetup[figure]{labelfont=it,font=it}
+\captionsetup[table]{labelfont={it,sc},font={it,sc}}
+
+\hypersetup{colorlinks,
+    linkcolor = black,
+    citecolor = black,
+    urlcolor  = black}
+\urlstyle{same}
+
+
+
+\begin{document}
+
+\noindent {\bf Hugh McDonald \hfill CS 411 Group 03}
+
+\noindent {\bf Bronson Mock}
+
+\noindent {\bf Soo-Hyun Yoo}
+
+\begin{center} \large \textbf{Project 1} \end{center}
+
+\section{Design}
+For this project, we first began by figuring out what was missing from the kernel source code.
+A recursive diff was taken between the vanilla Linux kernel and the given project1 source directories. We saw the following needed completion:
+
+
+
+\subsection{sched.c}
+
+\subsubsection{rt\_policy()}
+
+Simple scheduler-to-integer function. Make it return 1 if RT scheduler, 0 otherwise.
+
+\subsubsection{sched\_set\_stop\_task()}
+
+Make the stop task (highest-priority task in the system) look like a SCHED\_FIFO task so (per comments) userspace doesn't get confused. We need to use the nocheck version of sched\_setscheduler() here because the process calling this function may not have permission (but we don't care -- we just want to create a stop process so we can die peacefully).
+
+\subsubsection{sched\_fork()}
+
+Set proper task priority and policy of new process.
+
+\subsubsection{\_\_sched\_setscheduler()}
+
+Add SCHED\_FIFO and SCHED\_RR to equality check for invalid schedulers.
+
+\subsubsection{System call definitions for sched\_get\_priority\_max and sched\_get\_priority\_min}
+
+Add switch statement cases for SCHED\_FIFO and SCHED\_RR.
+
+
+
+\subsection{sched\_rt.c}
+
+\subsubsection{task\_tick\_rt()}
+
+Manage timeslice for SCHED\_RR. If we're not running SCHED\_RR, immediately return. Otherwise, decrement a time counter, which if zero, we reset it to DEF\_TIMESLICE and run the next task in the queue, if any.
+
+\subsubsection{get\_rr\_interval\_rt()}
+
+Return timeslice value of RT task. For FIFO, this is 0.
+
+
+\subsection{Implementation}
+
+After finding the missing sections from the project1 source directories, we started out by referencing the CS 411 textbook and the existing Linux kernel for implementation. Then we were able to fill in the missing code to make both the Round Robin scheduler and the FIFO scheduler work again. Once this was complete, the project1 kernel was compiled and successfully loaded onto the CentOS VM. 
+
+Our design, being based off of the existing kernel implementation, allowed us to utilize existing kernel data structures, definitions and functions. The Round Robin scheduling policy grants each process in the runqueue a certain time slot to run that is constrained by the timeslice definition. Each process runs in order in the queue for the allotted timeslice until it is finished where in it is removed from the queue. The cycle repeats itself until the queue is empty. If there is only one process in the queue, it will run indefinitely (until process completion) since the scheduler will continually give the next timeslice to that process until another process enters the queue. The FIFO scheduling policy is the same as the Round Robin policy other than it allots the next process in the queue a monopoly on the CPU until the process completes or blocks and yields the CPU.
+
+To verify our design, we wrote a test program to authenticate the scheduling policies. The program forks 4 children after setting the affinity and the scheduling policy. Each child then counts to the value of ULONG\_MAX. When the child has counted halfway, it prints a statement indicating halfway and prints a finished statement once done counting. Below is the terminal output from running the test in FIFO and in RR scheduling. As seen, the FIFO causes each child to control the CPU and finish running before the next child runs. The RR policy gives them timeslices and each child gets halfway before any of them complete but still maintains the order that they cycle in.
+
+\begin{verbatim}
+/***** This is the output from the SCHED_FIFO policy *****/
+
+[root@localhost project1]# ./test_sched
+START
+Parent: 0 PID: 2695 Iter: 0
+PID: 2695 is halfway there
+PID: 2695 finished
+Parent: 1 PID: 2696 Iter: 0
+PID: 2696 is halfway there
+PID: 2696 finished
+Parent: 2 PID: 2697 Iter: 0
+PID: 2697 is halfway there
+PID: 2697 finished
+Parent: 3 PID: 2698 Iter: 0
+PID: 2698 is halfway there
+PID: 2698 finished
+finished
+
+
+/***** Next is the implementation of the SCHED_RR Policy *****/
+
+[root@localhost project1]# ./test_sched
+START
+Parent: 0 PID: 2728 Iter: 0
+Parent: 1 PID: 2729 Iter: 0
+Parent: 2 PID: 2730 Iter: 0
+Parent: 3 PID: 2731 Iter: 0
+PID: 2728 is halfway there
+PID: 2729 is halfway there
+PID: 2730 is halfway there
+PID: 2731 is halfway there
+PID: 2728 finished
+PID: 2729 finished
+PID: 2730 finished
+PID: 2731 finished
+finished
+\end{verbatim}
+
+
+\end{document}
+

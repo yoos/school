@@ -1,0 +1,47 @@
+/***** This is the output from the SCHED_FIFO policy *****/
+
+[root@localhost project1]# gcc -Wall -c test_sched.c
+test_sched.c: In function ‘main’:
+test_sched.c:26: warning: implicit declaration of function ‘sched_setaffinity’
+test_sched.c:67: warning: implicit declaration of function ‘wait’
+[root@localhost project1]# gcc -Wall -o test_sched test_sched.o
+[root@localhost project1]# ./test_sched
+START
+Parent: 0 PID: 2695 Iter: 0
+PID: 2695 is halfway there
+PID: 2695 finished
+Parent: 1 PID: 2696 Iter: 0
+PID: 2696 is halfway there
+PID: 2696 finished
+Parent: 2 PID: 2697 Iter: 0
+PID: 2697 is halfway there
+PID: 2697 finished
+Parent: 3 PID: 2698 Iter: 0
+PID: 2698 is halfway there
+PID: 2698 finished
+finished
+
+
+/***** Next is the implementation of the SCHED_RR Policy *****/
+
+[root@localhost project1]# gcc -Wall -c test_sched.c
+test_sched.c: In function ‘main’:
+test_sched.c:26: warning: implicit declaration of function ‘sched_setaffinity’
+test_sched.c:67: warning: implicit declaration of function ‘wait’
+[root@localhost project1]# gcc -Wall -o test_sched test_sched.o
+[root@localhost project1]# ./test_sched
+START
+Parent: 0 PID: 2728 Iter: 0
+Parent: 1 PID: 2729 Iter: 0
+Parent: 2 PID: 2730 Iter: 0
+Parent: 3 PID: 2731 Iter: 0
+PID: 2728 is halfway there
+PID: 2729 is halfway there
+PID: 2730 is halfway there
+PID: 2731 is halfway there
+PID: 2728 finished
+PID: 2729 finished
+PID: 2730 finished
+PID: 2731 finished
+finished
+

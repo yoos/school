@@ -1,0 +1,128 @@
+--- ../project1/kernel/sched.c	2014-04-14 00:20:38.553346284 -0700
++++ project1/kernel/sched.c	2014-04-14 13:10:09.265413016 -0700
+@@ -125,6 +125,10 @@
+ 
+ static inline int rt_policy(int policy)
+ {
++	/* Policy will likely be SCHED_OTHER (Linux default). */
++	if (unlikely(policy == SCHED_FIFO || policy == SCHED_RR)) {
++		return 1;
++	}
+ 	return 0;
+ }
+ 
+@@ -2048,8 +2052,9 @@
+ 		 * much confusion -- but then, stop work should not
+ 		 * rely on PI working anyway.
+ 		 */
+-		
+-		
++		/* Change scheduling policy of stop task to FIFO. param holds the new
++		 * RT priority. */
++		sched_setscheduler_nocheck(stop, SCHED_FIFO, &param);
+ 		stop->sched_class = &stop_sched_class;
+ 	}
+ 
+@@ -2838,7 +2843,10 @@
+ 	 * Revert to default priority/policy on fork if requested.
+ 	 */
+ 	if (unlikely(p->sched_reset_on_fork)) {
+-			
++		if (p->policy == SCHED_FIFO || p->policy == SCHED_RR) {
++			p->policy = SCHED_NORMAL;
++			p->normal_prio = p->static_prio;
++		}
+ 
+ 		if (PRIO_TO_NICE(p->static_prio) < 0) {
+ 			p->static_prio = NICE_TO_PRIO(0);
+@@ -5081,7 +5089,8 @@
+ 		reset_on_fork = !!(policy & SCHED_RESET_ON_FORK);
+ 		policy &= ~SCHED_RESET_ON_FORK;
+ 
+-	if (policy != policy != SCHED_NORMAL && policy != SCHED_BATCH &&
++		if (policy != SCHED_FIFO && policy != SCHED_RR &&
++				policy != SCHED_NORMAL && policy != SCHED_BATCH &&
+ 				policy != SCHED_IDLE)
+ 			return -EINVAL;
+ 	}
+@@ -5729,10 +5738,13 @@
+ {
+ 	int ret = -EINVAL;
+ 
++	/* Return MAX_USER_RT_PRIO-1 for FIFO and RR schedulers. See definition in
++	 * include/linux/sched.h. */
+ 	switch (policy) {
+-	
+-	
+-	
++	case SCHED_FIFO:
++	case SCHED_RR:
++		ret = MAX_USER_RT_PRIO-1;
++		break;
+ 	case SCHED_NORMAL:
+ 	case SCHED_BATCH:
+ 	case SCHED_IDLE:
+@@ -5753,10 +5765,13 @@
+ {
+ 	int ret = -EINVAL;
+ 
++	/* Return minimum RT priority of 1 for FIFO and RR. Note some comments in
++	 * include/linux/sched.h regarding MAX_USER_RT_PRIO need updating. */
+ 	switch (policy) {
+-	
+-	
+-	
++	case SCHED_FIFO:
++	case SCHED_RR:
++		ret = 1;
++		break;
+ 	case SCHED_NORMAL:
+ 	case SCHED_BATCH:
+ 	case SCHED_IDLE:
+@@ -5786,7 +5801,6 @@
+ 	if (pid < 0)
+ 		return -EINVAL;
+ 
+-
+ 	retval = -ESRCH;
+ 	rcu_read_lock();
+ 	p = find_process_by_pid(pid);
+--- ../project1/kernel/sched_rt.c	2014-04-14 00:20:38.558345810 -0700
++++ project1/kernel/sched_rt.c	2014-04-14 00:04:09.137442322 -0700
+@@ -1765,9 +1765,22 @@
+ 	/*
+ 	 * RR tasks need a special form of timeslice management.
+ 	 * FIFO tasks have no timeslices.
++	 *
++	 * Refer to task_struct and sched_rt_entity in include/linux/sched.h.
+ 	 */
++	/* If not RR we're running FIFO, so just return. */
++	if (p->policy != SCHED_RR) {
++		return;
++	}
++
++	/* Decrement time and if at end, return. */
++	if (--p->rt.time_slice) {
++		return;
++	}
++
++	/* Reset time left to timeslice. */
++	p->rt.time_slice = DEF_TIMESLICE;
+ 
+-	
+ 	/*
+ 	 * Requeue to the end of queue if we are not the only element
+ 	 * on the queue:
+@@ -1793,8 +1806,10 @@
+ 	/*
+ 	 * Time slice is 0 for SCHED_FIFO tasks
+ 	 */
+-	 
+-		return 0;
++	if (task->policy == SCHED_RR) {
++		return DEF_TIMESLICE;
++	}
++	return 0;
+ }
+ 
+ static const struct sched_class rt_sched_class = {

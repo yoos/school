@@ -1,0 +1,84 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{fancyhdr}
+\usepackage[utf8]{inputenc}
+\usepackage{palatino}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{lastpage}
+\usepackage[hang,small]{caption}
+\usepackage{titlesec}
+\usepackage{amsmath,amssymb}
+\usepackage{multirow}
+
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot{}
+\fancyfoot[C]{\sf Page \thepage\ of \pageref{LastPage}}
+\pagestyle{fancy}
+
+\titleformat{\section}{\bfseries\Large}{\arabic{\thesection}}{1em}{}
+\titleformat{\subsection}{\bfseries\large}{\arabic{\thesection}.\arabic{\thesubsection}}{1em}{}
+\titleformat{\subsubsection}{\itshape}{\arabic{\thesection}.\arabic{\thesubsection}.\arabic{\thesubsubsection}}{1em}{}
+
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{0.8em}
+
+\captionsetup[figure]{labelfont=it,font=it}
+\captionsetup[table]{labelfont={it,sc},font={it,sc}}
+
+\hypersetup{colorlinks,
+    linkcolor = black,
+    citecolor = black,
+    urlcolor  = black}
+\urlstyle{same}
+
+
+
+\begin{document}
+
+Soo-Hyun Yoo \\
+CS411 \\
+Project 1 Group 03 Individual Writeup \\
+14 April 2014
+
+
+\section*{Project 1}
+
+\subsection*{What do you think the main point of this assignment is?}
+
+To become acquainted with the structure of the Linux kernel source, how to
+compile and deploy the kernel, and to learn about a few kernel debugging
+methods.
+
+
+\subsection*{How did you personally approach the problem? Design decisions,
+algorithm, etc.}
+
+The first thing I did was to look through the vanilla Linux kernel for the RT
+scheduler implementations. A recursive diff showed that the given source code
+was simply the vanilla kernel with a few lines removed, so determining what
+parts (and how) to modify was easy.
+
+To make this worthwhile, however, I went down a few rabbit holes of function
+calls to see how the RT scheduler fit in the bigger picture.
+
+
+\subsection*{How did you ensure your solution was correct? Testing details, for
+instance.}
+
+We wrote some simple C to spawn a few tasks under the FIFO scheduler. Each task
+was made to run for a significant amount of time (i.e., count up to ULONG\_MAX)
+while printing a few debug strings along the way. Under FIFO, we observed each
+task complete before the next task was started, while under RR, the tasks
+completed more concurrently.
+
+
+\subsection*{What did you learn?}
+
+In addition to how the FIFO and RR scheduling policies work and differ from the
+normal policy, I learned about the runqueue struct and how the scheduler uses
+it and other supporting objects.
+
+\end{document}
+
