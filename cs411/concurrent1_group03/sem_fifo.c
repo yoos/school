@@ -41,4 +41,11 @@ void signal(sem_fifo_t *queue)
 	pthread_mutex_lock(&queue->mutex);
 	queue->head++;
 	pthread_cond_broadcast(&queue->cond);
-	pthread_mutex_unlock(&queue->mutex
+	pthread_mutex_unlock(&queue->mutex);
+}
+
+int main(void)
+{
+	return 0;
+}
+
