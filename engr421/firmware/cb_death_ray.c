@@ -1,9 +1,9 @@
 #include <cb_death_ray.h>
 
-static pid_data_t pid_data_wheel_pos[2];
-static float cur_wheel_period[2];
-static bool up_to_speed[2];   // Is the wheel up to speed?
-static uint16_t startup_counter[2];
+static pid_data_t pid_data_wheel_pos;
+static float cur_wheel_period;
+static bool up_to_speed;   // Is the wheel up to speed?
+//static uint16_t startup_counter;
 
 /**
  * @brief Determine whether or not we are in startup state.
@@ -14,9 +14,8 @@ static uint16_t startup_counter[2];
  * hysteresis that makes the transition between the two states smoother.
  *
  * @param per Period of quadrature signal from wheel encoder.
- * @param i Index of wheel.
  */
-static void det_startup(float per, uint8_t i)
+static void det_startup(float per)
 {
 	/* Update counter and cap. */
 	//if (per < ROT_PERIOD_ST) {
@@ -32,75 +31,68 @@ static void det_startup(float per, uint8_t i)
 	//else if (startup_counter[i] == 0) {
 	//	up_to_speed[i] = false;
 	//}
-	up_to_speed[i] = true;
+	(void) per;
+	up_to_speed = true;
 }
 
 void setup_death_ray(void)
 {
-	uint8_t i;
-	for (i=0; i<2; i++) {
-		pid_data_wheel_pos[i].Kp = DEATH_RAY_KP;
-		pid_data_wheel_pos[i].Ki = DEATH_RAY_KI;
-		pid_data_wheel_pos[i].Kd = DEATH_RAY_KD;
-		pid_data_wheel_pos[i].dt = DEATH_RAY_DT;
-		pid_data_wheel_pos[i].last_val = 0;
-	}
+	pid_data_wheel_pos.Kp = DEATH_RAY_KP;
+	pid_data_wheel_pos.Ki = DEATH_RAY_KI;
+	pid_data_wheel_pos.Kd = DEATH_RAY_KD;
+	pid_data_wheel_pos.dt = DEATH_RAY_DT;
+	pid_data_wheel_pos.last_val = 0;
 }
 
-void update_death_ray(uint8_t status, float *dc)
+void update_death_ray(uint8_t status, float dc)
 {
-	cur_wheel_period[0] = MIN(2000, icu_get_period(I_ICU_DEATH_RAY_0));   /* The 2000 here is arbitrary. */
-	cur_wheel_period[1] = MIN(2000, icu_get_period(I_ICU_DEATH_RAY_1));   /* The 2000 here is arbitrary. */
+	(void) dc;
 
-	uint8_t i;
-	for (i=0; i<2; i++) {
-		/*
-		 * The ICU spits out bogus values of 0 and 39 that could be interpreted as
-		 * an actual period. Filter these out.
-		 */
-		if (cur_wheel_period[i] == 0 || cur_wheel_period[i] == 39) {
-			cur_wheel_period[i] = 2000;   /* Again, the 2000 is arbitrary. */
-		}
+	cur_wheel_period = MIN(2000, icu_get_period(I_ICU_DEATH_RAY));   /* The 2000 here is arbitrary. */
 
-		/* Determine startup state. */
-		det_startup(cur_wheel_period[i], i);
+	/*
+	 * The ICU spits out bogus values of 0 and 39 that could be interpreted as
+	 * an actual period. Filter these out.
+	 */
+	if (cur_wheel_period == 0 || cur_wheel_period == 39) {
+		cur_wheel_period = 2000;   /* Again, the 2000 is arbitrary. */
+	}
 
-		/* Controller */
-		if (status == DISABLED) {
-			/* Disabled */
-			dc[i] = ESC_MIN_DC;
-			pid_data_wheel_pos[i].I = 0;   /* Zero integral term. */
+	/* Determine startup state. */
+	det_startup(cur_wheel_period);
+
+	/* Controller */
+	if (status == DISABLED) {
+		/* Disabled */
+		dc = ESC_MIN_DC;
+		pid_data_wheel_pos.I = 0;   /* Zero integral term. */
+	}
+	else {
+		/* Standing by or playing */
+		if (!up_to_speed) {
+			/* Startup state */
+			dc = DEATH_RAY_STARTUP_DC;
+			pid_data_wheel_pos.I = 0;   /* Zero integral term. */
 		}
 		else {
-			/* Standing by or playing */
-			if (!up_to_speed[i]) {
-				/* Startup state */
-				dc[i] = DEATH_RAY_STARTUP_DC;
-				pid_data_wheel_pos[i].I = 0;   /* Zero integral term. */
-			}
-			else {
-				/* Running state */
+			/* Running state */
 
-				/* Cap I term. */
-				pid_data_wheel_pos[i].I = MAX(-DEATH_RAY_I_CAP, pid_data_wheel_pos[i].I);
-				pid_data_wheel_pos[i].I = MIN( DEATH_RAY_I_CAP, pid_data_wheel_pos[i].I);
+			/* Cap I term. */
+			pid_data_wheel_pos.I = MAX(-DEATH_RAY_I_CAP, pid_data_wheel_pos.I);
+			pid_data_wheel_pos.I = MIN( DEATH_RAY_I_CAP, pid_data_wheel_pos.I);
 
-				/* PID control. Silly flywheels want different target speeds. */
-				if (i==0) dc[i] = MIN(ESC_MAX_DC, (ESC_MIN_DC + MAX(0, calculate_pid(cur_wheel_period[i], ROT_PERIOD_ST_0, &pid_data_wheel_pos[i]))));
-				if (i==1) dc[i] = MIN(ESC_MAX_DC, (ESC_MIN_DC + MAX(0, calculate_pid(cur_wheel_period[i], ROT_PERIOD_ST_1, &pid_data_wheel_pos[i]))));
-			}
+			/* PID control. */
+			dc = MIN(ESC_MAX_DC, (ESC_MIN_DC + MAX(0, calculate_pid(cur_wheel_period, ROT_PERIOD_ST, &pid_data_wheel_pos))));
 		}
 	}
 }
 
 void death_ray_debug_output(uint8_t *buffer)
 {
-	chsprintf(buffer, "Speed: %5d/%4d, %5d/%4d  Step: %6d  T: %8d\r\n",
-			(int) cur_wheel_period[0],
-			(int) ROT_PERIOD_ST_0,
-			(int) cur_wheel_period[1],
-			(int) ROT_PERIOD_ST_1,
-			(int) (ROT_SIZE_0*1000000),
+	chsprintf(buffer, "Speed: %5d/%4d  Step: %6d  T: %8d\r\n",
+			(int) cur_wheel_period,
+			(int) ROT_PERIOD_ST,
+			(int) (ROT_SIZE*1000000),
 			(int) chTimeNow());
 }
 

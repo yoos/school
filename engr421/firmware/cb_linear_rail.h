@@ -15,6 +15,20 @@
  */
 void setup_linear_rail(void);
 
+
+/**
+ * @brief Calibrate linear rail.
+ *
+ * The rail starts at position 0, which is the leftmost side of the rail from
+ * the robot's perspective, looking at the board. The shooter is then moved to
+ * the right to MIN_BOARD_WIDTH at LINEAR_RAIL_CALIB_SPEED before being moved
+ * further to the right at 1/10 of that speed until the limit switch trips.
+ *
+ * @output dir Direction of movement (0 or 1).
+ * @output dc Dutycycle for linear rail motor.
+ */
+void calibrate_linear_rail(uint8_t dir, float dc);
+
 /**
  * @brief Update linear rail velocity and stuff.
  *
@@ -25,7 +39,7 @@ void setup_linear_rail(void);
  * @output dir Direction of movement (0 or 1).
  * @output dc Duty cycle for linear rail motor.
  */
-void update_linear_rail(uint8_t status, float *des_lin_pos, uint8_t *dir, float *dc);
+void update_linear_rail(uint8_t status, float des_lin_pos, uint8_t dir, float dc);
 
 /**
  * @brief Debug output
@@ -47,7 +61,7 @@ void linear_rail_debug_output(uint8_t *buffer);
  * @param dir Commanded direction of movement.
  * @output lin_pos Linear position of rail. Also used as an input.
  */
-void _update_linear_rail_position(uint8_t *dir, float *lin_pos);
+void _update_linear_rail_position(float lin_pos);
 
 #endif /* CB_LINEAR_RAIL_H */
 

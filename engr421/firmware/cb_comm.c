@@ -1,4 +1,5 @@
 #include <cb_comm.h>
+#include <chsprintf.h>
 
 static uint8_t comm_input[COMM_PACKET_LENGTH];   /* Possibly a valid command. */
 static uint8_t cmd_buffer[COMM_RECEIVE_BUFFER_LENGTH];   /* Circular buffer to store received bytes. */
@@ -25,8 +26,6 @@ void rxend(UARTDriver *uartp)
 
 command_t packet_to_command(void)
 {
-	uint16_t i;
-
 	command_t rc;   /* Robot commands */
 	rc.new_command = false;
 
