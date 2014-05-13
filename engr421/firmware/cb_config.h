@@ -28,7 +28,7 @@
 #define LINEAR_RAIL_VEL_KI (0)   // 1 is a good value here, but it increases power consumption without a target deadzone, so 0 for now.
 #define LINEAR_RAIL_VEL_KD (0)
 
-#define LINEAR_RAIL_CALIB_SPEED 2   // TODO(yoos): units?
+#define LINEAR_RAIL_CALIB_SPEED 0.1   // Rail velocity as approximate fraction of board width while it gropes for the far side of board.
 #define LINEAR_RAIL_MIN_SEPARATION 0.112
 #define LINEAR_RAIL_POS_I_CAP 2
 #define LINEAR_RAIL_VEL_I_CAP 2
@@ -82,7 +82,7 @@
 #define ROT_SPEED (BB_VEL/(WHEEL_DIA*M_PI))   // In rev/s
 #define ROT_PERIOD_ST (MS2ST(1000)/(ROT_SPEED*256))   // 256 quadrature pulses per revolution.
 
-#define REVS_PER_LENGTH 8.1   // Number of revolutions encoder pulley spins as it moves from one end of the slide to the other.
+#define MIN_REVS_PER_LENGTH 8.0   // Minimum board width expressed in number of encoder pulley revolutions.
 
 #define ESC_MIN_DC 0.45   // Minimum duty cycle for Mikrokopter ESCs.
 #define ESC_MAX_DC 0.83    // Maximum duty cycle for Mikrokopter ESCs.

@@ -19,7 +19,9 @@ float base_wheel_dc = 0;
 float dc[8];
 float lr_des_pos;   /* Desired linear rail position from serial input. */
 uint8_t digital_state[8];
-uint8_t status = 0;
+uint8_t status = STANDBY;
+uint8_t is_calibrated = 0;   /* Currently only concerned with linear rail */
+uint8_t lr_switch;
 
 void clear_buffer(uint8_t *buffer)
 {
@@ -174,13 +176,29 @@ static msg_t linear_rail_thread(void *arg)
 
 	uint8_t lr_dir = 0;   /* Direction of linear rail motor. */
 	float lr_dc = 0;   /* Duty cycle of linear rail motor. */
+	float lin_pos_calib = 1.0;
 
-	calibrate_linear_rail(lr_dir, lr_dc);
+	/* Calibrate. We simply push the rail to the far side until the switch
+	 * trips. update_linear_rail is a self-adjusting controller that updates
+	 * its maximum position, kind of like self-bleeding hydraulic brakes. */
+	update_linear_rail(status, MODE_POS, lin_pos_calib, lr_dir, lr_dc);
+	while (!lr_switch) {
+		time += MS2ST(1000*LINEAR_RAIL_DT);
 
+		update_linear_rail(status, MODE_VEL, LINEAR_RAIL_CALIB_SPEED, lr_dir, lr_dc);
+
+		dc[I_PWM_LINEAR_RAIL] = lr_dc;
+		digital_state[I_DIGITAL_LINEAR_RAIL] = lr_dir;
+
+		chThdSleepUntil(time);
+	}
+	is_calibrated = 1;
+
+	/* For real, now. */
 	while (TRUE) {
 		time += MS2ST(1000*LINEAR_RAIL_DT);
 
-		update_linear_rail(status, lr_des_pos, lr_dir, lr_dc);
+		update_linear_rail(status, MODE_POS, lr_des_pos, lr_dir, lr_dc);
 
 		dc[I_PWM_LINEAR_RAIL] = lr_dc;
 		digital_state[I_DIGITAL_LINEAR_RAIL] = lr_dir;
@@ -209,6 +227,7 @@ static msg_t control_thread(void *arg)
 	palSetPadMode(GPIOD, 6, PAL_MODE_INPUT_PULLUP);   /* Enable */
 	palSetPadMode(GPIOD, 7, PAL_MODE_INPUT_PULLUP);   /* Arbiter */
 
+	/* Track game status */
 	while (TRUE) {
 		time += MS2ST(1000*CONTROL_LOOP_DT);   // Next deadline in 1 ms.
 
@@ -223,7 +242,8 @@ static msg_t control_thread(void *arg)
 				palClearPad(GPIOD, j);
 			}
 		}
-		if      (palReadPad(GPIOD, 7) == PAL_LOW) status = BEAT_DANIEL_MILLER;
+		if (!is_calibrated)                       status = STANDBY;   /* Must be able to move rail for calibration. */
+		else if (palReadPad(GPIOD, 7) == PAL_LOW) status = BEAT_DANIEL_MILLER;
 		else if (palReadPad(GPIOD, 6) == PAL_LOW) status = STANDBY;
 		else                                      status = DISABLED;
 

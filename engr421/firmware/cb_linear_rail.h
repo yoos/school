@@ -10,36 +10,25 @@
 #include <cb_linear_rail_controller.h>
 #include <chsprintf.h>
 
+#define MODE_POS 0
+#define MODE_VEL 1
+
 /**
  * @brief Set up linear rail.
  */
 void setup_linear_rail(void);
 
-
-/**
- * @brief Calibrate linear rail.
- *
- * The rail starts at position 0, which is the leftmost side of the rail from
- * the robot's perspective, looking at the board. The shooter is then moved to
- * the right to MIN_BOARD_WIDTH at LINEAR_RAIL_CALIB_SPEED before being moved
- * further to the right at 1/10 of that speed until the limit switch trips.
- *
- * @output dir Direction of movement (0 or 1).
- * @output dc Dutycycle for linear rail motor.
- */
-void calibrate_linear_rail(uint8_t dir, float dc);
-
 /**
  * @brief Update linear rail velocity and stuff.
  *
- * @param base_wheel_dc Duty cycle of death ray. Used here just to determine
- * status.
- * @param des_lin_pos Desired linear position.
+ * @param status Game status
+ * @param mode Control mode, either position (0) or velocity (1)
+ * @param target Target value
  *
  * @output dir Direction of movement (0 or 1).
  * @output dc Duty cycle for linear rail motor.
  */
-void update_linear_rail(uint8_t status, float des_lin_pos, uint8_t dir, float dc);
+void update_linear_rail(uint8_t status, uint8_t mode, float target, uint8_t dir, float dc);
 
 /**
  * @brief Debug output
