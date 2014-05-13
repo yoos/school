@@ -5,7 +5,7 @@
 #include <hal.h>
 #include <cb_config.h>
 
-void setup_digital(void);
+void setup_digital(uint8_t *state);
 
 /*
  *

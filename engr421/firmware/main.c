@@ -22,7 +22,6 @@ float lr_des_pos;   /* Desired linear rail position from serial input. */
 uint8_t des_digital[8];
 uint8_t status = STANDBY;
 uint8_t is_calibrated = 0;   /* Currently only concerned with linear rail */
-uint8_t lr_switch = 0;
 
 void clear_buffer(uint8_t *buffer)
 {
@@ -183,7 +182,7 @@ static msg_t linear_rail_thread(void *arg)
 	 * trips. update_linear_rail is a self-adjusting controller that updates
 	 * its maximum position, kind of like self-bleeding hydraulic brakes. */
 	update_linear_rail(status, MODE_POS, lin_pos_calib, lr_dir, lr_dc);
-	while (!lr_switch) {
+	while (!des_digital[I_DIGITAL_LR_SWITCH]) {
 		time += MS2ST(1000*LINEAR_RAIL_DT);
 
 		update_linear_rail(status, MODE_VEL, LINEAR_RAIL_CALIB_SPEED, lr_dir, lr_dc);

@@ -1,6 +1,6 @@
 #include <cb_digital.h>
 
-void setup_digital(void)
+void setup_digital(uint8_t *state)
 {
 	/* Inputs */
 	palSetPadMode(GPIOD, I_DIGITAL_LR_SWITCH, PAL_MODE_INPUT_PULLDOWN);   /* Linear rail limit switch */
@@ -9,6 +9,12 @@ void setup_digital(void)
 
 	/* Outputs */
 	palSetPadMode(GPIOD, I_DIGITAL_LINEAR_RAIL, PAL_MODE_OUTPUT_PUSHPULL);
+
+	/* Set default desired states */
+	state[I_DIGITAL_LR_SWITCH] = 0;
+	state[I_DIGITAL_ENABLE] = 1;
+	state[I_DIGITAL_ARBITER] = 1;
+	state[I_DIGITAL_LINEAR_RAIL] = 0;
 }
 
 void update_digital(uint8_t *state)
