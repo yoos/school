@@ -56,9 +56,9 @@
 #define I_ICU_LINEAR_RAIL 3
 #define I_ICU_4 4
 #define I_ICU_5 5
-#define I_DIGITAL_LINEAR_RAIL 0
-#define I_DIGITAL_LR_SWITCH 1
-#define I_DIGITAL_2 2
+#define I_DIGITAL_LINEAR_RAIL 0   /* Linear rail direction pin */
+#define I_DIGITAL_LR_SWITCH 1   /* Linear rail limit switch */
+#define I_DIGITAL_HOPPER_IR 2   /* IR sensor on hopper */
 #define I_DIGITAL_3 3
 #define I_DIGITAL_4 4
 #define I_DIGITAL_5 5
@@ -82,7 +82,7 @@
 #define ROT_SPEED (BB_VEL/(WHEEL_DIA*M_PI))   // In rev/s
 #define ROT_PERIOD_ST (MS2ST(1000)/(ROT_SPEED*256))   // 256 quadrature pulses per revolution.
 
-#define MIN_REVS_PER_LENGTH 8.0   // Minimum board width expressed in number of encoder pulley revolutions.
+#define MIN_REVS_PER_LENGTH 4.0   // Minimum board width expressed in number of encoder pulley revolutions.
 
 #define ESC_MIN_DC 0.45   // Minimum duty cycle for Mikrokopter ESCs.
 #define ESC_MAX_DC 0.83    // Maximum duty cycle for Mikrokopter ESCs.
