@@ -19,6 +19,12 @@
 void setup_linear_rail(void);
 
 /**
+ * @brief Calibrate linear rail.
+ *
+ */
+void calibrate_linear_rail(uint8_t status, uint8_t limit_switch, uint8_t *dir, float *dc);
+
+/**
  * @brief Update linear rail velocity and stuff.
  *
  * @param status Game status
@@ -28,7 +34,7 @@ void setup_linear_rail(void);
  * @output dir Direction of movement (0 or 1).
  * @output dc Duty cycle for linear rail motor.
  */
-void update_linear_rail(uint8_t status, uint8_t mode, float target, uint8_t dir, float dc);
+void update_linear_rail(uint8_t status, uint8_t mode, float target, uint8_t *dir, float *dc);
 
 /**
  * @brief Debug output
@@ -36,21 +42,6 @@ void update_linear_rail(uint8_t status, uint8_t mode, float target, uint8_t dir,
  * @param buffer Output buffer.
  */
 void linear_rail_debug_output(uint8_t *buffer);
-
-/**
- * @brief Update position of linear rail (i.e., keep track of multiple
- * revolutions of encoder.
- *
- * A given rotational positon of the encoder will fit into certain "slots" in
- * the linear position of the rail. We assume that this position will not
- * change by more than 90% of full rotation between any two timesteps. There is
- * a 10% buffer in the opposite direction of desired movement to counter any
- * bumps.
- *
- * @param dir Commanded direction of movement.
- * @output lin_pos Linear position of rail. Also used as an input.
- */
-void _update_linear_rail_position(float lin_pos);
 
 #endif /* CB_LINEAR_RAIL_H */
 

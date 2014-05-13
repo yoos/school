@@ -176,16 +176,14 @@ static msg_t linear_rail_thread(void *arg)
 
 	uint8_t lr_dir = 0;   /* Direction of linear rail motor. */
 	float lr_dc = 0;   /* Duty cycle of linear rail motor. */
-	float lin_pos_calib = 1.0;
 
 	/* Calibrate. We simply push the rail to the far side until the switch
 	 * trips. update_linear_rail is a self-adjusting controller that updates
 	 * its maximum position, kind of like self-bleeding hydraulic brakes. */
-	update_linear_rail(status, MODE_POS, lin_pos_calib, lr_dir, lr_dc);
 	while (!des_digital[I_DIGITAL_LR_SWITCH]) {
 		time += MS2ST(1000*LINEAR_RAIL_DT);
 
-		update_linear_rail(status, MODE_VEL, LINEAR_RAIL_CALIB_SPEED, lr_dir, lr_dc);
+		calibrate_linear_rail(status, des_digital[I_DIGITAL_LR_SWITCH], &lr_dir, &lr_dc);
 
 		dc[I_PWM_LINEAR_RAIL] = lr_dc;
 		des_digital[I_DIGITAL_LINEAR_RAIL] = lr_dir;
@@ -198,7 +196,7 @@ static msg_t linear_rail_thread(void *arg)
 	while (TRUE) {
 		time += MS2ST(1000*LINEAR_RAIL_DT);
 
-		update_linear_rail(status, MODE_POS, lr_des_pos, lr_dir, lr_dc);
+		update_linear_rail(status, MODE_POS, lr_des_pos, &lr_dir, &lr_dc);
 
 		dc[I_PWM_LINEAR_RAIL] = lr_dc;
 		des_digital[I_DIGITAL_LINEAR_RAIL] = lr_dir;
@@ -232,9 +230,9 @@ static msg_t control_thread(void *arg)
 		update_digital(des_digital);
 
 		/* Update status */
-		if (!is_calibrated)                       status = STANDBY;   /* Must be able to move rail for calibration. */
-		else if (palReadPad(GPIOD, 7) == PAL_LOW) status = BEAT_DANIEL_MILLER;
-		else if (palReadPad(GPIOD, 6) == PAL_LOW) status = STANDBY;
+		if (!is_calibrated)                       status = BEAT_DANIEL_MILLER;   /* Must be able to move rail for calibration. */
+		else if (des_digital[I_DIGITAL_ARBITER] == PAL_LOW) status = BEAT_DANIEL_MILLER;
+		else if (des_digital[I_DIGITAL_ENABLE]  == PAL_LOW) status = STANDBY;
 		else                                      status = DISABLED;
 
 		/* Blink heartbeat LED. This is purely cosmetic. */
@@ -272,6 +270,8 @@ int main(void)
 	setup_adc();
 
 	setup_icu();
+
+	setup_digital(des_digital);
 
 	setup_motors();
 
