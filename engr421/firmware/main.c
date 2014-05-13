@@ -10,6 +10,7 @@
 #include <cb_death_ray.h>   // Death ray control code
 #include <cb_hopper.h>   // Hopper control code
 #include <cb_linear_rail.h>   // Linear rail control code
+#include <cb_digital.h>   // Digital I/O control
 #include <cb_config.h>   // General configuration
 #include <cb_math.h>
 
@@ -18,10 +19,10 @@ float dutyCycle = 0;
 float base_wheel_dc = 0;
 float dc[8];
 float lr_des_pos;   /* Desired linear rail position from serial input. */
-uint8_t digital_state[8];
+uint8_t des_digital[8];
 uint8_t status = STANDBY;
 uint8_t is_calibrated = 0;   /* Currently only concerned with linear rail */
-uint8_t lr_switch;
+uint8_t lr_switch = 0;
 
 void clear_buffer(uint8_t *buffer)
 {
@@ -188,7 +189,7 @@ static msg_t linear_rail_thread(void *arg)
 		update_linear_rail(status, MODE_VEL, LINEAR_RAIL_CALIB_SPEED, lr_dir, lr_dc);
 
 		dc[I_PWM_LINEAR_RAIL] = lr_dc;
-		digital_state[I_DIGITAL_LINEAR_RAIL] = lr_dir;
+		des_digital[I_DIGITAL_LINEAR_RAIL] = lr_dir;
 
 		chThdSleepUntil(time);
 	}
@@ -201,7 +202,7 @@ static msg_t linear_rail_thread(void *arg)
 		update_linear_rail(status, MODE_POS, lr_des_pos, lr_dir, lr_dc);
 
 		dc[I_PWM_LINEAR_RAIL] = lr_dc;
-		digital_state[I_DIGITAL_LINEAR_RAIL] = lr_dir;
+		des_digital[I_DIGITAL_LINEAR_RAIL] = lr_dir;
 
 		chThdSleepUntil(time);
 	}
@@ -220,34 +221,24 @@ static msg_t control_thread(void *arg)
 	systime_t time = chTimeNow();
 
 	uint16_t k = 0;
-	uint8_t i;
-	for (i=0; i<6; i++) {
-		palSetPadMode(GPIOD, i, PAL_MODE_OUTPUT_PUSHPULL);
-	}
-	palSetPadMode(GPIOD, 6, PAL_MODE_INPUT_PULLUP);   /* Enable */
-	palSetPadMode(GPIOD, 7, PAL_MODE_INPUT_PULLUP);   /* Arbiter */
 
 	/* Track game status */
 	while (TRUE) {
 		time += MS2ST(1000*CONTROL_LOOP_DT);   // Next deadline in 1 ms.
 
+		/* Update various duty cycles */
 		update_motors(dc);
 
-		uint8_t j;
-		for (j=0; j<6; j++) {
-			if (digital_state[j] == 1) {
-				palSetPad(GPIOD, j);
-			}
-			else {
-				palClearPad(GPIOD, j);
-			}
-		}
+		/* Update digital I/O */
+		update_digital(des_digital);
+
+		/* Update status */
 		if (!is_calibrated)                       status = STANDBY;   /* Must be able to move rail for calibration. */
 		else if (palReadPad(GPIOD, 7) == PAL_LOW) status = BEAT_DANIEL_MILLER;
 		else if (palReadPad(GPIOD, 6) == PAL_LOW) status = STANDBY;
 		else                                      status = DISABLED;
 
-		/* Blink status LED. */
+		/* Blink heartbeat LED. This is purely cosmetic. */
 		if      (k < MS2ST(50))  palSetPad  (GPIOD, 13);
 		else if (k < MS2ST(150)) palClearPad(GPIOD, 13);
 		else if (k < MS2ST(200)) palSetPad  (GPIOD, 13);

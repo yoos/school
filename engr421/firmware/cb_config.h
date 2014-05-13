@@ -57,13 +57,13 @@
 #define I_ICU_4 4
 #define I_ICU_5 5
 #define I_DIGITAL_LINEAR_RAIL 0
-#define I_DIGITAL_1 1
+#define I_DIGITAL_LR_SWITCH 1
 #define I_DIGITAL_2 2
 #define I_DIGITAL_3 3
 #define I_DIGITAL_4 4
 #define I_DIGITAL_5 5
-#define I_DIGITAL_6 6
-#define I_DIGITAL_7 7
+#define I_DIGITAL_ENABLE 6
+#define I_DIGITAL_ARBITER 7
 #define I_PWM_DEATH_RAY 0
 #define I_PWM_1 1   // Note there's some sort of coupling going on between 0 and 1.
 #define I_PWM_LINEAR_RAIL 2
