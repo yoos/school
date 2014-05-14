@@ -22,6 +22,7 @@ float lr_des_pos;   /* Desired linear rail position from serial input. */
 uint8_t des_digital[8];
 uint8_t status = STANDBY;
 uint8_t is_calibrated = 0;   /* Currently only concerned with linear rail */
+uint8_t trigger = 0;
 
 void clear_buffer(uint8_t *buffer)
 {
@@ -56,8 +57,11 @@ static msg_t comm_thread(void *arg)
 		 * transmitting? */
 		clear_buffer(txbuf);
 
-		/* Directly interpret byte as rail position command. */
-		lr_des_pos = ((float) rxbuf[0]) / 255;
+		/* MSB triggers shooter. */
+		trigger = rxbuf[0] >> 7;
+
+		/* Directly interpret following 7 bytes as rail position command. */
+		lr_des_pos = ((float) (0x7f & rxbuf[0])) / 127;
 
 		/* Fill transmit buffer with debug string */
 		death_ray_debug_output(txbuf);
@@ -154,6 +158,7 @@ static msg_t hopper_thread(void *arg)
 		time += MS2ST(1000*HOPPER_DT);
 
 		update_hopper(status, &hopper_dc);
+		if (!trigger) hopper_dc = 0;
 
 		dc[I_PWM_HOPPER] = hopper_dc;
 
