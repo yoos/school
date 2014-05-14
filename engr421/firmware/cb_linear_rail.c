@@ -19,7 +19,7 @@ static uint8_t dbg_mode;
 
 void setup_linear_rail(void)
 {
-	rot_pos_zero = icu_get_duty_cycle(I_ICU_LINEAR_RAIL);
+	rot_pos_zero = 1.0 - icu_get_duty_cycle(I_ICU_LINEAR_RAIL);
 	cur_lin_pos = 0.0;
 	cur_lin_vel = 0.0;
 	lin_rot_max = MIN_REVS_PER_LENGTH;
