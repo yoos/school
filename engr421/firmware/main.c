@@ -10,6 +10,7 @@
 #include <cb_death_ray.h>   // Death ray control code
 #include <cb_hopper.h>   // Hopper control code
 #include <cb_linear_rail.h>   // Linear rail control code
+#include <cb_watchdog.h>
 #include <cb_digital.h>   // Digital I/O control
 #include <cb_config.h>   // General configuration
 #include <cb_math.h>
@@ -230,7 +231,8 @@ static msg_t control_thread(void *arg)
 		update_digital(des_digital);
 
 		/* Update status */
-		if (!is_calibrated)                                 status = BEAT_DANIEL_MILLER;   /* Must be able to move rail for calibration. */
+		if (feed_linear_rail_watchdog(dc[I_PWM_LINEAR_RAIL])) status = DISABLED;
+		else if (!is_calibrated)                            status = BEAT_DANIEL_MILLER;   /* Must be able to move rail for calibration. */
 		else if (des_digital[I_DIGITAL_ARBITER] == PAL_LOW) status = BEAT_DANIEL_MILLER;
 		else if (des_digital[I_DIGITAL_ENABLE]  == PAL_LOW) status = STANDBY;
 		else                                                status = DISABLED;

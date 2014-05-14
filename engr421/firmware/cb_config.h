@@ -29,6 +29,8 @@
 #define LINEAR_RAIL_VEL_KD (0)
 
 #define LINEAR_RAIL_CALIB_SPEED 0.1   // Rail velocity as approximate fraction of board width while it gropes for the far side of board.
+#define LINEAR_RAIL_WATCHDOG_LD 1.0   // Watchdog lethal dose (of heat, i.e., integrated duty cycle)
+#define LINEAR_RAIL_WATCHDOG_COOLDOWN 0.2   // Watchdog cooldown rate. This should approximately equal the continuous duty cycle rating of motor.
 //#define LINEAR_RAIL_MIN_SEPARATION 0.112
 #define LINEAR_RAIL_POS_I_CAP 2
 #define LINEAR_RAIL_VEL_I_CAP 2
