@@ -21,6 +21,13 @@ void setup_linear_rail(void);
 /**
  * @brief Calibrate linear rail.
  *
+ * We simply push the rail to the far side until the switch trips.
+ *
+ * @param status Game status
+ * @param limit_switch Switch trip indicates far wall has been reached.
+ *
+ * @output dir Direction of movement (0 or 1).
+ * @output dc Duty cycle for linear rail motor.
  */
 uint8_t calibrate_linear_rail(uint8_t status, uint8_t limit_switch, uint8_t *dir, float *dc);
 

@@ -56,9 +56,8 @@ static msg_t comm_thread(void *arg)
 		 * transmitting? */
 		clear_buffer(txbuf);
 
-		/* Read in two bytes, since the computer will alternate between
-		 * commanding the left and right rails. */
-		//lr_des_pos = ((float) rxbuf[0]) / 255;   /* TODO(yoos): enable after comm implementation.
+		/* Directly interpret byte as rail position command. */
+		lr_des_pos = ((float) rxbuf[0]) / 255;
 
 		/* Fill transmit buffer with debug string */
 		death_ray_debug_output(txbuf);
@@ -177,9 +176,7 @@ static msg_t linear_rail_thread(void *arg)
 	uint8_t lr_dir = 0;   /* Direction of linear rail motor. */
 	float lr_dc = 0;   /* Duty cycle of linear rail motor. */
 
-	/* Calibrate. We simply push the rail to the far side until the switch
-	 * trips. update_linear_rail is a self-adjusting controller that updates
-	 * its maximum position, kind of like self-bleeding hydraulic brakes. */
+	/* Calibrate. */
 	while (!calibrate_linear_rail(status, des_digital[I_DIGITAL_LR_SWITCH], &lr_dir, &lr_dc)) {
 		time += MS2ST(1000*LINEAR_RAIL_DT);
 
