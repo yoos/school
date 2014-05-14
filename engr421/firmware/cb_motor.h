@@ -39,7 +39,8 @@ static const PWMConfig pwm1cfg = {
 		{PWM_OUTPUT_ACTIVE_HIGH, NULL},
 		{PWM_OUTPUT_ACTIVE_HIGH, NULL}
 	},
-	0   // HW dependent
+	0,  // HW dependent
+	0
 };
 
 /**
@@ -73,7 +74,8 @@ static const PWMConfig pwm8cfg = {
 		{PWM_OUTPUT_ACTIVE_HIGH, NULL},
 		{PWM_OUTPUT_ACTIVE_HIGH, NULL}
 	},
-	0   // HW dependent
+	0,  // HW dependent
+	0
 };
 
 #endif // CB_MOTOR_H

@@ -76,7 +76,8 @@ static const ICUConfig icu2cfg = {
 	icu2widthcb,
 	icu2periodcb,
 	NULL,
-	ICU_CHANNEL_1
+	ICU_CHANNEL_1,
+	0
 };
 
 /**
@@ -88,7 +89,8 @@ static const ICUConfig icu3cfg = {
 	icu3widthcb,
 	icu3periodcb,
 	NULL,
-	ICU_CHANNEL_1
+	ICU_CHANNEL_1,
+	0
 };
 
 /**
@@ -100,7 +102,8 @@ static const ICUConfig icu4cfg = {
 	icu4widthcb,
 	icu4periodcb,
 	NULL,
-	ICU_CHANNEL_1
+	ICU_CHANNEL_1,
+	0
 };
 
 /**
@@ -112,7 +115,8 @@ static const ICUConfig icu5cfg = {
 	icu5widthcb,
 	icu5periodcb,
 	NULL,
-	ICU_CHANNEL_1
+	ICU_CHANNEL_1,
+	0
 };
 
 #endif /* CB_ICU_H */
