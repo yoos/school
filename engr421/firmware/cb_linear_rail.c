@@ -15,6 +15,7 @@ static uint8_t des_dir;
 static float des_dc;
 static uint16_t dbg_dc_shift;
 static uint16_t dbg_q, dbg_r;
+static uint8_t dbg_mode;
 
 void setup_linear_rail(void)
 {
@@ -38,7 +39,7 @@ void setup_linear_rail(void)
 uint8_t calibrate_linear_rail(uint8_t status, uint8_t limit_switch, uint8_t *dir, float *dc)
 {
 	if (cur_lin_pos < 1.0) {
-		update_linear_rail(status, MODE_POS, 1.0, dir, dc);
+		update_linear_rail(status, MODE_VEL, 1.0, dir, dc);
 	}
 	else if (limit_switch == 1) {
 		update_linear_rail(status, MODE_VEL, LINEAR_RAIL_CALIB_SPEED, dir, dc);
@@ -142,10 +143,11 @@ void update_linear_rail(uint8_t status, uint8_t mode, float target, uint8_t *dir
 	des_dir = *dir;
 	des_dc = *dc;
 	dbg_dc_shift = (uint16_t) ABS(dc_shift * 1000);
+	dbg_mode = mode;
 }
 
 void linear_rail_debug_output(uint8_t *buffer)
 {
-	chsprintf(buffer, "%u  lin pos: %u  rot: %u  des dc: %u  dc_shift: %u  q:  %u  r: %u  des lin: %u\r\n", dbg_status, (uint16_t) (cur_lin_pos*1000), (uint16_t) (dbg_rot_pos*1000), (uint16_t) (des_dc*1000), dbg_dc_shift, dbg_q, dbg_r, (uint16_t) des_pos);
+	chsprintf(buffer, "Status: %u  mode: %u  lin pos: %u  rot: %u  des dc: %u  dc_shift: %u  q:  %u  r: %u  des lin: %u\r\n", dbg_status, dbg_mode, (uint16_t) (cur_lin_pos*1000), (uint16_t) (dbg_rot_pos*1000), (uint16_t) (des_dc*1000), dbg_dc_shift, dbg_q, dbg_r, (uint16_t) des_pos);
 }
 

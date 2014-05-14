@@ -58,7 +58,7 @@ static msg_t comm_thread(void *arg)
 
 		/* Read in two bytes, since the computer will alternate between
 		 * commanding the left and right rails. */
-		lr_des_pos = ((float) rxbuf[0]) / 255;
+		//lr_des_pos = ((float) rxbuf[0]) / 255;   /* TODO(yoos): enable after comm implementation.
 
 		/* Fill transmit buffer with debug string */
 		linear_rail_debug_output(txbuf);
@@ -189,13 +189,13 @@ static msg_t linear_rail_thread(void *arg)
 		chThdSleepUntil(time);
 	}
 	is_calibrated = 1;
+	lr_des_pos = 0.5;
 
 	/* For real, now. */
 	while (TRUE) {
 		time += MS2ST(1000*LINEAR_RAIL_DT);
 
-		//update_linear_rail(status, MODE_POS, lr_des_pos, &lr_dir, &lr_dc);
-		update_linear_rail(status, MODE_POS, 1.0, &lr_dir, &lr_dc);
+		update_linear_rail(status, MODE_POS, lr_des_pos, &lr_dir, &lr_dc);
 
 		dc[I_PWM_LINEAR_RAIL] = lr_dc;
 		des_digital[I_DIGITAL_LINEAR_RAIL] = lr_dir;
