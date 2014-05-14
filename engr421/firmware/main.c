@@ -189,7 +189,6 @@ static msg_t linear_rail_thread(void *arg)
 		chThdSleepUntil(time);
 	}
 	is_calibrated = 1;
-	lr_des_pos = 0.5;
 
 	/* For real, now. */
 	while (TRUE) {
@@ -229,10 +228,10 @@ static msg_t control_thread(void *arg)
 		update_digital(des_digital);
 
 		/* Update status */
-		if (!is_calibrated)                       status = BEAT_DANIEL_MILLER;   /* Must be able to move rail for calibration. */
+		if (!is_calibrated)                                 status = BEAT_DANIEL_MILLER;   /* Must be able to move rail for calibration. */
 		else if (des_digital[I_DIGITAL_ARBITER] == PAL_LOW) status = BEAT_DANIEL_MILLER;
 		else if (des_digital[I_DIGITAL_ENABLE]  == PAL_LOW) status = STANDBY;
-		else                                      status = DISABLED;
+		else                                                status = DISABLED;
 
 		/* Blink heartbeat LED. This is purely cosmetic. */
 		if      (k < MS2ST(50))  palSetPad  (GPIOD, 13);

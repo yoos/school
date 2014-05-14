@@ -103,42 +103,47 @@ void update_linear_rail(uint8_t status, uint8_t mode, float target, uint8_t *dir
 		}
 	}
 
-	/* Run controller */
+	/* If disabled, kill motors and return. */
 	if (status == DISABLED) {
-		/* Disabled */
 		*dir = 0;
 		*dc = LINEAR_RAIL_DC_MIN;
 
 		/* Zero integral terms. */
 		pid_data_pos.I = 0;
 		pid_data_vel.I = 0;
+
+		return;
+	}
+
+	/* Standby at center of rail. */
+	if (status == STANDBY) {
+		mode = MODE_POS;
+		target = 0.5;
+	}
+
+	/* Cap I term. */
+	pid_data_pos.I = MIN(LINEAR_RAIL_POS_I_CAP, MAX(-LINEAR_RAIL_POS_I_CAP, pid_data_pos.I));
+	pid_data_vel.I = MIN(LINEAR_RAIL_VEL_I_CAP, MAX(-LINEAR_RAIL_VEL_I_CAP, pid_data_vel.I));
+
+	/* Control */
+	if (mode == MODE_POS) {
+		des_lin_vel = linear_rail_position_controller(&pid_data_pos, cur_lin_pos, target);
+		*dir = (target > cur_lin_pos) ? 1 : 0;
 	}
 	else {
-		/* Standing by or playing */
-
-		/* Cap I term. */
-		pid_data_pos.I = MIN(LINEAR_RAIL_POS_I_CAP, MAX(-LINEAR_RAIL_POS_I_CAP, pid_data_pos.I));
-		pid_data_vel.I = MIN(LINEAR_RAIL_VEL_I_CAP, MAX(-LINEAR_RAIL_VEL_I_CAP, pid_data_vel.I));
-
-		/* Control */
-		if (mode == MODE_POS) {
-			des_lin_vel = linear_rail_position_controller(&pid_data_pos, cur_lin_pos, target);
-			*dir = (target > cur_lin_pos) ? 1 : 0;
-		}
-		else {
-			des_lin_vel = target;
-			*dir = (target > cur_lin_vel) ? 1 : 0;
-		}
-		dc_shift = linear_rail_velocity_controller(&pid_data_vel, cur_lin_vel, des_lin_vel);
-
-		/* Set duty cycle */
-		if (*dir == 0) {
-			*dc = MIN(1.0, ABS(dc_shift));
-		}
-		else {
-			*dc = MAX(0.0, 1.0-ABS(dc_shift));   /* Invert duty cycle if reverse. */
-		}
+		des_lin_vel = target;
+		*dir = (target > cur_lin_vel) ? 1 : 0;
 	}
+	dc_shift = linear_rail_velocity_controller(&pid_data_vel, cur_lin_vel, des_lin_vel);
+
+	/* Set duty cycle */
+	if (*dir == 0) {
+		*dc = MIN(1.0, ABS(dc_shift));
+	}
+	else {
+		*dc = MAX(0.0, 1.0-ABS(dc_shift));   /* Invert duty cycle if reverse. */
+	}
+
 	des_pos = target*1000;
 	des_dir = *dir;
 	des_dc = *dc;
