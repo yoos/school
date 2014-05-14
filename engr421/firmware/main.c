@@ -61,7 +61,7 @@ static msg_t comm_thread(void *arg)
 		//lr_des_pos = ((float) rxbuf[0]) / 255;   /* TODO(yoos): enable after comm implementation.
 
 		/* Fill transmit buffer with debug string */
-		linear_rail_debug_output(txbuf);
+		death_ray_debug_output(txbuf);
 
 		/* Transmit */
 		uartStartSend(&UARTD3, sizeof(txbuf), txbuf);
@@ -122,7 +122,7 @@ static msg_t death_ray_thread(void *arg)
 	while (TRUE) {
 		time += MS2ST(1000*DEATH_RAY_DT);
 
-		update_death_ray(status, dr_dc);
+		update_death_ray(status, &dr_dc);
 
 		dc[I_PWM_DEATH_RAY] = dr_dc;
 
@@ -154,7 +154,7 @@ static msg_t hopper_thread(void *arg)
 	while (TRUE) {
 		time += MS2ST(1000*HOPPER_DT);
 
-		update_hopper(status, hopper_dc);
+		update_hopper(status, &hopper_dc);
 
 		dc[I_PWM_HOPPER] = hopper_dc;
 

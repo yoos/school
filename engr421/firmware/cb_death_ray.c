@@ -44,10 +44,8 @@ void setup_death_ray(void)
 	pid_data_wheel_pos.last_val = 0;
 }
 
-void update_death_ray(uint8_t status, float dc)
+void update_death_ray(uint8_t status, float *dc)
 {
-	(void) dc;
-
 	cur_wheel_period = MIN(2000, icu_get_period(I_ICU_DEATH_RAY));   /* The 2000 here is arbitrary. */
 
 	/*
@@ -64,14 +62,14 @@ void update_death_ray(uint8_t status, float dc)
 	/* Controller */
 	if (status == DISABLED) {
 		/* Disabled */
-		dc = ESC_MIN_DC;
+		*dc = ESC_MIN_DC;
 		pid_data_wheel_pos.I = 0;   /* Zero integral term. */
 	}
 	else {
 		/* Standing by or playing */
 		if (!up_to_speed) {
 			/* Startup state */
-			dc = DEATH_RAY_STARTUP_DC;
+			*dc = DEATH_RAY_STARTUP_DC;
 			pid_data_wheel_pos.I = 0;   /* Zero integral term. */
 		}
 		else {
@@ -82,7 +80,7 @@ void update_death_ray(uint8_t status, float dc)
 			pid_data_wheel_pos.I = MIN( DEATH_RAY_I_CAP, pid_data_wheel_pos.I);
 
 			/* PID control. */
-			dc = MIN(ESC_MAX_DC, (ESC_MIN_DC + MAX(0, calculate_pid(cur_wheel_period, ROT_PERIOD_ST, &pid_data_wheel_pos))));
+			*dc = MIN(ESC_MAX_DC, (ESC_MIN_DC + MAX(0, calculate_pid(cur_wheel_period, ROT_PERIOD_ST, &pid_data_wheel_pos))));
 		}
 	}
 }

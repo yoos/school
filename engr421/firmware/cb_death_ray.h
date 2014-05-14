@@ -22,7 +22,7 @@ void setup_death_ray(void);
  *
  * @output dc Death ray duty cycle.
  */
-void update_death_ray(uint8_t status, float dc);
+void update_death_ray(uint8_t status, float *dc);
 
 /**
  * @brief Debug output

@@ -20,7 +20,7 @@ void setup_hopper(void);
  *
  * @output dc Duty cycle for hopper motor.
  */
-void update_hopper(uint8_t status, float dc);
+void update_hopper(uint8_t status, float *dc);
 
 /**
  * @brief Debug output
