@@ -1,4 +1,5 @@
 #include <cb_watchdog.h>
+#include <chsprintf.h>
 
 static float dbg_load;
 static uint8_t dbg_alive;
