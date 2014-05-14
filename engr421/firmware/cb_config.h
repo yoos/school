@@ -21,15 +21,15 @@
 #define HOPPER_PULSE_DC 0.7
 #define HOPPER_PULSE_FREQUENCY 2
 
-#define LINEAR_RAIL_POS_KP (3)
+#define LINEAR_RAIL_POS_KP (1)
 #define LINEAR_RAIL_POS_KI (0.1)
 #define LINEAR_RAIL_POS_KD (0)
 #define LINEAR_RAIL_VEL_KP (5)
 #define LINEAR_RAIL_VEL_KI (0)   // 1 is a good value here, but it increases power consumption without a target deadzone, so 0 for now.
 #define LINEAR_RAIL_VEL_KD (0)
 
-#define LINEAR_RAIL_CALIB_SPEED 0.1   // Rail velocity as approximate fraction of board width while it gropes for the far side of board.
-#define LINEAR_RAIL_MIN_SEPARATION 0.112
+#define LINEAR_RAIL_CALIB_SPEED 0.05   // Rail velocity as approximate fraction of board width while it gropes for the far side of board.
+//#define LINEAR_RAIL_MIN_SEPARATION 0.112
 #define LINEAR_RAIL_POS_I_CAP 2
 #define LINEAR_RAIL_VEL_I_CAP 2
 #define LINEAR_RAIL_VEL_CAP 1.0   // In m/s.

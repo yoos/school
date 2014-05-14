@@ -61,7 +61,7 @@ static msg_t comm_thread(void *arg)
 		lr_des_pos = ((float) rxbuf[0]) / 255;
 
 		/* Fill transmit buffer with debug string */
-		death_ray_debug_output(txbuf);
+		linear_rail_debug_output(txbuf);
 
 		/* Transmit */
 		uartStartSend(&UARTD3, sizeof(txbuf), txbuf);
@@ -180,10 +180,8 @@ static msg_t linear_rail_thread(void *arg)
 	/* Calibrate. We simply push the rail to the far side until the switch
 	 * trips. update_linear_rail is a self-adjusting controller that updates
 	 * its maximum position, kind of like self-bleeding hydraulic brakes. */
-	while (!des_digital[I_DIGITAL_LR_SWITCH]) {
+	while (!calibrate_linear_rail(status, des_digital[I_DIGITAL_LR_SWITCH], &lr_dir, &lr_dc)) {
 		time += MS2ST(1000*LINEAR_RAIL_DT);
-
-		calibrate_linear_rail(status, des_digital[I_DIGITAL_LR_SWITCH], &lr_dir, &lr_dc);
 
 		dc[I_PWM_LINEAR_RAIL] = lr_dc;
 		des_digital[I_DIGITAL_LINEAR_RAIL] = lr_dir;
@@ -196,7 +194,8 @@ static msg_t linear_rail_thread(void *arg)
 	while (TRUE) {
 		time += MS2ST(1000*LINEAR_RAIL_DT);
 
-		update_linear_rail(status, MODE_POS, lr_des_pos, &lr_dir, &lr_dc);
+		//update_linear_rail(status, MODE_POS, lr_des_pos, &lr_dir, &lr_dc);
+		update_linear_rail(status, MODE_POS, 1.0, &lr_dir, &lr_dc);
 
 		dc[I_PWM_LINEAR_RAIL] = lr_dc;
 		des_digital[I_DIGITAL_LINEAR_RAIL] = lr_dir;

@@ -5,7 +5,7 @@ static pid_data_t pid_data_vel;
 static float rot_pos_zero;   /* Zero position. Rail should be placed at end of slide at setup. TODO: This should be done with limit switches. */
 static float cur_lin_pos;   /* Current position of linear rail. */
 static float cur_lin_vel;   /* Current velocity of linear rail. */
-static float lin_rot_max = MIN_REVS_PER_LENGTH;
+static float lin_rot_max;
 
 // DEBUG
 static uint8_t dbg_status;
@@ -20,7 +20,8 @@ void setup_linear_rail(void)
 {
 	rot_pos_zero = icu_get_duty_cycle(I_ICU_LINEAR_RAIL);
 	cur_lin_pos = 0.0;
-	cur_lin_vel = 0;
+	cur_lin_vel = 0.0;
+	lin_rot_max = MIN_REVS_PER_LENGTH;
 
 	pid_data_pos.Kp = LINEAR_RAIL_POS_KP;
 	pid_data_pos.Ki = LINEAR_RAIL_POS_KI;
@@ -34,14 +35,21 @@ void setup_linear_rail(void)
 	pid_data_vel.last_val = cur_lin_vel;
 }
 
-void calibrate_linear_rail(uint8_t status, uint8_t limit_switch, uint8_t *dir, float *dc)
+uint8_t calibrate_linear_rail(uint8_t status, uint8_t limit_switch, uint8_t *dir, float *dc)
 {
 	if (cur_lin_pos < 1.0) {
 		update_linear_rail(status, MODE_POS, 1.0, dir, dc);
 	}
-	if (!limit_switch) {
+	else if (limit_switch == 1) {
 		update_linear_rail(status, MODE_VEL, LINEAR_RAIL_CALIB_SPEED, dir, dc);
 	}
+	else {
+		lin_rot_max = cur_lin_pos*lin_rot_max;
+		cur_lin_pos = 1.0;
+		return 1;
+	}
+
+	return 0;
 }
 
 void update_linear_rail(uint8_t status, uint8_t mode, float target, uint8_t *dir, float *dc)
@@ -60,7 +68,7 @@ void update_linear_rail(uint8_t status, uint8_t mode, float target, uint8_t *dir
 	 * a 10% buffer in the opposite direction of desired movement to counter any
 	 * bumps.
 	 */
-	rot_pos = icu_get_duty_cycle(I_ICU_LINEAR_RAIL);   /* I previously noted here that the ICU spits out bogus values of 0 and 39 that could be misinterpreted as an actual period. Hopefully it doesn't haunt us later. */
+	rot_pos = 1.0 - icu_get_duty_cycle(I_ICU_LINEAR_RAIL);   /* I previously noted here that the ICU spits out bogus values of 0 and 39 that could be misinterpreted as an actual period. Hopefully it doesn't haunt us later. */
 	q = (int) (lin_rot_max*cur_lin_pos);   /* Quotient */
 	r = lin_rot_max*cur_lin_pos - q;   /* Remainder. Effectively equals old rotational position. */
 
@@ -83,7 +91,6 @@ void update_linear_rail(uint8_t status, uint8_t mode, float target, uint8_t *dir
 	/* Update current state. */
 	cur_lin_pos += d_rot/lin_rot_max;
 	cur_lin_vel = d_rot;
-	//lin_rot_max = MAX(cur_lin_pos*lin_rot_max + d_rot, lin_rot_max);   // TODO(yoos): wtf inefficiency
 
 	/* Sanity check position target. */
 	if (mode == MODE_POS) {
@@ -115,19 +122,13 @@ void update_linear_rail(uint8_t status, uint8_t mode, float target, uint8_t *dir
 		/* Control */
 		if (mode == MODE_POS) {
 			des_lin_vel = linear_rail_position_controller(&pid_data_pos, cur_lin_pos, target);
-		}
-		else {
-			des_lin_vel = target;
-		}
-		dc_shift = linear_rail_velocity_controller(&pid_data_vel, cur_lin_vel, des_lin_vel);
-
-		/* Set direction */
-		if (mode == MODE_POS) {
 			*dir = (target > cur_lin_pos) ? 1 : 0;
 		}
 		else {
-			*dir = (target > 0) ? 1 : 0;
+			des_lin_vel = target;
+			*dir = (target > cur_lin_vel) ? 1 : 0;
 		}
+		dc_shift = linear_rail_velocity_controller(&pid_data_vel, cur_lin_vel, des_lin_vel);
 
 		/* Set duty cycle */
 		if (*dir == 0) {

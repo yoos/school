@@ -3,7 +3,7 @@
 void setup_digital(uint8_t *state)
 {
 	/* Inputs */
-	palSetPadMode(GPIOD, I_DIGITAL_LR_SWITCH, PAL_MODE_INPUT_PULLDOWN);   /* Linear rail limit switch */
+	palSetPadMode(GPIOD, I_DIGITAL_LR_SWITCH, PAL_MODE_INPUT_PULLUP);   /* Linear rail limit switch */
 	palSetPadMode(GPIOD, I_DIGITAL_ENABLE, PAL_MODE_INPUT_PULLUP);   /* Enable */
 	palSetPadMode(GPIOD, I_DIGITAL_ARBITER, PAL_MODE_INPUT_PULLUP);   /* Arbiter */
 
@@ -11,7 +11,7 @@ void setup_digital(uint8_t *state)
 	palSetPadMode(GPIOD, I_DIGITAL_LINEAR_RAIL, PAL_MODE_OUTPUT_PUSHPULL);
 
 	/* Set default desired states */
-	state[I_DIGITAL_LR_SWITCH] = 0;
+	state[I_DIGITAL_LR_SWITCH] = 1;
 	state[I_DIGITAL_ENABLE] = 1;
 	state[I_DIGITAL_ARBITER] = 1;
 	state[I_DIGITAL_LINEAR_RAIL] = 0;
