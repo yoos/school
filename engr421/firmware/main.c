@@ -21,7 +21,7 @@ float base_wheel_dc = 0;
 float dc[8];
 float lr_des_pos;   /* Desired linear rail position from serial input. */
 uint8_t des_digital[8];
-uint8_t status = STANDBY;
+uint8_t status = DISABLED;
 uint8_t is_calibrated = 0;   /* Currently only concerned with linear rail */
 uint8_t trigger = 0;
 
@@ -65,7 +65,7 @@ static msg_t comm_thread(void *arg)
 		lr_des_pos = ((float) (0x7f & rxbuf[0])) / 127;
 
 		/* Fill transmit buffer with debug string */
-		death_ray_debug_output(txbuf);
+		linear_rail_watchdog_debug_output(txbuf);
 
 		/* Transmit */
 		uartStartSend(&UARTD3, sizeof(txbuf), txbuf);
@@ -231,7 +231,7 @@ static msg_t control_thread(void *arg)
 		update_digital(des_digital);
 
 		/* Update status */
-		if (feed_linear_rail_watchdog(dc[I_PWM_LINEAR_RAIL])) status = DISABLED;
+		if (!feed_linear_rail_watchdog(des_digital[I_DIGITAL_LINEAR_RAIL], dc[I_PWM_LINEAR_RAIL])) status = DISABLED;
 		else if (!is_calibrated)                            status = BEAT_DANIEL_MILLER;   /* Must be able to move rail for calibration. */
 		else if (des_digital[I_DIGITAL_ARBITER] == PAL_LOW) status = BEAT_DANIEL_MILLER;
 		else if (des_digital[I_DIGITAL_ENABLE]  == PAL_LOW) status = STANDBY;
