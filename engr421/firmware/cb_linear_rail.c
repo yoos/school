@@ -44,7 +44,12 @@ uint8_t calibrate_linear_rail(uint8_t status, uint8_t limit_switch, uint8_t *dir
 	else if (limit_switch == 1) {
 		update_linear_rail(status, MODE_VEL, LINEAR_RAIL_CALIB_SPEED, dir, dc);
 	}
-	else {
+
+	/*
+	 * If limit switch triggers at any point during calibration, consider it
+	 * our new max, even if it's less than our preconceived max.
+	 */
+	if (limit_switch == 0) {
 		lin_rot_max = cur_lin_pos*lin_rot_max;
 		cur_lin_pos = 1.0;
 		return 1;
