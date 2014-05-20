@@ -1,0 +1,95 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{fancyhdr}
+\usepackage[utf8]{inputenc}
+\usepackage{palatino}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{lastpage}
+\usepackage[hang,small]{caption}
+\usepackage{titlesec}
+\usepackage{amsmath,amssymb}
+\usepackage{multirow}
+
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot{}
+\fancyfoot[C]{\sf Page \thepage\ of \pageref{LastPage}}
+\pagestyle{fancy}
+
+\titleformat{\section}{\bfseries\Large}{\arabic{\thesection}}{1em}{}
+\titleformat{\subsection}{\bfseries\large}{\arabic{\thesection}.\arabic{\thesubsection}}{1em}{}
+\titleformat{\subsubsection}{\itshape}{\arabic{\thesection}.\arabic{\thesubsection}.\arabic{\thesubsubsection}}{1em}{}
+
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{0.8em}
+
+\captionsetup[figure]{labelfont=it,font=it}
+\captionsetup[table]{labelfont={it,sc},font={it,sc}}
+
+\hypersetup{colorlinks,
+    linkcolor = black,
+    citecolor = black,
+    urlcolor  = black}
+\urlstyle{same}
+
+
+
+\begin{document}
+
+Soo-Hyun Yoo \\
+CS411 \\
+Project 3 Group 03 Individual Writeup \\
+19 May 2014
+
+
+\section*{Project 3}
+
+\subsection*{What do you think the main point of this assignment is?}
+
+Implementing a block device prompted me to dig around the fs directory as well
+as the block device drivers. The crypto part of the assignment was a bit
+difficult because of the poorly documented API. Specifically, the data
+structures were commented briefly, but none of the crypto functions were,
+though they were at least consistently named. Fortunately, the large variety of
+file system and block driver implementations provided enough precedence for us
+to figure out how things should be put together.
+
+
+\subsection*{How did you personally approach the problem? Design decisions,
+algorithm, etc.}
+
+I took a brief look through \verb|fs/ramfs| before resorting to using sbull
+(Simple Block Utility for Loading Localities), which we found through Googling.
+It provided us with a minimal block device driver which we could modify to
+provide more debug information and include disk encryption.
+
+The original \verb|memcpy| operations were replaced with calls to our own read
+and write functions, each of which called a kerne debug print function in
+addition to the \verb|crypto_cipher| encryption and decryption functions.
+
+
+\subsection*{How did you ensure your solution was correct? Testing details, for
+instance.}
+
+Each read and write operation was accompanied by a printout of the operation
+type and disk content to the kernel log. The encrypted content was also
+printed.
+
+We could therefore see that our modification of disk content (via \verb|dd| and
+creation of text files) was valid.
+
+
+\subsection*{What did you learn?}
+
+As Kevin pointed out in class, given a large, undocumented codebase, it is
+especially useful to refer to existing implementations to determine proper
+usage.
+
+I also note that whoever designed the crypto API did so through consistent
+naming of the functions -- I wish more of the kernel was like this. This is not
+to say that the API was well-documented, but it's fairly clear that the
+designer had a model in mind.
+
+\end{document}
+
