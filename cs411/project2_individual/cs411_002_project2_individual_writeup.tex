@@ -1,0 +1,91 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{fancyhdr}
+\usepackage[utf8]{inputenc}
+\usepackage{palatino}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{lastpage}
+\usepackage[hang,small]{caption}
+\usepackage{titlesec}
+\usepackage{amsmath,amssymb}
+\usepackage{multirow}
+
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot{}
+\fancyfoot[C]{\sf Page \thepage\ of \pageref{LastPage}}
+\pagestyle{fancy}
+
+\titleformat{\section}{\bfseries\Large}{\arabic{\thesection}}{1em}{}
+\titleformat{\subsection}{\bfseries\large}{\arabic{\thesection}.\arabic{\thesubsection}}{1em}{}
+\titleformat{\subsubsection}{\itshape}{\arabic{\thesection}.\arabic{\thesubsection}.\arabic{\thesubsubsection}}{1em}{}
+
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{0.8em}
+
+\captionsetup[figure]{labelfont=it,font=it}
+\captionsetup[table]{labelfont={it,sc},font={it,sc}}
+
+\hypersetup{colorlinks,
+    linkcolor = black,
+    citecolor = black,
+    urlcolor  = black}
+\urlstyle{same}
+
+
+
+\begin{document}
+
+Soo-Hyun Yoo \\
+CS411 \\
+Project 2 Group 03 Individual Writeup \\
+29 April 2014
+
+
+\section*{Project 2}
+
+\subsection*{What do you think the main point of this assignment is?}
+
+Implementing the SSTF scheduler made clear the hardware issues that software
+must deal with at some point. A secondary point may have been to further show
+how the Linux kernel source has no naming scheme (i.e., struct elevator\_type
+in the noop scheduler).
+
+
+\subsection*{How did you personally approach the problem? Design decisions,
+algorithm, etc.}
+
+The SSTF scheduler needs to track requests in order of increasing or decreasing
+sector number and track new requests behind (in opposite seek direction) the
+head. This calls for two queues, so the data struct was updated accordingly.
+
+The dispatch function was also updated to update the queues and change seek
+direction after servicing requests. Finally, Linux's existing list sort
+function was used to sort the queue after adding requests.
+
+
+\subsection*{How did you ensure your solution was correct? Testing details, for
+instance.}
+
+The scheduler was tested to be correct by printing information regarding the
+seek direction and the added and processed requests to the kernel log. We were
+able to verify that every processed request was at a sector number higher or
+lower than that of the previous request if the head was seeking up or down,
+respectively.
+
+
+\subsection*{What did you learn?}
+
+Code modularity allows for easy extension of existing tools.
+
+More importantly, I learned I don't want to program hardware drivers, at least
+not at this level. Hardware is cool and I like robots, but I'm glad there are
+other people working on things like disk access schedulers.
+
+Again, Linux kernel developers aren't very organized or disciplined when it
+comes to naming conventions. I can only presume it's nearly impossible to
+refactor when the code is changing so frequently.
+
+\end{document}
+
