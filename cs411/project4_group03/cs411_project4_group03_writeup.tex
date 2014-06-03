@@ -1,0 +1,144 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{fancyhdr}
+\usepackage[utf8]{inputenc}
+\usepackage{palatino}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{lastpage}
+\usepackage[hang,small]{caption}
+\usepackage{titlesec}
+\usepackage{amsmath,amssymb}
+\usepackage{multirow}
+\usepackage{amsthm}
+
+\usepackage{alltt}
+\usepackage{float}
+\usepackage{color}
+
+\usepackage{balance}
+\usepackage[TABBOTCAP, tight]{subfigure}
+\usepackage{enumitem}
+\usepackage{pstricks, pst-node, pst-tree}
+\usepackage{geometry}
+
+\renewcommand{\headrulewidth}{0pt}
+\fancyhead{}
+\fancyfoot{}
+\fancyfoot[C]{\sf Page \thepage\ of \pageref{LastPage}}
+\pagestyle{fancy}
+
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{0.8em}
+
+\hypersetup{colorlinks,
+    linkcolor = black,
+    citecolor = black,
+    urlcolor  = black}
+\urlstyle{same}
+
+
+
+\begin{document}
+
+\noindent {\bf Hugh McDonald \hfill CS 411 Group 03}
+
+\noindent {\bf Bronson Mock}
+
+\noindent {\bf Soo-Hyun Yoo}
+
+\begin{center} \large \textbf{Project 4} \end{center}
+
+\section*{Design}
+
+\par We began this assignment by researching how the \verb|slob| (simple list
+of blocks) memory management in Linux works. We utilizied resources available
+online as well as in the book "Linux Kernel Development" by Robert Love
+(namely, chapter 12).
+
+\par We started by modifying the file \verb|slob.c| found in the \verb|mm|
+folder. The given implementation of the \verb|slob| implemented a first-fit
+algorithim. This algorithim chooses the first page that has enough space to fit
+the request. This results in the fastest possible allocation but also results
+in a high level of fragmentation.
+
+\par We were asked to implement a best-fit algorithim for the \verb|slob|
+algorithm. The best-fit algorithim we implemented searches through the
+available pages. If it finds a perfect match, it will choose that one and end
+the search. If no perfect match is found, when the algorithim reaches the end,
+it will select the smallest page into which the request will fit. If the
+request will not fit into any of the current pages, a new page will be
+allocated for that request.
+
+\par We decided to implement our code in \verb|#ifdef| blocks so that we could
+toggle the use of best-fit and first-fit.
+
+\section*{Testing}
+
+\par We began by running the virtual machine with the first-fit algorithim and
+then ran the best-fit algorithim. There was an apparent performance loss (i.e.,
+system ran more slowly) with the best-fit algorithim. We then utilized the
+kernel log to output the wasted space resulting from the best-fit algorithm
+compared to what that space would have been with the first-fit algorithm.
+
+\par Using a program that we wrote, we computed the optimization and efficiency
+of the two algorithms. The program uses system calls that were added to
+\verb|slob.c| to transfer information such as the memory actually used and the
+memory that was claimed, which in turn allowed us to compare the fragmentation
+of the best-fit and first-fit algorithims. The efficiency of the algorithims
+was compared by timing how long it took each to allocate some chunk of memory.
+
+
+\subsection*{Output From Kernel Log}
+
+{\small
+\begin{verbatim}
+FIRST FIT DELTA: 4
+BEST FIT DELTA: 0
+
+FIRST FIT DELTA: 0
+BEST FIT DELTA: 0
+
+FIRST FIT DELTA: 4
+BEST FIT DELTA: 0
+
+FIRST FIT DELTA: 0
+BEST FIT DELTA: 0
+
+FIRST FIT DELTA: 1560
+BEST FIT DELTA: 248
+
+FIRST FIT DELTA: 734
+BEST FIT DELTA: 36
+
+FIRST FIT DELTA: 560
+BEST FIT DELTA: 0
+
+FIRST FIT DELTA: 0
+BEST FIT DELTA: 0
+
+FIRST FIT DELTA: 0
+BEST FIT DELTA: 0
+
+FIRST FIT DELTA: 2
+BEST FIT DELTA: 0
+
+FIRST FIT DELTA: 1694
+BEST FIT DELTA: 414
+
+FIRST FIT DELTA: 0
+BEST FIT DELTA: 0
+
+FIRST FIT DELTA: 1724
+BEST FIT DELTA: 0
+
+FIRST FIT DELTA: 0
+BEST FIT DELTA: 0
+
+
+\end{verbatim}
+}
+
+\end{document}
+
