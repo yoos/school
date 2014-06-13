@@ -45,7 +45,127 @@ Final Exam \\
 
 \section*{Analysis of the Android x86 Build Tree}
 
+For the most part, the Android kernel appears to be essentially the same as the
+standard Linux kernel. Consequently, I could not find many differences between
+the two kernels related to the concepts covered in the four assignments. For
+example, the available I/O schedulers, SLOB/SLAB/SLUB allocators, basic file
+I/O operators, and the crypto API are the same. Hardware differences are
+accounted for in the architecture-specific drivers. Any modifications thus
+exist in order to incorporate the larger additions made by Android.
 
+Android's additions to the Linux kernel exist, as will be illustrated in the
+two subsections below, to make the same programs work on many different
+hardware platforms with limited resources while providing top performance to
+the user.
+
+Towards that effort, Android employs a Java virtual machine dubbed Dalvik which
+runs all applications. Because processes run within this VM, applications can
+be easily written to run on any architecture supported by Android.
+Additionally, Android includes a new file system type called YAFFS2 (Yet
+Another Flash File System v2), which was designed specifically for NAND-based
+flash storage common on mobile devices.
+
+
+\subsection*{Process Scheduler}
+
+Although the CFS and the FIFO and RR schedulers are the same in both the
+Android and Linux standard kernels (i.e., first-in-first-out linked list queue,
+allotting timeslices to processes to determine when to switch context), the
+Android kernel prioritizes user experience over everything else. This means
+that applications in the foreground are given higher priority over those in the
+background and are able to preempt those in the background.
+
+There are also more subtle changes in \verb|kernel/kernel/sched.c|, such as
+Android's use of jiffies instead of comparing CPU ticks to a calculated
+\verb|LOAD_FREQ| for load balancing (presumably for increased accuracy?),
+reporting CPU power consumption, and refactoring the scheduler to make it
+available in userspace.
+
+
+\subsection*{Shared Memory}
+
+The Android kernel implements a special shared memory system in
+\verb|kernel/mm/ashmem.c| that helps the kernel and the applications above it
+function smoothly on lower-memory devices by sharing common resources. In
+addition to having a reference counter to keep track of whether or not the
+shared memory space is still being used by any processes, ashmem allows the
+kernel to release the shared memory and provides bindings for processes to
+reclaim this memory if it disappears. This is in contrast to the standard
+shared memory system, which does not allow shared memory to be freed by other
+processes.
+
+By ``unpinning'' a portion of memory, a process indicates to the kernel that
+that portion of memory is free to be claimed for other uses if the kernel feels
+the system is low on memory. The kernel commandeers this unpinned memory
+according to a FIFO linked list as defined in \verb|ashmem.c| (referred to as
+LRU, or Least Recently Used) and determines the amount of memory to be
+commandeered using ashmem's shrinker, also defined in \verb|ashmem.c|:
+
+{\small
+\begin{verbatim}
+static int ashmem_shrink(struct shrinker *s, struct shrink_control *sc)
+{
+    struct ashmem_range *range, *next;
+
+    /* we might recurse into filesystem code, so bail out if necessary */
+    if (sc->nr_to_scan && !(sc->gfp_mask & __gfp_fs))
+        return -1;
+    if (!sc->nr_to_scan)
+        return lru_count;
+
+    mutex_lock(&ashmem_mutex);
+    list_for_each_entry_safe(range, next, &ashmem_lru_list, lru) {
+        struct inode *inode = range->asma->file->f_dentry->d_inode;
+        loff_t start = range->pgstart * page_size;
+        loff_t end = (range->pgend + 1) * page_size - 1;
+
+        vmtruncate_range(inode, start, end);
+        range->purged = ashmem_was_purged;
+        lru_del(range);
+
+        sc->nr_to_scan -= range_size(range);
+        if (sc->nr_to_scan <= 0)
+            break;
+    }
+    mutex_unlock(&ashmem_mutex);
+
+    return lru_count;
+}
+\end{verbatim}
+}
+
+Ashmem is made accessible through a userspace API defined in \\
+\verb|system/core/libcutils/ashmem-dev.c|. Each process keeps enough memory
+pinned to safely store its state, so they are able to reallocate resources as
+the need arises later.
+
+The actual sharing of the memory occurs via file descriptors, which in turn are
+shared between processes using another Android-specific IPC service called the
+binder. Once mmap'ed, the shared memory space can be utilized using file I/O
+operations. This means the memory may be shared between processes that do not
+share a parent-child relationship. The ashmem read function, for example:
+
+This ability for processes to temporarily and nondestructively relinquish
+memory is an important feature for Android due to its inability to use swap
+space and its need to remain responsive for the user despite having less
+available memory compared to a desktop system.
+
+Finally, also unlike standard shared memory, ashmem dies with the process. With
+a kernel that commandeers resources away from processes left and right and even
+kills them to free up memory, usage of the standard shared memory system would
+result in consistent memory leaks that would force the user to reboot the
+device.
+
+
+\subsection*{Conclusion}
+
+Besides the above Android has added small but significant features such as USB
+debugging and kernel logging to RAM in order to ease development for embedded
+high-performance systems that are today's mobile devices. Much attention seems
+to have been paid to prioritizing user comfort and overall smoothness of the
+system. It's inspiring to see that even with such radical changes to the
+surface appearance of the operating system, the changes made to the inner
+workings are not all that extensive (albeit clever).
 
 \end{document}
 
