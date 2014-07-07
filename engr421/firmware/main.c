@@ -65,7 +65,7 @@ static msg_t comm_thread(void *arg)
 		lr_des_pos = ((float) (0x7f & rxbuf[0])) / 127;
 
 		/* Fill transmit buffer with debug string */
-		linear_rail_watchdog_debug_output(txbuf);
+		linear_rail_debug_output(txbuf);
 
 		/* Transmit */
 		uartStartSend(&UARTD3, sizeof(txbuf), txbuf);
