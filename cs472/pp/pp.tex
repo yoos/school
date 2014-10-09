@@ -1,0 +1,88 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{fancyhdr}
+\usepackage[utf8]{inputenc}
+\usepackage{palatino}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{lastpage}
+\usepackage[hang,small]{caption}
+\usepackage{titlesec}
+\usepackage{amsmath,amssymb}
+\usepackage{multirow}
+
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot{}
+%\fancyfoot[C]{\sf Page \thepage\ of \pageref{LastPage}}
+\pagestyle{fancy}
+
+\titleformat{\section}{\bfseries\Large}{\arabic{\thesection}}{1em}{}
+\titleformat{\subsection}{\bfseries\large}{\arabic{\thesection}.\arabic{\thesubsection}}{1em}{}
+\titleformat{\subsubsection}{\itshape}{\arabic{\thesection}.\arabic{\thesubsection}.\arabic{\thesubsubsection}}{1em}{}
+
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{0.8em}
+
+\captionsetup[figure]{labelfont=it,font=it}
+\captionsetup[table]{labelfont={it,sc},font={it,sc}}
+
+\hypersetup{colorlinks,
+    linkcolor = black,
+    citecolor = black,
+    urlcolor  = black}
+\urlstyle{same}
+
+
+
+\begin{document}
+
+Soo-Hyun Yoo \\
+CS472 \\
+Project Proposal \\
+October 8, 2014
+
+% Another idea is implementing TMR in non-ECC GPUs like the GeForce series. Or
+% we could just use the Tesla GPUs that already have ECC.
+
+\section*{GPGPU hard-realtime computing}
+
+Robotic perception and interaction involves computations that range from
+complex and slow (e.g., stereo vision, pathfinding) to simple and fast (e.g.,
+small feedback loops, filters). Often, the simple and fast operations occur in
+the context of hard-realtime systems where jitter must be virtually reduced to
+zero. Applications that require both complex behavior and realtime operation
+attempt to compromise by patching the time delay of the complex behavior with
+simple feedback loops. Ultimately, however, this is only a patch.
+
+The advent of GPUs as a general-purpose computing platform has made it possible
+to accelerate some of these complex algorithms. Yet, only in the last three
+years has anyone put thought towards hard-realtime concerns on GPUs. Even then,
+only proof-of-concept methods and benchmarks have been demonstrated.
+
+The Xenomai realtime kernel patch will be modified to interface with CUDA or
+OpenCL. Hopefully, it will be possible to bring jitter below 5 ms for tasks
+offloaded to the GPU, but this will depend on the particular GPU and driver
+used.
+
+The GPU driver provides the userspace interface to run command groups on the
+GPU, so the realtime scheduler must be implemented at the driver level. The
+open-source Nouveau driver will be modified. One way in which to make some
+semblance of a realtime guarantee may be to reserve a number of GPU cores for
+the realtime threads.
+
+It is interesting to note the Tegra K1 SoC on the Jetson includes a unified
+virtual memory shared between the 4+1 CPU cores and the GPU, which resolves the
+bandwidth and latency issues between the CPU and GPU in conventional systems
+with discrete GPUs. This will simplify scheduling and makes the Jetson
+especially suited for realtime applications.
+
+A feasible scope for this class might be to establish the jitter of the
+unmodified driver and to establish reliable task scheduling in the GPU.
+
+Proper analysis of this problem will require performance calculations (Course
+Objective 1), careful prediction of task runtimes (3, 5), use of the GPU cache
+to speed realtime tasks (7), and parallel programming (9).
+
+\end{document}
+
