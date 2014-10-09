@@ -1,0 +1,84 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{fancyhdr}
+\usepackage[utf8]{inputenc}
+\usepackage{palatino}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{lastpage}
+\usepackage[hang,small]{caption}
+\usepackage{titlesec}
+\usepackage{amsmath,amssymb}
+\usepackage{multirow}
+
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot{}
+\fancyfoot[C]{\sf Page \thepage\ of \pageref{LastPage}}
+\pagestyle{fancy}
+
+\titleformat{\section}{\bfseries\Large}{\arabic{\thesection}}{1em}{}
+\titleformat{\subsection}{\bfseries\large}{\arabic{\thesection}.\arabic{\thesubsection}}{1em}{}
+\titleformat{\subsubsection}{\itshape}{\arabic{\thesection}.\arabic{\thesubsection}.\arabic{\thesubsubsection}}{1em}{}
+
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{0.8em}
+
+\captionsetup[figure]{labelfont=it,font=it}
+\captionsetup[table]{labelfont={it,sc},font={it,sc}}
+
+\hypersetup{colorlinks,
+    linkcolor = black,
+    citecolor = black,
+    urlcolor  = black}
+\urlstyle{same}
+
+
+
+\begin{document}
+
+Soo-Hyun Yoo \\
+CS472 \\
+Homework 1\\
+October 8, 2014
+
+\begin{enumerate}
+	\item[1.8]
+		\begin{enumerate}
+			\item If transistor count were to double every two years, the
+				number in 2015 should be 32 times that in 2005.
+			\item Starting at 30 MHz growing at 52\% every year as shown in
+				Figure 1.1, clock rates in 2015 should have been around
+				$30\text{ MHz} \cdot 1.52^{25} = 1\text{ THz}$.
+			\item 3.3 GHz in 2010 increasing at 22\% per year should bring
+				clock rates up to 8.9 GHz in 2015.
+			\item As transistor size shrinks, issues such as propagation delay
+				and power dissipation limit play a larger role. Rather than
+				making one-time improvements to increase the clock speed,
+				engineers now focus on adding more cores per chip and make
+				innovations in speculative execution and caches.
+			\item DRAM capacity improvements may stop by 2020.
+		\end{enumerate}
+	\item[1.12]
+		\begin{enumerate}
+			\item Assuming MTTR of 0, $35/3 = 11.67\text{ days}$
+			\item Doubling the MTTF for an individual computer will double the
+				MTTF of the system. For 10000 computers, the upgrade will cost
+				\$10 million. Even for a multibillion-dollar company, this is
+				a significant amount of money, and considering automated
+				reboots of crashed servers cost very little, this upgrade makes
+				no sense.
+			\item $\frac{5}{4} \cdot 90000 = 112500\text{ dollars/hr}$
+		\end{enumerate}
+	\item[1.18]
+		\begin{enumerate}
+			\item Speedup will be $\cfrac{1}{0.2 + \frac{0.8}{N}}$.
+			\item $\cfrac{1 - 0.005\cdot8}{0.2 + \frac{0.8}{8}} = \boxed{3.2}$
+			\item $\cfrac{1 - 0.005\cdot3}{0.2 + \frac{0.8}{8}} = \boxed{3.283}$
+			\item Speedup will be $\cfrac{1 - 0.005\cdot\log_2N}{0.2 + \frac{0.8}{N}}$.
+			\item Speedup $s(N) = \cfrac{1 - 0.005\cdot\log_2N}{\frac{100-P}{100} + \frac{P}{100N}}$. Speedup is maximized when $s'(N) = 0$.
+		\end{enumerate}
+\end{enumerate}
+
+\end{document}
+
