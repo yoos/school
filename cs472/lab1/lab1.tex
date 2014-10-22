@@ -1,0 +1,165 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{fancyhdr}
+\usepackage[utf8]{inputenc}
+\usepackage{palatino}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{lastpage}
+\usepackage[hang,small]{caption}
+\usepackage{titlesec}
+\usepackage{amsmath,amssymb}
+\usepackage{multirow}
+
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot{}
+\fancyfoot[C]{\sf Page \thepage\ of \pageref{LastPage}}
+\pagestyle{fancy}
+
+\titleformat{\section}{\bfseries\Large}{\arabic{\thesection}}{1em}{}
+\titleformat{\subsection}{\bfseries\large}{\arabic{\thesection}.\arabic{\thesubsection}}{1em}{}
+\titleformat{\subsubsection}{\itshape}{\arabic{\thesection}.\arabic{\thesubsection}.\arabic{\thesubsubsection}}{1em}{}
+
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{0.8em}
+
+\captionsetup[figure]{labelfont=it,font=it}
+\captionsetup[table]{labelfont={it,sc},font={it,sc}}
+
+\hypersetup{colorlinks,
+    linkcolor = black,
+    citecolor = black,
+    urlcolor  = black}
+\urlstyle{same}
+
+
+
+\begin{document}
+
+Soo-Hyun Yoo \\
+CS472 \\
+Lab 1\\
+October 10, 2014
+
+The performance of addition, multiplication, and division operations is
+examined for floating point and integers on a 8-bit ATmega328p and a 64-bit
+Intel Core i7-3612QM.
+
+\section*{Setup}
+
+\subsection*{8-bit Microcontroller}
+
+An ATmega328p clocked at 16 MHz was set up with code such as the following to
+toggle a GPIO pin after every operation.
+
+\begin{verbatim}
+void main(void) {
+    DDRB |= _BV(5);
+
+    float a = 0.0;
+    float c = 99999.645543999993;
+    float b = 999.99999999999999;
+
+    while(1) {
+        PORTB = ~(PORTB & _BV(5));
+        a = b + c;
+    }
+}
+\end{verbatim}
+
+The frequency $f$ of the resulting square wave was measured with an
+oscilloscope. The number of operations per second was then $2f$.
+
+\subsection*{64-bit Laptop}
+
+A laptop with a 64-bit Intel Core i7-3612QM was set up with code such as the
+following to run 10 billion operations using a for loop. It is worth noting
+that the i7 throttles up from an idle state of 1.2 GHz to 3.0 GHz when running
+the benchmark.
+
+\begin{verbatim}
+void main(void)
+{
+    float a=0;
+
+    long long int i;
+    for (i=0; i<10000000000; i++) {
+        a /= 1.0f;
+    }
+}
+\end{verbatim}
+
+The UNIX {\tt time} tool was used to measure the runtime $t$ of the program.
+The number of operations per second was then $\cfrac{10,000,000,000}{t}$.
+
+
+\section*{Results and Analysis}
+
+The two devices perform the following number of operations per second:
+
+\begin{table}[!h]
+	\centering
+	\caption{Operations per second}
+	\begin{tabular}{|l|c|c|} \hline
+		          & ATmega328p & i7-3612QM \\ \hline\hline
+		Integer + & 571430 & 425985090 \\ \hline
+		Integer x & 454545 & 426257459 \\ \hline
+		Integer / & 65789  & 119631534 \\ \hline
+		Float +   & 90909  & 330939537 \\ \hline
+		Float x   & 100000 & 270343336 \\ \hline
+		Float /   & 30488  & 175561797 \\ \hline
+	\end{tabular}
+\end{table}
+
+This translates to the following CPI numbers:
+
+\begin{table}[!h]
+	\centering
+	\caption{Clock cycles per instruction}
+	\begin{tabular}{|l|c|c|} \hline
+		          & ATmega328p & i7-3612QM \\ \hline\hline
+		Integer + & 28  & 7  \\ \hline
+		Integer x & 35  & 7  \\ \hline
+		Integer / & 243 & 25 \\ \hline
+		Float +   & 176 & 9  \\ \hline
+		Float x   & 160 & 11 \\ \hline
+		Float /   & 525 & 17 \\ \hline
+	\end{tabular}
+\end{table}
+
+The i7 is nearly an order of magnitude more effective than the ATmega in terms
+of CPI for integer operations and half an order of magnitude greater still for
+floating point operations.
+
+Division is slow across the board. Division on both devices is slower than any
+of the tested floating point operations. The CPI improvement from the ATmega to
+the i7 is likely due to architectural optimizations made on the latter.
+
+% x86_64: 10 billion ops:
+
+% floating point
+% 	+: 30.217
+% 	x: 36.99
+% 	/: 56.96
+% integer
+% 	+: 23.475
+% 	x: 23.460
+% 	/: 83.59
+
+% atmega:
+
+% fp+: 11 us      90909
+% fpx: 10 us      100000
+% fp/: 32.8 us    30488
+% i+: 1.75 us     571430
+% ix: 2.2 us      454545
+% i/: 15.2 usA    65789
+% fp sin: 115 us
+% fp cos: 121 us
+% fp tan: 159 us
+% fp sqrt: 32 us
+% fp powf: 340 us
+
+\end{document}
+
