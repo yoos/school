@@ -1,0 +1,15 @@
+corner0: {x: 0.8859375, y: 0.175}
+corner1: {x: 0.25625, y: 0.12083333333333333}
+corner2: {x: 0.9234375, y: 0.6458333333333334}
+corner3: {x: 0.296875, y: 0.8145833333333333}
+encircle_max_size: 26
+encircle_min_size: 8
+puck_canny_lower_threshold: 0
+puck_erosion_iter: 0
+puck_hue_high: 200
+puck_hue_low: 60
+puck_sat_high: 80
+puck_sat_low: 0
+puck_val_high: 255
+puck_val_low: 190
+puckiness_min_ratio: 0.0
