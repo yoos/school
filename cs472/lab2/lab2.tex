@@ -1,0 +1,121 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{fancyhdr}
+\usepackage[utf8]{inputenc}
+\usepackage{palatino}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{lastpage}
+\usepackage[hang,small]{caption}
+\usepackage{titlesec}
+\usepackage{amsmath,amssymb}
+\usepackage{multirow}
+
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot{}
+\fancyfoot[C]{\sf Page \thepage\ of \pageref{LastPage}}
+\pagestyle{fancy}
+
+\titleformat{\section}{\bfseries\Large}{\arabic{\thesection}}{1em}{}
+\titleformat{\subsection}{\bfseries\large}{\arabic{\thesection}.\arabic{\thesubsection}}{1em}{}
+\titleformat{\subsubsection}{\itshape}{\arabic{\thesection}.\arabic{\thesubsection}.\arabic{\thesubsubsection}}{1em}{}
+
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{0.8em}
+
+\captionsetup[figure]{labelfont=it,font=it}
+\captionsetup[table]{labelfont={it,sc},font={it,sc}}
+
+\hypersetup{colorlinks,
+    linkcolor = black,
+    citecolor = black,
+    urlcolor  = black}
+\urlstyle{same}
+
+
+
+\begin{document}
+
+Soo-Hyun Yoo \\
+CS472 \\
+Lab 2 \\
+October 24, 2014
+
+The FLOPS per watt was determined for an 8-bit ATmega328p Arduino and a 32-bit
+STM32F3 Discovery development board.
+
+\section*{Setup}
+
+\subsection*{8-bit Microcontroller}
+
+An ATmega328p clocked at 16 MHz was set up with code such as the following to
+toggle a GPIO pin after every floating point multiply operation.
+
+\begin{verbatim}
+void main(void) {
+    DDRB |= _BV(5);
+
+    float a = 0.0;
+    float c = 99999.645543999993;
+    float b = 999.99999999999999;
+
+    while(1) {
+        PORTB = ~(PORTB & _BV(5));
+        a = b * c;
+    }
+}
+\end{verbatim}
+
+The frequency $f$ of the resulting square wave was measured with an
+oscilloscope. The number of operations per second was then $2f$.
+
+\subsection*{32-bit STM32F3 Discovery development board}
+
+The STM32F3 devboard clocked at 72 MHz was set up similarly to the Arduino in
+toggling a GPIO pin after every floating point multiply operation. The
+following code was compiled with the hardware FPU module enabled.
+
+\begin{verbatim}
+int main(void) {
+    halInit();
+    chSysInit();
+
+    palSetPadMode(GPIOC, 6, PAL_MODE_OUTPUT_PUSHPULL);
+
+    volatile float a = 1.5555555555555;
+    volatile float b = 1.6766763454354;
+    volatile float c = 6.7865776565756;
+    while(true) {
+        palTogglePad(GPIOC, 6);
+
+        a = b * c;
+    }
+}
+\end{verbatim}
+
+\section*{Results and Analysis}
+
+The power consumption of each devboard was determined by multiplying the supply
+voltage by the consumed current. The FLOPS/mW figure is also shown:
+
+\begin{table}[!h]
+	\centering
+	\caption*{FLOPS and wattage of ATmega328p and STM32F3 devboards}
+	\begin{tabular}{|l|c|c|c|} \hline
+		           & FLOPS   & Power (mW) & FLOPS/mW \\ \hline\hline
+		ATmega328p & 90000   & 125        & 720 \\ \hline
+		STM32F3    & 5142000 & 262        & 19626 \\ \hline
+	\end{tabular}
+\end{table}
+
+The Discovery board outperforms the Arduino by over an order of magnitude.
+
+It is worth noting that the ATmega328P and STM32F3 microcontrollers themselves,
+when isolated from the rest of their respective devboards, pulled 8 and 40 mA,
+respectively. This translates to 11250 and 128550 FLOPS/mW, respectively, which
+pushes the performance factor of the STM32F3 only slightly beyond an order of
+magnitude over the ATmega328P.
+
+\end{document}
+
