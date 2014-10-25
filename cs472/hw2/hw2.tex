@@ -1,0 +1,167 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{fancyhdr}
+\usepackage[utf8]{inputenc}
+\usepackage{palatino}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{lastpage}
+\usepackage[hang,small]{caption}
+\usepackage{titlesec}
+\usepackage{amsmath,amssymb}
+\usepackage{multirow}
+
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot{}
+\fancyfoot[C]{\sf Page \thepage\ of \pageref{LastPage}}
+\pagestyle{fancy}
+
+\titleformat{\section}{\bfseries\Large}{\arabic{\thesection}}{1em}{}
+\titleformat{\subsection}{\bfseries\large}{\arabic{\thesection}.\arabic{\thesubsection}}{1em}{}
+\titleformat{\subsubsection}{\itshape}{\arabic{\thesection}.\arabic{\thesubsection}.\arabic{\thesubsubsection}}{1em}{}
+
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{0.8em}
+
+\captionsetup[figure]{labelfont=it,font=it}
+\captionsetup[table]{labelfont={it,sc},font={it,sc}}
+
+\hypersetup{colorlinks,
+    linkcolor = black,
+    citecolor = black,
+    urlcolor  = black}
+\urlstyle{same}
+
+
+
+\begin{document}
+
+Soo-Hyun Yoo \\
+CS472 \\
+Homework 2 \\
+October 24, 2014
+
+\begin{enumerate}
+	\item[2.1.1]
+		\begin{enumerate}
+			\item {\tt sub f, g, h}
+			\item {\tt addi f, h, -5 \\ add f, f, g}
+		\end{enumerate}
+
+	\item[2.1.2]
+		\begin{enumerate}
+			\item 1
+			\item 2
+		\end{enumerate}
+
+	\item[2.1.3]
+		\begin{enumerate}
+			\item -1
+			\item 0
+		\end{enumerate}
+
+	\item[2.1.4]
+		\begin{enumerate}
+			\item {\tt f = f + 4;}
+			\item {\tt f = i + (g + h);}
+		\end{enumerate}
+
+	\item[2.1.5]
+		\begin{enumerate}
+			\item 5
+			\item 9
+		\end{enumerate}
+
+	\item[2.3.1]
+		\begin{enumerate}
+			\item {\tt sub f, 0, f \\ sub f, f, g}
+			\item {\tt sub f, 0, f \\ addi f, f, -5 \\ add f, f, g}
+		\end{enumerate}
+
+	\item[2.3.2]
+		\begin{enumerate}
+			\item 2
+			\item 3
+		\end{enumerate}
+
+	\item[2.3.3]
+		\begin{enumerate}
+			\item -3
+			\item -4
+		\end{enumerate}
+
+	\item[2.3.4]
+		\begin{enumerate}
+			\item {\tt f = f - 4;}
+			\item {\tt f = g + h;}
+		\end{enumerate}
+
+	\item[2.3.1]
+		\begin{enumerate}
+			\item -3
+			\item 5
+		\end{enumerate}
+
+	\item[2.7.1]
+		\begin{enumerate}
+			\item 613566756
+			\item 1606303744
+		\end{enumerate}
+
+	\item[2.7.2]
+		\begin{enumerate}
+			\item 613566756
+			\item 1606303744
+		\end{enumerate}
+
+	\item[2.7.3]
+		\begin{enumerate}
+			\item 24924924
+			\item 5fbe4000
+		\end{enumerate}
+
+	\item[2.7.4]
+		\begin{enumerate}
+			\item 1111 1111 1111 1111
+			\item 0000 0100 0000 0000
+		\end{enumerate}
+
+	\item[2.7.5]
+		\begin{enumerate}
+			\item ffff
+			\item 0400
+		\end{enumerate}
+
+	\item[2.7.6]
+		\begin{enumerate}
+			\item 0001
+			\item fc00
+		\end{enumerate}
+
+	\item[2.27.1]
+		\begin{enumerate}
+			\item {\tt lw \$s1, 20(\$s2)} sets {\tt \$s1 = Memory[\$s2+20]}.
+			\item {\tt j 2500} jumps to the target address, 2500.
+		\end{enumerate}
+
+	\item[2.27.2]
+		\begin{enumerate}
+			\item I-type
+			\item J-type
+		\end{enumerate}
+
+	\item[2.27.4]
+		\begin{enumerate}
+			\item {\tt 0x00400000: 000100 00001 00010 0000110001000000 \\
+				0x00403100: 001000 00001 00001 0000000000000001}
+			\item {\tt 0x00000100: 000010 01000000000000000000000100 \\
+				0x04000010: 001000 00001 00001 0000000000000001}
+		\end{enumerate}
+
+	% \item[2.34]
+	% \item[2.35]
+\end{enumerate}
+
+\end{document}
+
