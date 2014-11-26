@@ -40,7 +40,7 @@
 Soo-Hyun Yoo \\
 ST314 \\
 Data Analysis 4 \\
-November 11, 2014
+November 18, 2014
 
 \begin{enumerate}
   \item
@@ -125,13 +125,13 @@ t.test(CombFE~US)
     \begin{enumerate}
       \item \hfill\\ \includegraphics[width=0.8\textwidth]{2a.png}
 
-        There is definitely a difference between differen US manufacturers.
+        There is definitely a difference between different US manufacturers.
         Ford's median fuel efficiency, for example, is nearly coincident with
         GM's 3rd IQR.
 
       \item $H_0: \mu_1 = \mu_2 = \mu_3$
 
-        $H_a: \mu_1 \ne \mu_2 \ne \mu_3$
+        $H_a$: At least two $\mu_i$'s are unequal.
 
       \item R output:
         \begin{verbatim}
@@ -144,6 +144,10 @@ Residuals   344   8754   25.45
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
         \end{verbatim}
+
+        There is a statistically significant difference between the groups as
+        shown by the p-value of 0.00012. There is convincing evidence that fuel
+        efficiency of car models of at least two of the manufacturers differ.
 
       \item R output:
         \begin{verbatim}
@@ -160,6 +164,10 @@ FordMC-ChryslerGLLC  1.273016 -0.6193757  3.1654075 0.2541443
 GM-ChryslerGLLC     -1.693642 -3.1533274 -0.2339564 0.0181726
 GM-FordMC           -2.966658 -4.7061889 -1.2271267 0.0002156
         \end{verbatim}
+
+        GM and Chrysler differ by -1.694 with an adjusted p-value of 0.018.
+
+        GM and Ford differ by -2.967 with an adjusted p-value of 0.00022.
     \end{enumerate}
 \end{enumerate}
 
