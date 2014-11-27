@@ -1,0 +1,106 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{fancyhdr}
+\usepackage[utf8]{inputenc}
+\usepackage{palatino}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{lastpage}
+\usepackage[hang,small]{caption}
+\usepackage{titlesec}
+\usepackage{amsmath,amssymb}
+\usepackage{multirow}
+
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot{}
+\fancyfoot[C]{\sf Page \thepage\ of \pageref{LastPage}}
+\pagestyle{fancy}
+
+\titleformat{\section}{\bfseries\Large}{\arabic{\thesection}}{1em}{}
+\titleformat{\subsection}{\bfseries\large}{\arabic{\thesection}.\arabic{\thesubsection}}{1em}{}
+\titleformat{\subsubsection}{\itshape}{\arabic{\thesection}.\arabic{\thesubsection}.\arabic{\thesubsubsection}}{1em}{}
+
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{0.8em}
+
+\captionsetup[figure]{labelfont=it,font=it}
+\captionsetup[table]{labelfont={it,sc},font={it,sc}}
+
+\hypersetup{colorlinks,
+    linkcolor = black,
+    citecolor = black,
+    urlcolor  = black}
+\urlstyle{same}
+
+
+
+\begin{document}
+
+Soo-Hyun Yoo \\
+CS472 \\
+Homework 4 \\
+November 26, 2014
+
+\section*{Memory Locality}
+
+\begin{enumerate}
+    \item[5.2.1]
+        \begin{enumerate}
+            \item 8
+            \item 8
+        \end{enumerate}
+    \item[5.2.2]
+        \begin{enumerate}
+            \item I, J
+            \item I, J
+        \end{enumerate}
+    \item[5.2.3]
+        \begin{enumerate}
+            \item A, B
+            \item A, B
+        \end{enumerate}
+    \item[5.2.4]
+        \begin{enumerate}
+            \item 128000
+            \item 128000
+        \end{enumerate}
+    \item[5.2.5]
+        \begin{enumerate}
+            \item I, J
+            \item I, J
+        \end{enumerate}
+    \item[5.2.6]
+        \begin{enumerate}
+            \item A, B
+            \item A, B
+        \end{enumerate}
+\end{enumerate}
+
+
+\section*{Cache Table}
+
+\begin{enumerate}
+    \item[5.10.2] Larger page sizes can help reduce the number of TLB misses by
+        allowing a TLB of a given size to track more memory. However, it will
+        be difficult to pack process memory into the page table if the page
+        size is comparatively large, resulting in more wasted memory.
+    \item[5.10.3] Virtual memory access without a TLB will have to scan the
+        page table directly.
+    \item[5.10.4]
+        \begin{enumerate}
+            \item $\cfrac{2^{32-13} \cdot 4}{2} = \boxed{1\text{ MB}}$
+            \item $\cfrac{2^{64-13} \cdot 6}{2} = \boxed{6\text{ PB}}$
+        \end{enumerate}
+    \item[5.12.5] There are many factors that affect cache performance,
+        including read/write ratio, their time cost, amount of cache available,
+        and average access size. It is difficult to determine a single policy
+        that can address all combinations of such factors, so policies must be
+        developed on a more case-by-case basis.
+    \item[5.12.6] Having control of the cache decision and knowledge of the
+        process being run, I could minimize the miss rate by caching exactly
+        the addresses I know will be used most frequently by the process.
+\end{enumerate}
+
+\end{document}
+
