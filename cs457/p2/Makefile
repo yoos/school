@@ -8,5 +8,5 @@ view: all
 	xpdf $(TARGET).pdf
 
 clean:
-	rm $(TARGET).{aux,log,out}
+	rm $(TARGET).{aux,log,out,pdf}
 
