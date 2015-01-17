@@ -7,7 +7,7 @@ p2d(
    )
 {
 	// Calculate ellipse geometry
-	float up = 2. * u;
+	float up = 2. * u;   // Make things visually proportional.
 	float vp = v;
 	float numinu = floor( up / A );
 	float numinv = floor( vp / B );
