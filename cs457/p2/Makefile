@@ -1,12 +1,17 @@
-TARGET=p2
+TEX=p2
 
 all:
-	pdflatex $(TARGET).tex
-	pdflatex $(TARGET).tex
+	shaderdl p2s.sl p2d.sl
+	renderdl p2.rib
 
-view: all
-	xpdf $(TARGET).pdf
+tex:
+	pdflatex $(TEX).tex
+	pdflatex $(TEX).tex
+
+view: tex
+	xpdf $(TEX).pdf
 
 clean:
-	rm $(TARGET).{aux,log,out,pdf}
+	rm p2s.sdl p2d.sdl p2.tiff
+	rm $(TEX).{aux,log,out,pdf}
 
