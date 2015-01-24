@@ -3,12 +3,24 @@ p3d(
 		float A = 0.05,   // Ellipse horizontal diameter
 		B = 0.10,         // Ellipse vertical diameter
 		Ramp = 0.20,      // fraction of diameter used in the ramp
-		Height = 0.2;     // displacement height
+		Height = 0.2,     // displacement height
+		Noise_factor = 5;
    )
 {
-	// Calculate ellipse geometry
+	// Scale current location
 	float up = 2. * u;   // Make things visually proportional.
 	float vp = v;
+
+	// Distort location
+	float nf = 1.;   // Noise "frequency"
+	float i;
+	for (i=0.; i<Noise_factor; i+=1.) {
+	   up += (float noise(P*nf) - 0.5) / nf;
+	   vp += (float noise(P*nf) - 0.5) / nf;
+	   nf *= 2.;
+	}
+
+	// Calculate ellipse geometry
 	float numinu = floor( up / A );
 	float numinv = floor( vp / B );
 	float uo = numinu*A + A/2;   // Ellipse center u
@@ -17,10 +29,14 @@ p3d(
 	// Calculate distance away from ellipse edge and ramp accordingly
 	float dist = 1 - sqrt(pow((up-uo)/(A/2),2) + pow((vp-vo)/(B/2),2));   // Distance from edge
 	float t = smoothstep( 0., Ramp, dist );   // Ramps smoothly from 0 to Ramp distance.
-	float TheHeight = 0.;   // Base height
-	TheHeight += t*Height;   // apply the blending
 
-#define DISPLACEMENT_MAPPING
+	// Set height
+	float TheHeight = 0.;   // Base height
+
+	// Displace
+	if (dist > 0.)
+		TheHeight += t*Height*noise(P);   // apply the blending
+
 	if( TheHeight != 0. )
 	{
 #ifdef DISPLACEMENT_MAPPING

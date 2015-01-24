@@ -4,26 +4,27 @@ Declare "A" "uniform float"   # Ellipse horizontal diameter
 Declare "B" "uniform float"   # Ellipse vertical diameter
 Declare "Height" "uniform float"
 Declare "Ramp"   "uniform float"
+Declare "Noise_factor" "uniform float"
 
 Display "p3.tiff" "file" "rgb" 
-Format 500 500 -1
+Format 1000 1000 -1
 
-LightSource "ambientlight" 1 "intensity" [0.25]
+LightSource "ambientlight" 1 "intensity" [0.55]
 LightSource "distantlight" 2 "intensity" [0.75] "from" [5 8 -10] "to" [0 0 0]
 
 ShadingRate 1
 Projection "perspective" "fov" [70]
 
 WorldBegin
-	Surface      "p3s" "A" 0.125 "B" 0.15
-	Displacement "p3d" "A" 0.125 "B" 0.15 "Height" 0.2 "Ramp" 1.00
+	Surface      "p3s" "A" 0.125 "B" 0.15 "Noise_factor" 4
+	Displacement "p3d" "A" 0.125 "B" 0.15 "Height" 0.15 "Ramp" 1.00 "Noise_factor" 4
 	Attribute "bound" "displacement" [0.5]
 
 	Color   [1 1 1]   # Cs
 	Opacity [1 1 1]   # Os
 	TransformBegin
 		Translate 0 0 6       # move away from the eye
-		Rotate 25  1. 0. 0.   # rotate so don't see north pole
+		Rotate 90  1. 0. 0.   # rotate so don't see north pole
 		Sphere 3 -3 3 360     # a full sphere
 	TransformEnd
 WorldEnd
