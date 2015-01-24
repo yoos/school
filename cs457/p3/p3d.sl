@@ -37,6 +37,7 @@ p3d(
 	if (dist > 0.)
 		TheHeight += t*Height*noise(P);   // apply the blending
 
+#define DISPLACEMENT_MAPPING
 	if( TheHeight != 0. )
 	{
 #ifdef DISPLACEMENT_MAPPING

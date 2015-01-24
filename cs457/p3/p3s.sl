@@ -34,8 +34,8 @@ p3s(
 	//float c = 2*u+v+.5*smoothstep( 0., 1., dist );   // Ramps smoothly from 0 to Ramp distance.
 
 	// Set color
-	color TheColor = color (0.8, 0.2, 0.0);
-	color LandColor = color "hsv" (0.1, 0.5, 0.2);
+	color TheColor = color (0.8, 0.2, 0.0);   // Lava
+	color LandColor = color "hsv" (0.1, 0.5, 0.2);   // Igneous landmasses
 
 	// Vary color
 	if (dist > 0.)
