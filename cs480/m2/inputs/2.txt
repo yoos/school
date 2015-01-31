@@ -1,0 +1,5 @@
+bool int arst Hello World!
+1234 + 567890-123arst
+integer real string
+true false
+stdout if while let assign
