@@ -71,7 +71,8 @@
        (do
          ((c (read-char istream NIL)
              (read-char istream NIL)))
-         ((not (letter? c))   ; We should allow numbers, too
+         ((and (not (letter? c))
+               (not (digit? c)))   ; We should allow numbers, too
           (unread-char c istream)
           (defparameter *state* :store-token))
          (vector-push-extend c *token*))
