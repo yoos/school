@@ -1,3 +1,6 @@
+compiler:
+	@echo "Usage: ./lexer.lisp"
+
 stutest.out:
 	./lexer.lisp >> stutest.out
 
