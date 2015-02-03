@@ -16,26 +16,30 @@
   (or (and (string>= c "A") (string<= c "Z"))
       (and (string>= c "a") (string<= c "z"))))
 
-(defun digit? (c)
+(defun number? (c)
+  (or (and (string>= c "0") (string<= c "9"))
+      (char= c #\.)
+      (char= c #\e)))
+
+(defun digit(c)   ; Combine with number? somehow
   (and (string>= c "0") (string<= c "9")))
 
-(defun buildtoken (istream token)
+(defun build-token (istream token)
   (let (c '(read-char istream nil))
     (vector-push-extend c token)
     c))
 
-;(defun update-state (fsa-state fsa-type)
-;  (defvar *state* fsa-state)
-;  (defvar *type* fsa-type))
-;
-(defun store-token (token-type token-string)
-  (format T "[TOKEN] <~A ~A>~%" token-type token-string)
-  (defparameter *state* :find-token)
-  (defparameter *type* :unknown-t)
+(defun clear-token ()
   (defparameter *token* (make-array 0
                                     :element-type 'character
                                     :fill-pointer 0
                                     :adjustable t)))
+
+(defun store-token (token-type token-string)
+  (format T "[TOKEN] <~A ~A>~%" token-type token-string)
+  (defparameter *state* :find-token)
+  (defparameter *type* :unknown-t)
+  (clear-token))
 
 
 (with-open-file (istream "inputs/2.txt")
@@ -54,7 +58,8 @@
          ((c (read-char istream NIL)
              (read-char istream NIL)))
          ((not (letter? c))   ; We should allow numbers, too
-          (unread-char c istream))
+          (unread-char c istream)
+          (defparameter *state* :store-token))
          (vector-push-extend c *token*))
        (cond
          ;; Check if primitive type
@@ -81,9 +86,7 @@
          (T
            (defparameter *type* :identifier-tt))
          )
-
-       ;; Store token and reset FSA
-       (store-token *type* *token*))
+       )
 
       ;; String
       ((char= c #\")
@@ -91,56 +94,60 @@
          ((c (read-char istream NIL)
              (read-char istream NIL)))
          ((char= c #\")   ; Read until next quotation mark
-          (vector-push-extend c *token*))   ; Push one more time. TODO(yoos): avoid this
+          (vector-push-extend c *token*)   ; Push one more time. TODO(yoos): avoid this
+          (defparameter *state* :store-token))
          (vector-push-extend c *token*))
 
-       (defparameter *type* :string-ct)
+       (defparameter *type* :string-ct))
 
-       ;; Store token and reset FSA
-       (store-token *type* *token*))
-
-      ;; 0-9
-      ((digit? c)
+      ;; Number
+      ((number? c)
+       (defparameter *type* :integer-ct)
        (do
          ((c (read-char istream NIL)
              (read-char istream NIL)))
-         ((not (digit? c))   ; We should allow exponents and at most one decimal point
-          (unread-char c istream))
-         (vector-push-extend c *token*))
-       (cond
-         ((or (string= *token* "e")
-              (string= *token* "."))
-          (defparameter *type* :real-tt))
+         ((if (equal *type* :real-ct)
+            (not (digit? c))
+            (not (number? c)))
+          (unread-char c istream)
+          (defparameter *state* :store-token))
+         (vector-push-extend c *token*)
+         ;; Check if real. Doesn't have to be cond here since only one condition, but just in case..
+         (cond
+           ((or (char= c #\e)
+                (char= c #\.))
+            (defparameter *type* :real-tt)))
          )
-       (store-token *type* *token*)
-       ;(format T "[Token FSA] Number~%")
        )
-
-      ;; String
-      ((string= c #\")
-       (format T "[Token FSA] String~%"))
 
       ;; Op
       ((member c '(#\( #\)
                    #\+ #\- #\* #\/ #\^ #\%
                    #\= #\> #\< #\! #\: #\;
                    ))   ; The semicolon above screws up syntax highlighting.
-       (format T "[Token FSA] Op: ~A~%" c))
+       (defparameter *type* :op-t)
+       (defparameter *state* :store-token)
+       )
 
       ;; Whitespace
       ((or (string= c " ")
            (string= c #\tab))
-       ;(format T "[Token FSA] Whitespace~%")
+       (clear-token)
        )
 
       ;; Newline
       ((string= c #\linefeed)
-       (format T "[Token FSA] Newline~%"))
+       (clear-token))
 
       ;; Fallback
       (T
         (format T "[Token FSA] Unknown: ~A~%" c))
-      ))
+      )
+
+    ;; Store token and reset FSA
+    (if (equal *state* :store-token)
+      (store-token *type* *token*))
+    )
   )
 
 
