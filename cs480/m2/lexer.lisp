@@ -21,8 +21,14 @@
       (char= c #\.)
       (char= c #\e)))
 
-(defun digit(c)   ; Combine with number? somehow
+(defun digit? (c)   ; Combine with number? somehow
   (and (string>= c "0") (string<= c "9")))
+
+(defun op? (c)
+  (member c '(#\( #\)
+              #\+ #\- #\* #\/ #\^ #\%
+              #\= #\> #\< #\! #\: #\;
+              )))
 
 (defun build-token (istream token)
   (let (c '(read-char istream nil))
@@ -36,7 +42,7 @@
                                     :adjustable t)))
 
 (defun store-token (token-type token-string)
-  (format T "[TOKEN] <~A ~A>~%" token-type token-string)
+  (format T "[STORE-TOKEN] <~A ~A>~%" token-type token-string)
   (defparameter *state* :find-token)
   (defparameter *type* :unknown-t)
   (clear-token))
@@ -53,6 +59,8 @@
     (cond
       ;; Letters
       ((letter? c)
+       (defparameter *type* :identifier-tt)
+
        ;; More letters, non-numerals, etc?
        (do
          ((c (read-char istream NIL)
@@ -62,7 +70,7 @@
           (defparameter *state* :store-token))
          (vector-push-extend c *token*))
        (cond
-         ;; Check if primitive type
+         ;; Primitive types
          ((string= *token* "bool")
           (defparameter *type* :boolean-tt))
          ((string= *token* "int")
@@ -72,7 +80,7 @@
          ((string= *token* "string")
           (defparameter *type* :string-tt))
 
-         ;; Check if statement
+         ;; Statements
          ((string= *token* "stdout")
           (defparameter *type* :stdout-st))
          ((string= *token* "if")
@@ -82,27 +90,32 @@
          ((string= *token* "let")
           (defparameter *type* :let-st))
 
+         ;; Boolean constants
+         ((or (string= *token* "true")
+              (string= *token* "false"))
+          (defparameter *type* :boolean-ct))
+
          ;; Fallback
-         (T
-           (defparameter *type* :identifier-tt))
-         )
+         (T ()))
        )
 
       ;; String
       ((char= c #\")
+       (defparameter *type* :string-ct)
+
        (do
          ((c (read-char istream NIL)
              (read-char istream NIL)))
          ((char= c #\")   ; Read until next quotation mark
           (vector-push-extend c *token*)   ; Push one more time. TODO(yoos): avoid this
           (defparameter *state* :store-token))
-         (vector-push-extend c *token*))
+         (vector-push-extend c *token*)))
 
-       (defparameter *type* :string-ct))
 
       ;; Number
       ((number? c)
        (defparameter *type* :integer-ct)
+
        (do
          ((c (read-char istream NIL)
              (read-char istream NIL)))
@@ -116,17 +129,33 @@
          (cond
            ((or (char= c #\e)
                 (char= c #\.))
-            (defparameter *type* :real-tt)))
-         )
+            (defparameter *type* :real-tt))))
        )
 
       ;; Op
-      ((member c '(#\( #\)
-                   #\+ #\- #\* #\/ #\^ #\%
-                   #\= #\> #\< #\! #\: #\;
-                   ))   ; The semicolon above screws up syntax highlighting.
+      ((op? c)   ; The semicolon above screws up syntax highlighting.
        (defparameter *type* :op-t)
-       (defparameter *state* :store-token)
+
+       ;; Try reading one more before proceeding to :store-token.
+       (let ((c (read-char istream NIL)))
+         (vector-push-extend c *token*)
+         (cond
+           ;; Multichar ops
+           ((or (string= *token* ">=")
+                (string= *token* "<=")
+                (string= *token* "!=")))
+
+           ;; Assign statement
+           ((string= *token* ":=")
+            (defparameter *type* :assign-st))
+
+           ;; Unread
+           (T
+             (unread-char c istream)
+             (vector-pop *token*))
+             )
+         (defparameter *state* :store-token)
+         )
        )
 
       ;; Whitespace
@@ -137,6 +166,7 @@
 
       ;; Newline
       ((string= c #\linefeed)
+       (format T "~%")   ; Print out newline for readability
        (clear-token))
 
       ;; Fallback
