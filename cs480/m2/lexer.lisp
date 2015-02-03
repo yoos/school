@@ -8,9 +8,14 @@
 (defparameter *token* (make-array 0
                                   :element-type 'character
                                   :fill-pointer 0
-                                  :adjustable t))
+                                  :adjustable T))
 (defparameter *state* :find-token)    ; FSA state
 (defparameter *type* :unknown-t)      ; Current token type
+
+(defparameter *token-list* (make-array 0
+                                       :element-type 'list
+                                       :fill-pointer 0
+                                       :adjustable T))
 
 (defun letter? (c)
   (or (and (string>= c "A") (string<= c "Z"))
@@ -43,6 +48,7 @@
 
 (defun store-token (token-type token-string)
   (format T "[STORE-TOKEN] <~A ~A>~%" token-type token-string)
+  (vector-push-extend (list token-type token-string) *token-list*)
   (defparameter *state* :find-token)
   (defparameter *type* :unknown-t)
   (clear-token))
@@ -132,7 +138,7 @@
             (defparameter *type* :real-tt))))
        )
 
-      ;; Op
+      ;; Op (and assign)
       ((op? c)   ; The semicolon above screws up syntax highlighting.
        (defparameter *type* :op-t)
 
@@ -178,6 +184,9 @@
     (if (equal *state* :store-token)
       (store-token *type* *token*))
     )
+
+  ;; Print symbol table
+  (format T "Symbol table:~%~S" *token-list*)
   )
 
 
