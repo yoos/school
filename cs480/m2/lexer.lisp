@@ -83,8 +83,21 @@
          )
 
        ;; Store token and reset FSA
-       (store-token *type* *token*)
-       )
+       (store-token *type* *token*))
+
+      ;; String
+      ((char= c #\")
+       (do
+         ((c (read-char istream NIL)
+             (read-char istream NIL)))
+         ((char= c #\")   ; Read until next quotation mark
+          (vector-push-extend c *token*))   ; Push one more time. TODO(yoos): avoid this
+         (vector-push-extend c *token*))
+
+       (defparameter *type* :string-ct)
+
+       ;; Store token and reset FSA
+       (store-token *type* *token*))
 
       ;; 0-9
       ((digit? c)
