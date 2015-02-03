@@ -48,14 +48,40 @@
 
 \begin{itemize}
     \item p4.glib
-    \item p4.frag
     \item p4.vert
+    \item p4.frag
 \end{itemize}
 
 
 \section*{Explanation}
 
 \subsection*{p4.glib}
+
+We declare the vertex and fragment files to be used as well as some variables
+to display in sliders. We set a default color and initialize an object.
+
+\subsection*{p4.vert}
+
+After declaring some output variables, we calculate basic lighting and position
+information. We calculate both ST and XYZ positions for use in our noisy
+ellipses in the fragment file.
+
+\subsection*{p4.frag}
+
+First, we specify the input variables to mirror the output variables from the
+vertex file. We also declare our uniform variables.
+
+We then generate noise based on the XYZ coordinates and calculate a delta based
+on the noise amplitude. We then calculate the ellipse geometry using a noisy
+distance to center, which causes the ellipse boundary to warp.
+
+The color is set by mixing the default and ellipse color across the ellipse
+boundary, with a tolerance value that spreads the smoothstep values apart.
+
+An attempt was made at varying the lighting, but it is left unfinished (really
+close!).
+
+If the current color's alpha channel is 0, the pixel is discarded.
 
 
 \newpage
