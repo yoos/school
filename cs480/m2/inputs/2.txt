@@ -1,5 +1,11 @@
 bool int arst Hello World!
 1234 + 567890-123arst
 integer real string
-true false
-stdout if while let assign
+Bool constants true false
+Statements stdout if while let :=
+String constant "string in quotes"
+Integer 123 real 123.0 also real 123e0
+Identifier abc123efg
+Negatives are split up -456
+Multichar ops >= <= !=
+Singlechar ops >> == !! !< + - * / ^ % ( ) : ;
