@@ -1,0 +1,26 @@
+##OpenGL GLIB
+
+MessageBox This implements the Alpha extra credit.
+
+Perspective 60
+LookAt 0 0 2  0 0 0  0 1 0
+Noise2D 400
+
+Vertex   p4.vert
+Fragment p4.frag
+Program  p4                                        \
+	uAd <.01 .2 1.>  uBd <.01 .2 1.>             \
+	uNoiseAmp <0. 0. 10.>  uNoiseFreq <0. 1. 10.>   \
+	uAlpha <0. 1. 1.>                              \
+	uTol <0. 0. 1.> \
+	//Ka <0. 0.1 1.0> \
+	//Kd <0. 0.6 1.0> \
+	//Ks <0. 0.3 1.0> \
+	//Shininess <3. 10. 1000.> \
+	//SpecularColor {1. 1. 1. 1.}
+
+Color  0  0.4  0.1
+//Sphere 1 50 50
+Obj bunny010n.obj
+
+// vim: ft=c
