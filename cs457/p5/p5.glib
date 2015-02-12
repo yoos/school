@@ -1,0 +1,32 @@
+##OpenGL GLIB
+
+//Ortho -1. 1.  -1. 1.
+Perspective 60
+
+LookAt  0. 0. 2.  0. 0. 0.  0. 1. 0.
+
+Vertex p5.vert
+Fragment p5.frag
+Program p5   \
+	uK  <0. 0.2 1.>          \
+	uY0 <0. 0.8 1.>          \
+	uP  <0. 1. 2.>           \
+	uNoiseAmp <-3.14159 0. 3.14159>    \
+	uNoiseFreq <0. 1. 10.>   \
+	uLightX <-10. 0. 10.>    \
+	uLightY <-10. 0. 10.>    \
+	uLightZ <-10. 4. 10.>    \
+	uKa <0. 0.1 1.0>         \
+	uKd <0. 0.6 1.0>         \
+	uKs <0. 0.3 1.0>         \
+	uShininess <0. 10. 1000.>   \
+	uColor {0. .7 1. 1.}     \
+	uAlpha <0. 1. 1.>        \
+	uSpecularColor {1. 1. 1. 1.}
+
+// Create quad with many subquads
+Color 0 0.4 0.1
+QuadXY  0.1  1. 500 500
+//Obj bunny010n.obj
+
+// vim: syntax=c
