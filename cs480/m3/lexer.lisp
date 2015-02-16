@@ -67,7 +67,7 @@
     (cond
       ;; Letters
       ((letter? c)
-       (defparameter *type* :identifier-tt)
+       (defparameter *type* :identifier-t)
 
        ;; More letters, non-numerals, etc?
        (do
@@ -81,13 +81,13 @@
        (cond
          ;; Primitive types
          ((string= *token* "bool")
-          (defparameter *type* :boolean-tt))
+          (defparameter *type* :boolean-pt))
          ((string= *token* "int")
-          (defparameter *type* :integer-tt))
+          (defparameter *type* :integer-pt))
          ((string= *token* "real")
-          (defparameter *type* :real-tt))
+          (defparameter *type* :real-pt))
          ((string= *token* "string")
-          (defparameter *type* :string-tt))
+          (defparameter *type* :string-pt))
 
          ;; Statements
          ((string= *token* "stdout")
@@ -138,7 +138,7 @@
          (cond
            ((or (char= c #\e)
                 (char= c #\.))
-            (defparameter *type* :real-tt))))
+            (defparameter *type* :real-pt))))
        )
 
       ;; Op (and assign)

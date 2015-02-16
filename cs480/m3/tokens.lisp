@@ -16,11 +16,11 @@
 ;;; Types and statements
 ;;;
 ;;; Stored as (type, NIL)
-(deftype type-t ()         ; Primitive types
-  '(member :boolean-tt
-           :integer-tt
-           :real-tt
-           :string-tt))
+(deftype primitive-t ()         ; Primitive types
+  '(member :boolean-pt
+           :integer-pt
+           :real-pt
+           :string-pt))
 (deftype statement-t ()    ; Statements
   '(member :stdout-st
            :if-st
@@ -32,7 +32,8 @@
 (deftype token-t ()
   '(member constant-t
            identifier-t
-           type-t
+           op-t
+           primitive-t
            statement-t
            unknown-t))
 
