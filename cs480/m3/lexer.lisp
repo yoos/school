@@ -30,7 +30,6 @@
   (and (string>= c "0") (string<= c "9")))
 
 ; TODO: ! is not an op
-; TODO: treat sin cos tan as unary ops
 (defun op? (c)
   (member c '(#\( #\)
               #\+ #\- #\* #\/ #\^ #\%
@@ -56,7 +55,7 @@
   (clear-token))
 
 
-(with-open-file (istream "inputs/2.txt")
+(with-open-file (istream "proftest.in")
   ;; Read in one character
   (do
     ((c (read-char istream NIL)     ; Start with first char read
@@ -79,7 +78,18 @@
           (defparameter *state* :store-token))
          (vector-push-extend c *token*))
        (cond
-         ;; Primitive types
+         ;; Constants
+         ((or (string= *token* "true")
+              (string= *token* "false"))
+          (defparameter *type* :boolean-ct))
+
+         ;; Ops
+         ((or (string= *token* "sin")
+              (string= *token* "cos")
+              (string= *token* "tan"))
+          (defparameter *type* :op-t))
+
+         ;; Primitives
          ((string= *token* "bool")
           (defparameter *type* :boolean-pt))
          ((string= *token* "int")
@@ -98,11 +108,6 @@
           (defparameter *type* :while-st))
          ((string= *token* "let")
           (defparameter *type* :let-st))
-
-         ;; Boolean constants
-         ((or (string= *token* "true")
-              (string= *token* "false"))
-          (defparameter *type* :boolean-ct))
 
          ;; Fallback
          (T ()))
