@@ -3,9 +3,9 @@
 
 ;;; Buffer in which to store token as we build it up
 (defparameter *lexeme* (make-array 0
-                                  :element-type 'character
-                                  :fill-pointer 0
-                                  :adjustable T))
+                                   :element-type 'character
+                                   :fill-pointer 0
+                                   :adjustable T))
 (defparameter *state* :find-token)    ; FSA state
 (defparameter *type* :unknown-t)      ; Current token type
 
@@ -38,9 +38,9 @@
 
 (defun clear-token ()
   (defparameter *lexeme* (make-array 0
-                                    :element-type 'character
-                                    :fill-pointer 0
-                                    :adjustable t)))
+                                     :element-type 'character
+                                     :fill-pointer 0
+                                     :adjustable t)))
 
 (defun store-token (token-type token-string)
   (format T "[LEX] (~A ~A)~%" token-type token-string)
@@ -188,7 +188,8 @@
 
       ;; Fallback
       (T
-        (format T "[LEX] Unknown: ~A~%" c))
+        (defparameter *type* :unknown-t)
+        (defparameter *state* :store-token))
       )
 
     ;; Store token and reset FSA
