@@ -30,7 +30,7 @@ opers -> __( :=__ ids opers __)__ | __(__ binops opers opers __)__ | __(__ unops
 
 binops -> __+__ | __-__ | __*__ | __/__ | __%__ | __^__ | __=__ | __>__ | __>=__ | __<__ | __<=__ | __!=__ | __or__ | __and__
 
-unops -> __-__ | __not__ | __sin__ | __cos__ | __tan__
+unops -> __not__ | __sin__ | __cos__ | __tan__
 
 Primitives
 ----------
