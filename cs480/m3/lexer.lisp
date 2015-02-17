@@ -198,7 +198,7 @@
     )
 
   ;; Print symbol table
-  ;(format T "Symbol table:~%~S" *token-list*)
+  ;(format T "Symbol table:~%~S~%" *token-list*)
 
-  *token-list*
+  (nreverse *token-list*)   ; Reverse symbol table so we can pop.
   )
