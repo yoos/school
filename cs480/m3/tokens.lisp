@@ -10,8 +10,8 @@
                             :semicolon-dt))   ; TODO(yoos): Do we really need to categorize these separately?
 (defparameter identifiers '(:function-it
                              :variable-it))
-(defparameter operators '(:unop-ot
-                           :binop-ot))
+(defparameter operators '(:binop-ot
+                           :unop-ot))
 (defparameter primitives '(:boolean-pt
                             :integer-pt
                             :real-pt
