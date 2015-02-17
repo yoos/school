@@ -26,6 +26,7 @@
 (deftype unknown-t    ())
 
 ;;; Encapsulate the above types as a token type
+;;; TODO(yoos): don't think this is quite right.
 (deftype token-t ()
   `(member :constant-t
            :identifier-t
