@@ -1,43 +1,33 @@
 (defpackage #:lexer-tokens)
 
-;;; Constants and identifiers
-;;;
-;;; These will be stored as (type, token) pairs in the symbol table, where
-;;; token is a string.
-(deftype constant-t ()     ; Constants
-  '(member :boolean-ct
-           :integer-ct
-           :real-ct
-           :string-ct))
-(deftype identifier-t ()   ; Identifiers
-  '(member :function-it
-           :variable-it))
+;;; Define type members
+(defparameter constants '(:boolean-ct
+                           :integer-ct
+                           :real-ct
+                           :string-ct))
+(defparameter identifiers '(:function-it
+                             :variable-it))
+(defparameter primitives '(:boolean-pt
+                            :integer-pt
+                            :real-pt
+                            :string-pt))
+(defparameter statements '(:stdout-st
+                            :if-st
+                            :while-st
+                            :let-st
+                            :assign-st))
 
-;;; Types and statements
-;;;
-;;; Stored as (type, NIL)
-(deftype primitive-t ()         ; Primitive types
-  '(member :boolean-pt
-           :integer-pt
-           :real-pt
-           :string-pt))
-(deftype statement-t ()    ; Statements
-  '(member :stdout-st
-           :if-st
-           :while-st
-           :let-st
-           :assign-st))
-
-;;; Ops and unknowns
-;;;
-;;; No specific subtypes for these - we'll simply refer to the lexeme stored
-;;; alongside when syntax parsing.
-(deftype op-t ())
-(deftype unknown-t ())
+;;; Define types
+(deftype constant-t   () `(member ,@constants))
+(deftype identifier-t () `(member ,@identifiers))
+(deftype primitive-t  () `(member ,@primitives))
+(deftype statement-t  () `(member ,@statements))
+(deftype op-t         ())
+(deftype unknown-t    ())
 
 ;;; Encapsulate the above types as a token type
 (deftype token-t ()
-  '(member :constant-t
+  `(member :constant-t
            :identifier-t
            :op-t
            :primitive-t
