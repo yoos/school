@@ -43,7 +43,7 @@
                                      :adjustable t)))
 
 (defun store-token (token-type token-string)
-  (format T "[LEX] (~A ~A)~%" token-type token-string)
+  ;(format T "[LEX] (~A ~A)~%" token-type token-string)
   (vector-push-extend (list token-type token-string) *token-list*)
   (defparameter *state* :find-token)
   (defparameter *type* :unknown-t)
@@ -193,7 +193,7 @@
 
       ;; Newline
       ((string= c #\linefeed)
-       (format T "~%")   ; Print out newline for readability
+       ;(format T "~%")   ; Print out newline for readability
        (clear-token))
 
       ;; Fallback
