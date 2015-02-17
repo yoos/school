@@ -167,7 +167,12 @@
            (T
              (unread-char c istream)
              (vector-pop *token*))
-             )
+           )
+
+         ;; Categorize "!" as unknown lexeme
+         (if (string= *token* "!")
+           (defparameter *type* :unknown-t))
+
          (defparameter *state* :store-token)
          )
        )
