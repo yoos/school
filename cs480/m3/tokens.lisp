@@ -28,12 +28,19 @@
            :let-st
            :assign-st))
 
+;;; Ops and unknowns
+;;;
+;;; No specific subtypes for these - we'll simply refer to the lexeme stored
+;;; alongside when syntax parsing.
+(deftype op-t ())
+(deftype unknown-t ())
+
 ;;; Encapsulate the above types as a token type
 (deftype token-t ()
-  '(member constant-t
-           identifier-t
-           op-t
-           primitive-t
-           statement-t
-           unknown-t))
+  '(member :constant-t
+           :identifier-t
+           :op-t
+           :primitive-t
+           :statement-t
+           :unknown-t))
 
