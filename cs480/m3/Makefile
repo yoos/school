@@ -2,11 +2,11 @@ compiler:
 	@echo "Usage: ./lexer.lisp"
 
 stutest.out:
-	./lexer.lisp >> stutest.out
+	./compiler.lisp inputs/2.txt inputs/3.txt >> stutest.out
 
 proftest.out:
 	cat $(PROFTEST)
-	compiler $(PROFTEST) > proftest.out
+	./compiler.lisp $(PROFTEST) > proftest.out
 	cat proftest.out
 
 report:
