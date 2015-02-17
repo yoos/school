@@ -1,10 +1,10 @@
 Grammar Specification
 =====================
-S -> __(__ __)__ | __(__ S __)__ | SS | expr
+S -> __(__ __)__ | __(__ S __)__ | SS | exprs
 
-expr -> oper | stmts
+exprs -> opers | stmts
 
-exprlist -> expr | expr exprlist
+exprlist -> exprs | exprs exprlist
 
 Constants
 ---------
@@ -20,13 +20,13 @@ strings -> __regex for str literal in C__ (any alphanumeric)
 
 Identifiers
 -----------
-id -> __regex for ids in C__ (any lower and upper char or underscore followed by any combination of lower, upper, digits, or underscores)
+ids -> __regex for ids in C__ (any lower and upper char or underscore followed by any combination of lower, upper, digits, or underscores)
 
-idlist -> __(__ id prim __)__ | __(__ id prim __)__ idlist
+idlist -> __(__ ids prims __)__ | __(__ ids prims __)__ idlist
 
 Operators
 ---------
-oper -> __( :=__ id oper __)__ | __(__ binops oper oper __)__ | __(__ unops oper __)__ | constants | id
+opers -> __( :=__ ids opers __)__ | __(__ binops opers opers __)__ | __(__ unops opers __)__ | constants | ids
 
 binops -> __+__ | __-__ | __*__ | __/__ | __%__ | __^__ | __=__ | __>__ | __>=__ | __<__ | __<=__ | __!=__ | __or__ | __and__
 
@@ -34,16 +34,16 @@ unops -> __-__ | __not__ | __sin__ | __cos__ | __tan__
 
 Primitives
 ----------
-prim -> __bool__ | __int__ | __real__ | __string__
+prims -> __bool__ | __int__ | __real__ | __string__
 
 Statements
 ----------
-stmts -> ifstmts | whilestmts | letstmts |printsmts
+stmts -> ifstmts | whilestmts | letstmts | printstmts
 
-printstmts -> __(__ __stdout__ oper __)__
+printstmts -> __(__ __stdout__ opers __)__
 
-ifstmts -> __(__ __if__ expr expr expr __)__ | __(__ __if__ expr expr __)__
+ifstmts -> __(__ __if__ exprs exprs exprs __)__ | __(__ __if__ exprs exprs __)__
 
-whilestmts -> __(__ __while__ expr exprlist __)__
+whilestmts -> __(__ __while__ exprs exprlist __)__
 
 letstmts -> __(__ __let__ __(__ varlist __)__ __)__
