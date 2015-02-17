@@ -2,6 +2,7 @@
 
 (load "lexer")
 (load "parser")
+(load "grammar")
 
 (with-open-file (istream "proftest.in")
-  (parse (lex istream)))
+  (parse (lex istream) *grammar*))
