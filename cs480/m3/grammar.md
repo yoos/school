@@ -46,4 +46,4 @@ ifstmts -> __(__ __if__ exprs exprs exprs __)__ | __(__ __if__ exprs exprs __)__
 
 whilestmts -> __(__ __while__ exprs exprlist __)__
 
-letstmts -> __(__ __let__ __(__ varlist __)__ __)__
+letstmts -> __(__ __let__ __(__ idlist __)__ __)__
