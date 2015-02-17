@@ -14,8 +14,7 @@
     (let ((token-type (nth 0 sym))
           (token      (nth 1 sym)))
       ;; Handle closing parenthesis specially
-      (cond ((and (equal token-type :op-t)
-                  (string= token ")"))
+      (cond ((equal token-type :rightp-dt)
              (format T "~,,v,@A~%" (* 2 (- depth 1)) token)
              (return))
             (T NIL))
@@ -25,8 +24,7 @@
       (format T "~,,v,@A~%" (* 2 depth) token)
 
       ;; Recurse on opening parenthesis
-      (cond ((and (equal token-type :op-t)
-                  (string= token "("))
+      (cond ((equal token-type :leftp-dt)
              (syntax-parse symbol-table grammar (+ 1 depth)))
             (T NIL))
       )))

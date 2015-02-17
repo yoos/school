@@ -171,8 +171,15 @@
            )
 
          ;; Categorize "!" as unknown lexeme
-         (if (string= *lexeme* "!")
-           (defparameter *type* :unknown-t))
+         (cond
+           ((string= *lexeme* "(")
+            (defparameter *type* :leftp-dt))
+           ((string= *lexeme* ")")
+            (defparameter *type* :rightp-dt))
+           ((string= *lexeme* ";")
+            (defparameter *type* :semicolon-dt))
+           ((string= *lexeme* "!")
+            (defparameter *type* :unknown-t)))
 
          (defparameter *state* :store-token)
          )
