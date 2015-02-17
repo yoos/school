@@ -5,7 +5,7 @@
 ;(use-package #:lexer-tokens)
 
 ;;; Buffer in which to store token as we build it up
-(defparameter *token* (make-array 0
+(defparameter *lexeme* (make-array 0
                                   :element-type 'character
                                   :fill-pointer 0
                                   :adjustable T))
@@ -42,7 +42,7 @@
     c))
 
 (defun clear-token ()
-  (defparameter *token* (make-array 0
+  (defparameter *lexeme* (make-array 0
                                     :element-type 'character
                                     :fill-pointer 0
                                     :adjustable t)))
@@ -61,7 +61,7 @@
     ((c (read-char istream NIL)     ; Start with first char read
         (read-char istream NIL)))   ; Read another char each step
     ((null c))                      ; End when c is null
-    (vector-push-extend c *token*)   ; Append char to token
+    (vector-push-extend c *lexeme*)   ; Append char to token
 
     (cond
       ;; Letters
@@ -76,37 +76,37 @@
                (not (digit? c)))   ; We should allow numbers, too
           (unread-char c istream)
           (defparameter *state* :store-token))
-         (vector-push-extend c *token*))
+         (vector-push-extend c *lexeme*))
        (cond
          ;; Constants
-         ((or (string= *token* "true")
-              (string= *token* "false"))
+         ((or (string= *lexeme* "true")
+              (string= *lexeme* "false"))
           (defparameter *type* :boolean-ct))
 
          ;; Ops
-         ((or (string= *token* "sin")
-              (string= *token* "cos")
-              (string= *token* "tan"))
+         ((or (string= *lexeme* "sin")
+              (string= *lexeme* "cos")
+              (string= *lexeme* "tan"))
           (defparameter *type* :op-t))
 
          ;; Primitives
-         ((string= *token* "bool")
+         ((string= *lexeme* "bool")
           (defparameter *type* :boolean-pt))
-         ((string= *token* "int")
+         ((string= *lexeme* "int")
           (defparameter *type* :integer-pt))
-         ((string= *token* "real")
+         ((string= *lexeme* "real")
           (defparameter *type* :real-pt))
-         ((string= *token* "string")
+         ((string= *lexeme* "string")
           (defparameter *type* :string-pt))
 
          ;; Statements
-         ((string= *token* "stdout")
+         ((string= *lexeme* "stdout")
           (defparameter *type* :stdout-st))
-         ((string= *token* "if")
+         ((string= *lexeme* "if")
           (defparameter *type* :if-st))
-         ((string= *token* "while")
+         ((string= *lexeme* "while")
           (defparameter *type* :while-st))
-         ((string= *token* "let")
+         ((string= *lexeme* "let")
           (defparameter *type* :let-st))
 
          ;; Fallback
@@ -121,9 +121,9 @@
          ((c (read-char istream NIL)
              (read-char istream NIL)))
          ((char= c #\")   ; Read until next quotation mark
-          (vector-push-extend c *token*)   ; Push one more time. TODO(yoos): avoid this
+          (vector-push-extend c *lexeme*)   ; Push one more time. TODO(yoos): avoid this
           (defparameter *state* :store-token))
-         (vector-push-extend c *token*)))
+         (vector-push-extend c *lexeme*)))
 
 
       ;; Number
@@ -138,7 +138,7 @@
             (not (number? c)))
           (unread-char c istream)
           (defparameter *state* :store-token))
-         (vector-push-extend c *token*)
+         (vector-push-extend c *lexeme*)
          ;; Check if real. Doesn't have to be cond here since only one condition, but just in case..
          (cond
            ((or (char= c #\e)
@@ -152,25 +152,25 @@
 
        ;; Try reading one more before proceeding to :store-token.
        (let ((c (read-char istream NIL)))
-         (vector-push-extend c *token*)
+         (vector-push-extend c *lexeme*)
          (cond
            ;; Multichar ops
-           ((or (string= *token* ">=")
-                (string= *token* "<=")
-                (string= *token* "!=")))
+           ((or (string= *lexeme* ">=")
+                (string= *lexeme* "<=")
+                (string= *lexeme* "!=")))
 
            ;; Assign statement
-           ((string= *token* ":=")
+           ((string= *lexeme* ":=")
             (defparameter *type* :assign-st))
 
            ;; Unread
            (T
              (unread-char c istream)
-             (vector-pop *token*))
+             (vector-pop *lexeme*))
            )
 
          ;; Categorize "!" as unknown lexeme
-         (if (string= *token* "!")
+         (if (string= *lexeme* "!")
            (defparameter *type* :unknown-t))
 
          (defparameter *state* :store-token)
@@ -195,7 +195,7 @@
 
     ;; Store token and reset FSA
     (if (equal *state* :store-token)
-      (store-token *type* *token*))
+      (store-token *type* *lexeme*))
     )
 
   ;; Print symbol table
