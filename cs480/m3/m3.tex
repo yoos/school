@@ -48,37 +48,60 @@
 % Handwritten answers
 %\includepdf[pages={1}]{m3_handwritten.pdf}
 
+\section*{Formal Definition}
+
+\subsection*{Parser}
+
+\begin{verbatim}
+def check-syntax(input):
+    stack = [S]
+    while (input != [] and stack != []):
+        rule, term = stack.pop_front(), input.pop_front()
+        if (rule == term): continue
+        p = productions[rule][term]
+        if p = DNE: return FALSE
+        stack.push_front(p[1:])
+    if (input != [] or stack != []):
+        return FALSE
+    return TRUE
+\end{verbatim}
+
 \section*{Specification}
 
-This milestone prompts me to pick a data structure to represent the abstract
-syntax graphs that will be used to determine whether or not the list of symbols
-satisfy the syntax of the IBTL. In doing so, I will also find out whether the
-symbol table structure is sufficient for the tasks at hand or needs
-improvement.
+This milestone prompts me to pick a data structure to represent the syntax
+graphs that will be used to determine whether or not the list of symbols
+satisfy the IBTL syntax. I will develop an algorithm to recursively parse these
+syntax trees. In doing so, I will also find out whether the symbol table
+structure is sufficient for the tasks at hand or needs improvement.
 
 \section*{Processing}
 
-All token types were recategorized as lists of types and the type symbols used
-to store the (type, string) tuples in the symbol table.
+All token types were recategorized as lists of types and type symbols. These
+were used to specify the production rules of the IBTL grammar.
 
 The provided grammar was refactored to more closely mirror the lexer before
-being incorporated into the grammar definition in code. The compiler passes
-this definition to the syntax parser along with the symbol table output from
-the lexer and the initial recursion depth of 0.
+being incorporated into the definition in code. The compiler passes this
+definition to the syntax parser along with the symbol table output from the
+lexer and an initial recursion depth of 0.
 
 \section*{Testing Requirement}
 
-% TODO
-
-I tested the lexer for correctness using the same inputs used in Milestone 2 to
-test the lexer. The inputs are composed of as many combinations of token types
-as I could reasonably come up with. The tokens are output at an indentation
-proportional to the recursion depth, which was checked manually.
+I tested the parser for correctness by using inputs similar to those used in
+Milestone 2 to test the lexer. The inputs are composed of as many combinations
+of token types as I could reasonably come up with along with some nested
+parentheses. The tokens are output at an indentation proportional to the
+recursion depth, which was checked manually.
 
 \section*{Retrospective}
 
 The symbol table and lexer did not require heavy modification. I can see
 (again) that having a clear model and modular code is paramount to keeping the
 compiler comprehensible.
+
+Lisp has various list manipulation tools built into the language that makes it
+easy to move data around. I have not yet fully grasped the different symbol and
+value types specified by Lisp's modifiers, but I have been able to use a few to
+make the code more concise (e.g., list element expansion to populate list of
+terminals from list of list of terminal types in {\tt grammar.lisp}).
 
 \end{document}
