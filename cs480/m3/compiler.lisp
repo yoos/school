@@ -5,4 +5,4 @@
 (load "grammar")
 
 (with-open-file (istream "proftest.in")
-  (syntax-parse (lex istream) *grammar*))
+  (syntax-parse (lex istream) *grammar* 0))
