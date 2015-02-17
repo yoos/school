@@ -24,10 +24,6 @@ id -> __regex for ids in C__ (any lower and upper char or underscore followed by
 
 idlist -> __(__ id prim __)__ | __(__ id prim __)__ idlist
 
-Primitives
-----------
-prim -> __bool__ | __int__ | __real__ | __string__
-
 Operators
 ---------
 oper -> __( :=__ id oper __)__ | __(__ binops oper oper __)__ | __(__ unops oper __)__ | constants | id
@@ -35,6 +31,10 @@ oper -> __( :=__ id oper __)__ | __(__ binops oper oper __)__ | __(__ unops oper
 binops -> __+__ | __-__ | __*__ | __/__ | __%__ | __^__ | __=__ | __>__ | __>=__ | __<__ | __<=__ | __!=__ | __or__ | __and__
 
 unops -> __-__ | __not__ | __sin__ | __cos__ | __tan__
+
+Primitives
+----------
+prim -> __bool__ | __int__ | __real__ | __string__
 
 Statements
 ----------
