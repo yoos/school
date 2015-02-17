@@ -1,24 +1,37 @@
-S -> _(_ _)_ | _(_S_)_ | SS | expr
+S -> __(__ __)__ | __(__S__)__ | SS | expr
+
 expr -> oper | stmts
+
 exprlist -> expr | expr exprlist
 
-oper -> _( :=_ id oper _)_ | _(_ binops oper oper _)_ | _(_ unops oper _)_ | constants | id
-binops -> _+_ | _-_ | _*_ | _/_ | _%_ | _^_ | _=_ | _>_ | _>=_ | _<_ | _<=_ | _!=_ | _or_ | _and_
-unops -> _-_ | _not_ | _sin_ | _cos_ | _tan_
+oper -> __( :=__ id oper __)__ | __(__ binops oper oper __)__ | __(__ unops oper __)__ | constants | id
+
+binops -> __+__ | __-__ | __*__ | __/__ | __%__ | __^__ | __=__ | __>__ | __>=__ | __<__ | __<=__ | __!=__ | __or__ | __and__
+
+unops -> __-__ | __not__ | __sin__ | __cos__ | __tan__
 
 constants -> bools | ints | reals | strings
-bools -> _true_ | _false_
-ints -> _regex for positive/negative ints in C_
-reals -> _regex for positive/negative doubles in C_
-strings -> _regex for str literal in C_ (any alphanumeric)
 
-id -> _regex for ids in C_ (any lower and upper char or underscore followed by any combination of lower, upper, digits, or underscores)
-idlist -> _(_ id prim _)_ | _(_ id prim _)_ idlist
+bools -> __true__ | __false__
 
-prim -> _bool_ | _int_ | _real_ | _string_
+ints -> __regex for positive/negative ints in C__
+
+reals -> __regex for positive/negative doubles in C__
+
+strings -> __regex for str literal in C__ (any alphanumeric)
+
+id -> __regex for ids in C__ (any lower and upper char or underscore followed by any combination of lower, upper, digits, or underscores)
+
+idlist -> __(__ id prim __)__ | __(__ id prim __)__ idlist
+
+prim -> __bool__ | __int__ | __real__ | __string__
 
 stmts -> ifstmts | whilestmts | letstmts |printsmts
-printstmts -> _(_ _stdout_ oper _)_
-ifstmts -> _(_ _if_ expr expr expr _)_ | _(_ _if_ expr expr _)_
-whilestmts -> _(_ _while_ expr exprlist _)_
-letstmts -> _(_ _let_ _(_ varlist _)_ _)_
+
+printstmts -> __(__ __stdout__ oper __)__
+
+ifstmts -> __(__ __if__ expr expr expr __)__ | __(__ __if__ expr expr __)__
+
+whilestmts -> __(__ __while__ expr exprlist __)__
+
+letstmts -> __(__ __let__ __(__ varlist __)__ __)__
