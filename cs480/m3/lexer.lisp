@@ -80,7 +80,10 @@
           (defparameter *type* :boolean-ct))
 
          ;; Ops
-         ((or (string= *lexeme* "sin")
+         ((or (string= *lexeme* "and")
+              (string= *lexeme* "or")
+              (string= *lexeme* "not")
+              (string= *lexeme* "sin")
               (string= *lexeme* "cos")
               (string= *lexeme* "tan"))
           (defparameter *type* :op-t))
