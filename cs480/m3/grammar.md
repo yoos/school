@@ -1,15 +1,13 @@
+Grammar specification
+=====================
 S -> __(__ __)__ | __(__ S __)__ | SS | expr
 
 expr -> oper | stmts
 
 exprlist -> expr | expr exprlist
 
-oper -> __( :=__ id oper __)__ | __(__ binops oper oper __)__ | __(__ unops oper __)__ | constants | id
-
-binops -> __+__ | __-__ | __*__ | __/__ | __%__ | __^__ | __=__ | __>__ | __>=__ | __<__ | __<=__ | __!=__ | __or__ | __and__
-
-unops -> __-__ | __not__ | __sin__ | __cos__ | __tan__
-
+Constants
+---------
 constants -> bools | ints | reals | strings
 
 bools -> __true__ | __false__
@@ -20,12 +18,26 @@ reals -> __regex for positive/negative doubles in C__
 
 strings -> __regex for str literal in C__ (any alphanumeric)
 
+Identifiers
+-----------
 id -> __regex for ids in C__ (any lower and upper char or underscore followed by any combination of lower, upper, digits, or underscores)
 
 idlist -> __(__ id prim __)__ | __(__ id prim __)__ idlist
 
+Primitives
+----------
 prim -> __bool__ | __int__ | __real__ | __string__
 
+Operators
+---------
+oper -> __( :=__ id oper __)__ | __(__ binops oper oper __)__ | __(__ unops oper __)__ | constants | id
+
+binops -> __+__ | __-__ | __*__ | __/__ | __%__ | __^__ | __=__ | __>__ | __>=__ | __<__ | __<=__ | __!=__ | __or__ | __and__
+
+unops -> __-__ | __not__ | __sin__ | __cos__ | __tan__
+
+Statements
+----------
 stmts -> ifstmts | whilestmts | letstmts |printsmts
 
 printstmts -> __(__ __stdout__ oper __)__
