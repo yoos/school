@@ -114,12 +114,12 @@
       ;; String
       ((char= c #\")
        (defparameter *type* :string-ct)
+       (vector-pop *lexeme*)   ; Don't store the quotation mark
 
        (do
          ((c (read-char istream NIL)
              (read-char istream NIL)))
          ((char= c #\")   ; Read until next quotation mark
-          (vector-push-extend c *lexeme*)   ; Push one more time. TODO(yoos): avoid this
           (defparameter *state* :store-token))
          (vector-push-extend c *lexeme*)))
 
