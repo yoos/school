@@ -1,8 +1,5 @@
-#!/usr/bin/sbcl --script
-
 (load "tokens")
 (load "states")
-;(use-package #:lexer-tokens)
 
 ;;; Buffer in which to store token as we build it up
 (defparameter *lexeme* (make-array 0
@@ -29,17 +26,16 @@
 (defun digit? (c)   ; Combine with number? somehow
   (and (string>= c "0") (string<= c "9")))
 
-; TODO: ! is not an op
 (defun op? (c)
   (member c '(#\( #\)
               #\+ #\- #\* #\/ #\^ #\%
               #\= #\> #\< #\! #\: #\;
               )))
 
-(defun build-token (istream token)
-  (let (c '(read-char istream nil))
-    (vector-push-extend c token)
-    c))
+;(defun build-token (istream token)
+;  (let (c '(read-char istream nil))
+;    (vector-push-extend c token)
+;    c))
 
 (defun clear-token ()
   (defparameter *lexeme* (make-array 0
@@ -48,14 +44,14 @@
                                     :adjustable t)))
 
 (defun store-token (token-type token-string)
-  (format T "[STORE-TOKEN] <~A ~A>~%" token-type token-string)
+  (format T "[LEX] <~A ~A>~%" token-type token-string)
   (vector-push-extend (list token-type token-string) *token-list*)
   (defparameter *state* :find-token)
   (defparameter *type* :unknown-t)
   (clear-token))
 
 
-(with-open-file (istream "proftest.in")
+(defun lex (istream)
   ;; Read in one character
   (do
     ((c (read-char istream NIL)     ; Start with first char read
@@ -190,7 +186,7 @@
 
       ;; Fallback
       (T
-        (format T "[Token FSA] Unknown: ~A~%" c))
+        (format T "[LEX] Unknown: ~A~%" c))
       )
 
     ;; Store token and reset FSA
@@ -199,7 +195,7 @@
     )
 
   ;; Print symbol table
-  (format T "Symbol table:~%~S" *token-list*)
+  ;(format T "Symbol table:~%~S" *token-list*)
+
+  *token-list*
   )
-
-
