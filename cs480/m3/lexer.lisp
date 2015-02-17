@@ -78,14 +78,17 @@
               (string= *lexeme* "false"))
           (defparameter *type* :boolean-ct))
 
-         ;; Ops
-         ((or (string= *lexeme* "and")
-              (string= *lexeme* "or")
-              (string= *lexeme* "not")
+         ;; Unary ops
+         ((or (string= *lexeme* "not")
               (string= *lexeme* "sin")
               (string= *lexeme* "cos")
               (string= *lexeme* "tan"))
-          (defparameter *type* :op-t))
+          (defparameter *type* :unop-t))
+
+         ;; Binary ops
+         ((or (string= *lexeme* "and")
+              (string= *lexeme* "or"))
+          (defparameter *type* :binop-t))
 
          ;; Primitives
          ((string= *lexeme* "bool")
@@ -145,8 +148,8 @@
        )
 
       ;; Op (and assign)
-      ((op? c)   ; The semicolon above screws up syntax highlighting.
-       (defparameter *type* :op-t)
+      ((op? c)
+       (defparameter *type* :binop-t)
 
        ;; Try reading one more before proceeding to :store-token.
        (let ((c (read-char istream NIL)))

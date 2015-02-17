@@ -16,13 +16,15 @@
                             :while-st
                             :let-st
                             :assign-st))
+(defparameter operators '(:unop-ot
+                           :binop-ot))
 
 ;;; Define types
 (deftype constant-t   () `(member ,@constants))
 (deftype identifier-t () `(member ,@identifiers))
 (deftype primitive-t  () `(member ,@primitives))
 (deftype statement-t  () `(member ,@statements))
-(deftype op-t         ())
+(deftype operator-t   () `(member ,@operators))
 (deftype unknown-t    ())
 
 ;;; Encapsulate the above types as a token type
@@ -30,7 +32,7 @@
 (deftype token-t ()
   `(member :constant-t
            :identifier-t
-           :op-t
+           :operator-t
            :primitive-t
            :statement-t
            :unknown-t))
