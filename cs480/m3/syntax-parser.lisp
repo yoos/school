@@ -1,6 +1,6 @@
 
 
-(defun parse (symbol-table grammar)
+(defun syntax-parse (symbol-table grammar)
 
   ;; Print symbol table
   (format T "[PARSE] token list:~%~S~%" symbol-table)
