@@ -46,45 +46,39 @@
 \fancyfoot[C]{\sffamily Page \thepage\ of \pageref{LastPage}}
 
 % Handwritten answers
-\includepdf[pages={1}]{m3_handwritten.pdf}
+%\includepdf[pages={1}]{m3_handwritten.pdf}
 
 \section*{Specification}
 
-% TODO
-
-This milestone prompts the design and creation of a scanner and symbol table
-that will be used to recognize and store IBTL tokens. Importantly, I will learn
-to design finite state automata using a state transition diagram before writing
-the actual code. Having this consistent model will hopefully preclude headaches
-when writing the syntactic and semantic parsers.
+This milestone prompts me to pick a data structure to represent the abstract
+syntax graphs that will be used to determine whether or not the list of symbols
+satisfy the syntax of the IBTL. In doing so, I will also find out whether the
+symbol table structure is sufficient for the tasks at hand or needs
+improvement.
 
 \section*{Processing}
 
-% TODO
+All token types were recategorized as lists of types and the type symbols used
+to store the (type, string) tuples in the symbol table.
 
-All possible token types were identified and categorized. A rough state
-transition diagram was constructed to recognize these token types by character.
-
-The state transition graph is composed of several FSAs strung in series with
-four initial "top-level" FSAs for lexemes that start with a quotation mark,
-letter, number, or special character. These further categorize and accept the
-lexemes as actual token types or reject otherwise.
+The provided grammar was refactored to more closely mirror the lexer before
+being incorporated into the grammar definition in code. The compiler passes
+this definition to the syntax parser along with the symbol table output from
+the lexer and the initial recursion depth of 0.
 
 \section*{Testing Requirement}
 
 % TODO
 
-I tested the lexer for correctness by feeding it as many combinations of token
-types as I could reasonably come up with. The lexemes were printed with the
-lexer's recognized token type, each of which I checked manually.
+I tested the lexer for correctness using the same inputs used in Milestone 2 to
+test the lexer. The inputs are composed of as many combinations of token types
+as I could reasonably come up with. The tokens are output at an indentation
+proportional to the recursion depth, which was checked manually.
 
 \section*{Retrospective}
 
-% TODO
-
-Code modularity is extremely important in keeping the lexer comprehensible.
-This seems to go hand in hand with the consistency of the state transition
-model. This also makes it easy to track any special cases (e.g., assign
-statement starts with a special character but is not an op).
+The symbol table and lexer did not require heavy modification. I can see
+(again) that having a clear model and modular code is paramount to keeping the
+compiler comprehensible.
 
 \end{document}
