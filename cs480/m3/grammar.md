@@ -1,4 +1,4 @@
-Grammar specification
+Grammar Specification
 =====================
 S -> __(__ __)__ | __(__ S __)__ | SS | expr
 
