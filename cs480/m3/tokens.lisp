@@ -1,6 +1,6 @@
 (defpackage #:lexer-tokens)
 
-;;; Define type members
+;;; Define terminals
 (defparameter constants '(:boolean-ct
                            :integer-ct
                            :real-ct
@@ -22,7 +22,7 @@
                             :let-st
                             :assign-st))
 
-;;; Define types
+;;; Define categorical symbols
 (deftype constant-t   () `(member ,@constants))
 (deftype delimiter-t  () `(member ,@delimiters))
 (deftype identifier-t () `(member ,@identifiers))
@@ -31,7 +31,7 @@
 (deftype statement-t  () `(member ,@statements))
 (deftype unknown-t    ())
 
-;;; Encapsulate the above types as a token type
+;;; Encapsulate the above symbols as a token type
 ;;; TODO(yoos): don't think this is quite right.
 (deftype token-t ()
   `(member :constant-t
