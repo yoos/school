@@ -27,10 +27,9 @@
   (and (string>= c "0") (string<= c "9")))
 
 (defun op? (c)
-  (member c '(#\( #\)
-              #\+ #\- #\* #\/ #\^ #\%
-              #\= #\> #\< #\! #\: #\;
-              )))
+  (member c (list #\( #\)
+                  #\+ #\- #\* #\/ #\^ #\%
+                  #\= #\> #\< #\! #\: #\;)))
 
 ;(defun build-token (istream token)
 ;  (let (c '(read-char istream nil))
@@ -44,7 +43,7 @@
                                     :adjustable t)))
 
 (defun store-token (token-type token-string)
-  (format T "[LEX] <~A ~A>~%" token-type token-string)
+  (format T "[LEX] (~A ~A)~%" token-type token-string)
   (vector-push-extend (list token-type token-string) *token-list*)
   (defparameter *state* :find-token)
   (defparameter *type* :unknown-t)
