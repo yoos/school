@@ -1,0 +1,22 @@
+##OpenGL GLIB
+Ortho  -5 5.  -5. 5.
+LookAt 0 0 2  0 0 0  0 1 0
+
+Texture2D 5 sr71.bmp
+
+Vertex   p6.vert
+Fragment p6.frag
+Program  P6 \
+	uScenter     <0. .5 1.> \
+	uTcenter     <0. .5 1.> \
+	uDs          <0.01 .1 .5> \
+	uDt          <0.01 .1 .5> \
+	uMagFactor   <.1 1. 25.> \
+	uRotAngle    <-3.14159 0. 3.14159> \
+	uSharpFactor <0. 1. 5.> \
+	uCircle      <false> \
+	uImageUnit   5
+
+QuadXY .2 5.
+
+// vim: syntax=c
