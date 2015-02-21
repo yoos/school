@@ -6,10 +6,6 @@ uniform float uMagFactor, uRotAngle, uSharpFactor;
 uniform bool uCircle;
 uniform sampler2D uImageUnit;
 
-const float PI = 3.14159265;
-const float PI_OVER_4 = PI/4.;
-const float SIN_PI_OVER_4 = 0.707;
-
 in vec2 vST;
 
 bool isInside(vec2 vST)
