@@ -2,6 +2,7 @@
 
 (load "lexer")
 (load "syntax-parser")
+(load "semantics-parser")
 (load "grammar")
 
 (defun my-command-line ()
@@ -17,7 +18,7 @@
       (cond ((not (string= (subseq arg 0 1) "-"))
              (format T "Parsing ~S:~%" arg)
              (with-open-file (istream arg)
-               (format T "~S" (syntax-parse (lex istream) *grammar* 0)))
+               (format T "~S" (semantics-parse (syntax-parse (lex istream) *grammar* 0))))
              (format T "~%~%"))
             (T NIL))
       )
