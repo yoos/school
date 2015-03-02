@@ -6,7 +6,7 @@
     (vector-pop symbol-table)))
 
 (defun syntax-parse (symbol-table grammar depth)
-  (let ((subtree ()))
+  (let ((syntax-tree ()))
     (do
       ((sym (table-pop symbol-table)
             (table-pop symbol-table)))
@@ -19,11 +19,13 @@
                (return))
               ((equal token-type :leftp-dt)   ;; Recurse on opening parenthesis
                (format T "~,,v,@A~%" (* 2 depth) token)
-               (setf subtree (cons (syntax-parse symbol-table grammar (+ 1 depth)) subtree)))
+               (let ((subtree (syntax-parse symbol-table grammar (+ 1 depth))))
+                 (if (not (null subtree))
+                   (setf syntax-tree (cons subtree syntax-tree)))))
               (T
                 ;; Print to screen at correct indentation
                 ;; See http://stackoverflow.com/questions/20072959/lisp-format-a-character-a-number-of-times
                 (format T "~,,v,@A~%" (* 2 depth) token)
-                (setf subtree (cons sym subtree))
+                (setf syntax-tree (cons sym syntax-tree))
                 ))))
-    (nreverse subtree)))
+    (nreverse syntax-tree)))
