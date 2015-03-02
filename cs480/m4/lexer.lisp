@@ -27,9 +27,9 @@
   (and (string>= c "0") (string<= c "9")))
 
 (defun op? (c)
-  (member c (list #\( #\)
+  (member c (list #\( #\) #\;
                   #\+ #\- #\* #\/ #\^ #\%
-                  #\= #\> #\< #\! #\: #\;)))
+                  #\= #\> #\< #\! #\:)))
 
 ;(defun build-token (istream token)
 ;  (let (c '(read-char istream nil))
