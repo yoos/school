@@ -14,10 +14,10 @@
       ()
       (let ((token-type (nth 0 sym))
             (token      (nth 1 sym)))
-        (cond ((equal token-type :rightp-dt)   ;; Handle closing parenthesis specially
+        (cond ((equal token-type 'rightp-dt)   ;; Handle closing parenthesis specially
                (format T "~,,v,@A~%" (* 2 (- depth 1)) token)
                (return))
-              ((equal token-type :leftp-dt)   ;; Recurse on opening parenthesis
+              ((equal token-type 'leftp-dt)   ;; Recurse on opening parenthesis
                (format T "~,,v,@A~%" (* 2 depth) token)
                (let ((subtree (syntax-parse symbol-table grammar (+ 1 depth))))
                  (if (not (null subtree))
