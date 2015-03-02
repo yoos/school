@@ -17,7 +17,7 @@
       (cond ((not (string= (subseq arg 0 1) "-"))
              (format T "Parsing ~S:~%" arg)
              (with-open-file (istream arg)
-               (syntax-parse (lex istream) *grammar* 0))
+               (format T "~S" (syntax-parse (lex istream) *grammar* 0)))
              (format T "~%~%"))
             (T NIL))
       )
