@@ -1,8 +1,8 @@
 compiler:
-	@echo "Usage: ./lexer.lisp"
+	@echo "Usage: ./compiler.lisp <input file>"
 
 stutest.out:
-	./compiler.lisp inputs/2.txt inputs/3.txt >> stutest.out
+	./compiler.lisp test/good/*.txt test/bad/*.txt >> stutest.out
 
 proftest.out:
 	cat $(PROFTEST)
