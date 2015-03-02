@@ -1,0 +1,101 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{fancyhdr}
+\usepackage[utf8]{inputenc}
+\usepackage{palatino}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{lastpage}
+\usepackage[hang,small,margin=1in]{caption}
+\usepackage{titlesec}
+\usepackage{pdfpages}
+
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot{}
+\fancyfoot[C]{\sffamily Page \thepage\ of \pageref{LastPage}}
+\pagestyle{fancy}
+
+\titleformat{\section}{\bfseries\MakeUppercase}{\arabic{\thesection}}{1em}{}
+\titleformat{\subsection}{\bfseries}{\arabic{\thesection}.\arabic{\thesubsection}}{1em}{}
+\titleformat{\subsubsection}{\itshape}{\arabic{\thesection}.\arabic{\thesubsection}.\arabic{\thesubsubsection}}{1em}{}
+
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{1em}
+
+\captionsetup[figure]{labelfont=it, font=it}
+\captionsetup[table]{labelfont={it,sc}, font={it,sc}}
+
+\hypersetup{colorlinks, linkcolor = black, citecolor = black, urlcolor = black}
+\urlstyle{same}
+
+
+
+\begin{document}
+
+\fancyfoot{}
+\begin{center}
+    \hfill \\
+    \vspace{4in}
+    {\bf\Huge CS480 Milestone \#4 \\}
+    \vspace{2in}
+    {\Large Soo-Hyun Yoo \\ March 2, 2015}
+\end{center}
+
+\newpage
+\fancyfoot[C]{\sffamily Page \thepage\ of \pageref{LastPage}}
+
+\section*{Formal Definition}
+
+\subsection*{Semantic Parser (Constants Only)}
+
+We can assume the input is well-formed, as the syntax parser will have thrown
+an error otherwise. The following defines a recursive semantics parser:
+
+\begin{verbatim}
+def sem-parse(parse-tree):
+    if parse-tree.type is token:
+        return parse-tree
+    else:
+        op = parse-tree.pop()
+        if op is unop:
+            type, code = gen-code(op,
+                                  sem-parse(parse-tree.pop()))
+        else:
+            type, code = gen-code(op,
+                                  sem-parse(parse-tree.pop()),
+                                  sem-parse(parse-tree.pop()))
+        return make-token(type, code)
+\end{verbatim}
+
+\section*{Specification}
+
+This milestone gives me practice producing gforth code from IBTL by
+implementing a semantic parser for constants only. A simple semantic parser
+will be written to recursively parse the parse tree and generate gforth code.
+This will hopefully shed some light on how to properly build the parser for the
+other token types in the next milestone.
+
+\section*{Processing}
+
+The syntax parser was updated to fully reject any malformed input. That is,
+binary and unary operations were verified for the correct number of associated
+operands and that constants were not being used as operators, etc. This
+simplified the semantic parser, which could immediately start processing the
+input parse tree.
+
+\section*{Testing Requirement}
+
+I made short, simple test cases to test all operators for all four constant
+types. The simplicity of each test case allows for manual verification of test
+results. The test cases are grouped by their expected result (success/failure).
+
+\section*{Retrospective}
+
+The resultant semantics parser did not require a crazy network of state
+machines as I had previously envisioned (partially due to an initial
+misunderstanding of how the work is divided between the syntax and semantics
+parsers). Translating the parse tree output by the syntax parser into gforth
+required some thinking in order to correctly use the gforth stack.
+
+\end{document}
