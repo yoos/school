@@ -21,11 +21,13 @@
                (format T "~,,v,@A~%" (* 2 depth) token)
                (let ((subtree (syntax-parse symbol-table grammar (+ 1 depth))))
                  (if (not (null subtree))
-                   (setf syntax-tree (cons subtree syntax-tree)))))
+                   (setf syntax-tree
+                         (cons subtree syntax-tree)))))
               (T
                 ;; Print to screen at correct indentation
                 ;; See http://stackoverflow.com/questions/20072959/lisp-format-a-character-a-number-of-times
                 (format T "~,,v,@A~%" (* 2 depth) token)
-                (setf syntax-tree (cons sym syntax-tree))
+                (setf syntax-tree
+                      (cons sym syntax-tree))
                 ))))
     (nreverse syntax-tree)))
