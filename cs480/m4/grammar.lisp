@@ -47,7 +47,7 @@
 
                        (list 'stmts      (list 'leftp-dt 'stdout-st 'opers 'rightp-dt))
                        (list 'stmts      (list 'leftp-dt 'if-st 'exprs 'exprs 'exprs 'rightp-dt))
-                       (list 'stmts      (list 'leftp-dt 'exprs 'exprs))
+                       (list 'stmts      (list 'leftp-dt 'if-st 'exprs 'exprs 'rightp-dt))
                        (list 'stmts      (list 'leftp-dt 'while-st 'exprs 'exprlist 'rightp-dt))
                        (list 'stmts      (list 'leftp-dt 'let-st 'leftp-dt 'idlist 'rightp-dt 'rightp-dt))
                        ))   ; Set of productions
