@@ -1,10 +1,10 @@
 Grammar Specification
 =====================
-S -> __(__ __)__ | __(__ S __)__ | SS | exprs
+S -> __(__ __)__ | __(__ S __)__ | SS | EXPRS
 
-exprs -> opers | stmts
+EXPRS -> OPERS | STMTS
 
-exprlist -> exprs | exprs exprlist
+EXPRLIST -> EXPRS | EXPRS EXPRLIST
 
 Constants
 ---------
@@ -22,11 +22,11 @@ Identifiers
 -----------
 ids -> __regex for ids in C__ (any lower and upper char or underscore followed by any combination of lower, upper, digits, or underscores)
 
-idlist -> __(__ ids prims __)__ | __(__ ids prims __)__ idlist
+IDLIST -> __(__ ids prims __)__ | __(__ ids prims __)__ IDLIST
 
 Operators
 ---------
-opers -> __( :=__ ids opers __)__ | __(__ binops opers opers __)__ | __(__ unops opers __)__ | constants | ids
+OPERS -> __( :=__ ids OPERS __)__ | __(__ binops OPERS OPERS __)__ | __(__ unops OPERS __)__ | constants | ids
 
 binops -> __+__ | __-__ | __*__ | __/__ | __%__ | __^__ | __=__ | __>__ | __>=__ | __<__ | __<=__ | __!=__ | __or__ | __and__
 
@@ -38,12 +38,4 @@ prims -> __bool__ | __int__ | __real__ | __string__
 
 Statements
 ----------
-stmts -> ifstmts | whilestmts | letstmts | printstmts
-
-printstmts -> __(__ __stdout__ opers __)__
-
-ifstmts -> __(__ __if__ exprs exprs exprs __)__ | __(__ __if__ exprs exprs __)__
-
-whilestmts -> __(__ __while__ exprs exprlist __)__
-
-letstmts -> __(__ __let__ __(__ idlist __)__ __)__
+STMTS -> __(__ __if__ EXPRS EXPRS EXPRS __)__ | __(__ __if__ EXPRS EXPRS __)__ | __(__ __while__ EXPRS EXPRLIST __)__ | __(__ __let__ __(__ IDLIST __)__ __)__ | __(__ __stdout__ OPERS __)__
