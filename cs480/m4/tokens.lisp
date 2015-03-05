@@ -1,26 +1,26 @@
 (defpackage #:lexer-tokens)
 
 ;;; Define terminals
-(defparameter constants `('boolean-ct
-                          'integer-ct
-                          'real-ct
-                          'string-ct))
-(defparameter delimiters `('leftp-dt
-                           'rightp-dt
-                           'semicolon-dt))   ; TODO(yoos)' Do we really need to categorize these separately?
-(defparameter identifiers `('function-it
-                            'variable-it))
-(defparameter operators `('binop-ot
-                          'unop-ot))
-(defparameter primitives `('boolean-pt
-                           'integer-pt
-                           'real-pt
-                           'string-pt))
-(defparameter statements `('stdout-st
-                           'if-st
-                           'while-st
-                           'let-st
-                           'assign-st))
+(defparameter constants (list 'boolean-ct
+                              'integer-ct
+                              'real-ct
+                              'string-ct))
+(defparameter delimiters (list 'leftp-dt
+                               'rightp-dt
+                               'semicolon-dt))   ; TODO(yoos)' Do we really need to categorize these separately?
+(defparameter identifiers (list 'function-it
+                                'variable-it))
+(defparameter operators (list 'binop-ot
+                              'unop-ot))
+(defparameter primitives (list 'boolean-pt
+                               'integer-pt
+                               'real-pt
+                               'string-pt))
+(defparameter statements (list 'stdout-st
+                               'if-st
+                               'while-st
+                               'let-st
+                               'assign-st))
 
 ;;; Define categorical symbols
 (deftype constant-t   () `(member ,@constants))
@@ -32,13 +32,11 @@
 (deftype unknown-t    ())
 
 ;;; Encapsulate the above symbols as a token type
-;;; TODO(yoos): don't think this is quite right.
+;;; TODO(yoos): Include unknown-t? Do I need this?
 (deftype token-t ()
-  `(member 'constant-t
-           'delimiter-t
-           'identifier-t
-           'operator-t
-           'primitive-t
-           'statement-t
-           'unknown-t))
-
+  `(member ,@constants
+           ,@delimiters
+           ,@identifiers
+           ,@operators
+           ,@primitives
+           ,@statements))
