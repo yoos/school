@@ -83,12 +83,12 @@
               (string= *lexeme* "sin")
               (string= *lexeme* "cos")
               (string= *lexeme* "tan"))
-          (defparameter *type* 'unop-t))
+          (defparameter *type* 'unop-ot))
 
          ;; Binary ops
          ((or (string= *lexeme* "and")
               (string= *lexeme* "or"))
-          (defparameter *type* 'binop-t))
+          (defparameter *type* 'binop-ot))
 
          ;; Primitives
          ((string= *lexeme* "bool")
@@ -149,7 +149,7 @@
 
       ;; Op (and assign)
       ((op? c)
-       (defparameter *type* 'binop-t)
+       (defparameter *type* 'binop-ot)
 
        ;; Try reading one more before proceeding to 'store-token.
        (let ((c (read-char istream NIL)))
