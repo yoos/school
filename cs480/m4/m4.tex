@@ -47,7 +47,7 @@
 
 \section*{Formal Definition}
 
-\subsection*{Semantic Parser (Constants Only)}
+\subsection*{Semantics Parser (Constants Only)}
 
 We can assume the input is well-formed, as the syntax parser will have thrown
 an error otherwise. The following defines a recursive semantics parser:
@@ -71,18 +71,18 @@ def sem-parse(parse-tree):
 \section*{Specification}
 
 This milestone gives me practice producing gforth code from IBTL by
-implementing a semantic parser for constants only. A simple semantic parser
+implementing a semantics parser for constants only. A simple semantics parser
 will be written to recursively parse the parse tree and generate gforth code.
 This will hopefully shed some light on how to properly build the parser for the
 other token types in the next milestone.
 
 \section*{Processing}
 
-The syntax parser was updated to fully reject any malformed input. That is,
-binary and unary operations were verified for the correct number of associated
-operands and that constants were not being used as operators, etc. This
-simplified the semantic parser, which could immediately start processing the
-input parse tree.
+The semantics parser was updated to fully reject any malformed input. That is,
+all operators were verified for the correct number of associated operands and
+that constants were not being used as operators, etc. The parser could then
+generate the gforth code by recursively adding onto several stacks representing
+the various gforth stacks.
 
 \section*{Testing Requirement}
 
@@ -95,7 +95,7 @@ results. The test cases are grouped by their expected result (success/failure).
 The resultant semantics parser did not require a crazy network of state
 machines as I had previously envisioned (partially due to an initial
 misunderstanding of how the work is divided between the syntax and semantics
-parsers). Translating the parse tree output by the syntax parser into gforth
-required some thinking in order to correctly use the gforth stack.
+parsers). An attempt was made at making an LR(1) parser, but I quickly realized
+a parser generator would be much better suited to such a task.
 
 \end{document}
