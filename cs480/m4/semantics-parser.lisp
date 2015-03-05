@@ -1,0 +1,28 @@
+(load "tokens")
+
+;;; Convenience function so popping from symbol table fails gracefully.
+;(defun table-pop (symbol-table)
+;  (if (> (fill-pointer symbol-table) 0)
+;    (vector-pop symbol-table)))
+
+(defun semantics-parse (parse-tree depth)
+  (if (or (typep (car parse-tree) 'token-t)
+          (null parse-tree))
+    (car parse-tree)
+    (let ((g (list 'operator-t 'constant-t 'constant-t))
+          (ret-type 'unknown-t))
+      (do
+        ((expr (car parse-tree) (car parse-tree))
+         (parse-tree (cdr parse-tree) (cdr parse-tree))
+         (g g (cdr g))
+         (expr-type (semantics-parse (car parse-tree) (+ depth 1))
+                    (semantics-parse (car parse-tree) (+ depth 1))))
+        ((null expr))
+        ()
+        (format T "~S ~S is ~S: ~S~%" depth expr (car g) (typep expr-type (car g))))
+      ret-type)
+    ;(let ((sym (car (car (car parse-tree)))))
+    ;  (format T "Object : ~S~%" sym)
+    ;  (format T "Type-of: ~S~%" (type-of sym))
+    ;  (format T "Typep  : ~S~%" (typep sym 'operator-t)))
+    ))
