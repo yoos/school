@@ -13,13 +13,13 @@ Program p7   \
 	uLightY <-10. 10. 10.>    \
 	uLightZ <-10. -2. 10.>    \
 	uKa <0. 0.1 1.0>         \
-	uKd <0. 0.6 1.0>         \
-	uKs <0. 0.3 1.0>         \
-	uShininess <0. 10. 1000.>   \
+	uKd <0. 0.7 1.0>         \
+	uKs <0. 0.8 1.0>         \
+	uShininess <0. 800. 1000.>   \
 	uColor {0. .3 .6 1.}     \
 	uAlpha <0. 1. 1.>        \
 	uSpecularColor {1. 1. 1. 1.}   \
-	uFogStep <1 20 100>   \
+	uFogStep <1 100 100>   \
 	uFogNoise <0 0.4 1.>
 
 Color 0 0.4 0.1
