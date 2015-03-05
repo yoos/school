@@ -20,7 +20,7 @@ Program p7   \
 	uAlpha <0. 1. 1.>        \
 	uSpecularColor {1. 1. 1. 1.}   \
 	uFogStep <1 20 100>   \
-	uFogNoise <0 0.5 5.>
+	uFogNoise <0 0.4 1.>
 
 Color 0 0.4 0.1
 QuadXZ -0.5 100 1 1   // "Ground"
