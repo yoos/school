@@ -20,6 +20,7 @@
 
 (defun number? (c)
   (or (and (string>= c "0") (string<= c "9"))
+      (char= c #\-)   ; negative sign is first checked as number.
       (char= c #\.)
       (char= c #\e)))
 
@@ -28,7 +29,7 @@
 
 (defun op? (c)
   (member c (list #\( #\) #\;
-                  #\+ #\- #\* #\/ #\^ #\%
+                  #\+ #\* #\/ #\^ #\%
                   #\= #\> #\< #\! #\:)))
 
 ;(defun build-token (istream token)
@@ -145,6 +146,8 @@
            ((or (char= c #\e)
                 (char= c #\.))
             (defparameter *type* 'real-pt))))
+       (if (string= *lexeme* "-")
+         (defparameter *type* 'binop-ot))
        )
 
       ;; Op (and assign)
