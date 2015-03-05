@@ -1,0 +1,28 @@
+##OpenGL GLIB
+
+//Ortho -1. 1.  -1. 1.
+Perspective 60
+
+// Eye, target, up
+LookAt  0. .5 2.  0. .5 0.  0. 1. 0.
+
+Vertex p7.vert
+Fragment p7.frag
+Program p7   \
+	uLightX <-10. 4. 10.>    \
+	uLightY <-10. 10. 10.>    \
+	uLightZ <-10. -2. 10.>    \
+	uKa <0. 0.1 1.0>         \
+	uKd <0. 0.6 1.0>         \
+	uKs <0. 0.3 1.0>         \
+	uShininess <0. 10. 1000.>   \
+	uColor {0. .3 .6 1.}     \
+	uAlpha <0. 1. 1.>        \
+	uSpecularColor {1. 1. 1. 1.}   \
+	uFogStep <1 20 100>   \
+	uFogNoise <0 0.5 5.>
+
+Color 0 0.4 0.1
+QuadXZ -0.5 100 1 1   // "Ground"
+Sphere 100 100 100    // Background
+Obj bunny010n.obj
