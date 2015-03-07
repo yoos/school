@@ -26,7 +26,7 @@
                        (list 'idlist     (list 'leftp-dt 'ids 'prims 'rightp-dt 'idlist))
 
                        (list 'opers      (list 'leftp-dt 'assign-st 'ids   'opers 'rightp-dt))
-                       (list 'opers      (list 'leftp-dt 'binop-ot  'integer-ct 'integer-ct 'rightp-dt))
+                       (list 'opers      (list 'leftp-dt 'binop-ot  'opers 'opers 'rightp-dt))
                        (list 'opers      (list 'leftp-dt 'unop-ot   'opers        'rightp-dt))
                        (list 'opers      (list 'constants))
                        (list 'opers      (list 'ids))
