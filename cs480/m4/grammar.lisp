@@ -26,8 +26,8 @@
                        (list 'idlist     (list 'leftp-dt 'ids 'prims 'rightp-dt 'idlist))
 
                        (list 'opers      (list 'leftp-dt 'assign-st 'ids   'opers 'rightp-dt))
-                       (list 'opers      (list 'leftp-dt 'binops    'opers 'opers 'rightp-dt))
-                       (list 'opers      (list 'leftp-dt 'unops     'opers        'rightp-dt))
+                       (list 'opers      (list 'leftp-dt 'binop-ot  'integer-ct 'integer-ct 'rightp-dt))
+                       (list 'opers      (list 'leftp-dt 'unop-ot   'opers        'rightp-dt))
                        (list 'opers      (list 'constants))
                        (list 'opers      (list 'ids))
 
@@ -44,8 +44,6 @@
                        (list 'constants  (list 'string-ct))
                        (list 'ids        (list 'function-it))
                        (list 'ids        (list 'variable-it))
-                       (list 'binops     (list 'binop-ot))
-                       (list 'unops      (list 'unop-ot))
                        (list 'prims      (list 'boolean-pt))
                        (list 'prims      (list 'integer-pt))
                        (list 'prims      (list 'real-pt))
