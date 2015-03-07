@@ -18,27 +18,30 @@
 (defun semantics-parse (parse-tree grammar depth)
   (let ((sentence ())
         (gG (nth 2 grammar)))
-    (if (or (typep (car parse-tree) 'token-t)
-            (null parse-tree))
-      (setf sentence (list (car parse-tree)))
-      (let ()
-        (setf sentence (list 'leftp-dt))
+    (cond
+      ;; Base case
+      ((typep (car parse-tree) 'token-t)
+       (car parse-tree))
+
+      ;; Recurse
+      (T
         (do
-          ((expr (car parse-tree) (car parse-tree))
-           (parse-tree (cdr parse-tree) (cdr parse-tree))
-           (expr-type (semantics-parse (car parse-tree) grammar (+ depth 1))
-                      (semantics-parse (car parse-tree) grammar (+ depth 1))))
-          ((null expr))
-          ()
-          (setf sentence (cons (determ grammar expr-type) sentence)))
-        (setf sentence (cons 'rightp-dt sentence))))
-    (setf sentence (nreverse sentence))
-    (format T "s~S: ~S~%" depth sentence)
-    (let ((match-pos (position T (mapcar (lambda (R)
-                                           (equal (cadr R)
-                                                  sentence))
-                                         gG))))
-      (if (null match-pos)
-        'unknown-t
-        (car (nth match-pos gG))))
+          ((expr       (car parse-tree) (car parse-tree))
+           (parse-tree (cdr parse-tree) (cdr parse-tree)))
+          ((null expr))   ; Stop when we can't pop any more
+          (let ((expr-type (semantics-parse expr grammar (+ depth 1))))
+            (setf sentence (cons expr-type sentence))
+            ))
+
+        (setf sentence (nreverse sentence))   ; Reverse sentence
+        (format T "s~S: ~S~%" depth sentence)
+
+        ;; Try to match rule
+        (let ((match-pos (position T (mapcar (lambda (R)
+                                               (equal (cadr R)
+                                                      sentence))
+                                             gG))))
+          (if (null match-pos)
+            'error
+            (car (nth match-pos gG))))))
     ))
