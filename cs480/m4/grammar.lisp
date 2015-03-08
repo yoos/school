@@ -1,3 +1,30 @@
+;;;; *GRAMMAR* definition
+;;;
+;;; The following is the IBTL grammar in BNF:
+;;;
+;;;   S     -> ( ) S   |
+;;;            ( S ) S |
+;;;            expr S  |
+;;;            ( )     |
+;;;            ( S )   |
+;;;            expr
+;;;   expr  -> oper |
+;;;            stmt
+;;;   oper  -> ( := id oper )      |
+;;;            ( binop oper oper ) |
+;;;            ( unop oper )       |
+;;;            const               |
+;;;            id
+;;;   stmt  -> ( if expr expr expr ) |
+;;;            ( if expr expr )      |
+;;;            ( while expr exprs )  |
+;;;            ( let ( ids ) )       |
+;;;            ( stdout oper )
+;;;   exprs -> expr exprs |
+;;;            expr
+;;;   ids   -> ( id prim ) ids |
+;;;            ( id prim )
+
 (load "tokens")
 
 (defparameter gN (list 'S 'expr 'oper 'stmt 'exprs 'ids))   ; Set of non-terminals
