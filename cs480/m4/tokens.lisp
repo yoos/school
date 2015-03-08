@@ -1,26 +1,26 @@
 (defpackage #:lexer-tokens)
 
 ;;; Define terminals
-(defparameter constants (list 'boolean-ct
-                              'integer-ct
-                              'real-ct
-                              'string-ct))
-(defparameter delimiters (list 'leftp-dt
-                               'rightp-dt
-                               'semicolon-dt))   ; TODO(yoos)' Do we really need to categorize these separately?
+(defparameter constants   (list 'boolean-ct
+                                'integer-ct
+                                'real-ct
+                                'string-ct))
+(defparameter delimiters  (list 'leftp-dt
+                                'rightp-dt
+                                'semicolon-dt))   ; TODO(yoos)' Do we really need to categorize these separately?
 (defparameter identifiers (list 'function-it
                                 'variable-it))
-(defparameter operators (list 'binop-ot
-                              'unop-ot))
-(defparameter primitives (list 'boolean-pt
-                               'integer-pt
-                               'real-pt
-                               'string-pt))
-(defparameter statements (list 'stdout-st
-                               'if-st
-                               'while-st
-                               'let-st
-                               'assign-st))
+(defparameter operators   (list 'binop-ot
+                                'unop-ot))
+(defparameter primitives  (list 'boolean-pt
+                                'integer-pt
+                                'real-pt
+                                'string-pt))
+(defparameter statements  (list 'stdout-st
+                                'if-st
+                                'while-st
+                                'let-st
+                                'assign-st))
 
 ;;; Define categorical symbols
 (deftype constant-t   () `(member ,@constants))
