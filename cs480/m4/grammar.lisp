@@ -1,9 +1,6 @@
 (load "tokens")
 
-(defparameter gN (list 'S 'expr 'exprs
-                       'oper
-                       'stmt
-                       'ids))   ; Set of non-terminals
+(defparameter gN (list 'S 'expr 'oper 'stmt 'exprs 'ids))   ; Set of non-terminals
 
 (defparameter gT `(list ,@constants
                         ,@delimiters
@@ -18,8 +15,6 @@
                        (list 'S     (list 'expr))
                        (list 'expr  (list 'oper))
                        (list 'expr  (list 'stmt))
-                       (list 'exprs (list 'expr))
-                       (list 'exprs (list 'expr 'exprs))
 
                        (list 'oper  (list 'leftp-dt 'assign-st 'id   'oper 'rightp-dt))
                        (list 'oper  (list 'leftp-dt 'binop-ot  'oper 'oper 'rightp-dt))
@@ -32,6 +27,9 @@
                        (list 'stmt  (list 'leftp-dt 'if-st     'expr     'expr             'rightp-dt))
                        (list 'stmt  (list 'leftp-dt 'while-st  'expr     'exprs            'rightp-dt))
                        (list 'stmt  (list 'leftp-dt 'let-st    'leftp-dt 'ids   'rightp-dt 'rightp-dt))
+
+                       (list 'exprs (list 'expr))
+                       (list 'exprs (list 'expr 'exprs))
 
                        (list 'ids   (list 'leftp-dt 'id 'prim 'rightp-dt))
                        (list 'ids   (list 'leftp-dt 'id 'prim 'rightp-dt 'ids))
