@@ -9,10 +9,13 @@
                         ,@primitives
                         ,@statements))   ; Set of terminals
 
-(defparameter gG (list (list 'S     (list 'leftp-dt    'rightp-dt))
+(defparameter gG (list (list 'S     (list 'leftp-dt    'rightp-dt 'S))
+                       (list 'S     (list 'leftp-dt 'S 'rightp-dt 'S))
+                       (list 'S     (list 'expr                   'S))
+                       (list 'S     (list 'leftp-dt    'rightp-dt))
                        (list 'S     (list 'leftp-dt 'S 'rightp-dt))
-                       (list 'S     (list 'S 'S))
                        (list 'S     (list 'expr))
+
                        (list 'expr  (list 'oper))
                        (list 'expr  (list 'stmt))
 
@@ -22,17 +25,17 @@
                        (list 'oper  (list 'const))
                        (list 'oper  (list 'id))
 
-                       (list 'stmt  (list 'leftp-dt 'stdout-st 'oper                       'rightp-dt))
                        (list 'stmt  (list 'leftp-dt 'if-st     'expr     'expr  'expr      'rightp-dt))
                        (list 'stmt  (list 'leftp-dt 'if-st     'expr     'expr             'rightp-dt))
                        (list 'stmt  (list 'leftp-dt 'while-st  'expr     'exprs            'rightp-dt))
                        (list 'stmt  (list 'leftp-dt 'let-st    'leftp-dt 'ids   'rightp-dt 'rightp-dt))
+                       (list 'stmt  (list 'leftp-dt 'stdout-st 'oper                       'rightp-dt))
 
-                       (list 'exprs (list 'expr))
                        (list 'exprs (list 'expr 'exprs))
+                       (list 'exprs (list 'expr))
 
-                       (list 'ids   (list 'leftp-dt 'id 'prim 'rightp-dt))
                        (list 'ids   (list 'leftp-dt 'id 'prim 'rightp-dt 'ids))
+                       (list 'ids   (list 'leftp-dt 'id 'prim 'rightp-dt))
 
                        ;; Singular constant categories
                        (list 'const (list 'boolean-ct))
