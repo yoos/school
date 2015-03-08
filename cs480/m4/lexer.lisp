@@ -28,7 +28,7 @@
   (and (string>= c "0") (string<= c "9")))
 
 (defun op? (c)
-  (member c (list #\( #\) #\;
+  (member c (list #\( #\)
                   #\+ #\* #\/ #\^ #\%
                   #\= #\> #\< #\! #\:)))
 
@@ -179,8 +179,6 @@
             (defparameter *type* 'leftp-dt))
            ((string= *lexeme* ")")
             (defparameter *type* 'rightp-dt))
-           ((string= *lexeme* ";")
-            (defparameter *type* 'semicolon-dt))
            ((string= *lexeme* "!")
             (defparameter *type* 'unknown-t)))
 

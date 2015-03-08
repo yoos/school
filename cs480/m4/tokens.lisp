@@ -6,8 +6,7 @@
                                 'real-ct
                                 'string-ct))
 (defparameter delimiters  (list 'leftp-dt
-                                'rightp-dt
-                                'semicolon-dt))   ; TODO(yoos)' Do we really need to categorize these separately?
+                                'rightp-dt))   ; TODO(yoos)' Do we really need to categorize these separately?
 (defparameter identifiers (list 'function-it
                                 'variable-it))
 (defparameter operators   (list 'binop-ot
