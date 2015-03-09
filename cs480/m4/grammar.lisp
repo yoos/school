@@ -91,7 +91,7 @@
                  (list 'prim  (list 'real-pt))
                  (list 'prim  (list 'string-pt))
 
-                 ;; Former ambiguous grammar
+                 ;; Former non-left-factored grammar
                  ; (list 'S     (list 'leftp-dt    'rightp-dt 'S))
                  ; (list 'S     (list 'leftp-dt 'S 'rightp-dt 'S))
                  ; (list 'S     (list 'expr                   'S))
