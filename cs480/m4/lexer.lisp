@@ -45,7 +45,7 @@
 
 (defun store-token (token-type token-string)
   ;(format T "[LEX] (~A ~A)~%" token-type token-string)
-  (vector-push-extend (list token-type token-string) *token-list*)
+  (vector-push-extend (cons token-type token-string) *token-list*)
   (defparameter *state* 'find-token)
   (defparameter *type* 'unknown-t)
   (clear-token))
