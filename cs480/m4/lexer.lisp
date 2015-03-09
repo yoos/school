@@ -145,7 +145,7 @@
          (cond
            ((or (char= c #\e)
                 (char= c #\.))
-            (defparameter *type* 'real-pt))))
+            (defparameter *type* 'real-ct))))
        (if (string= *lexeme* "-")
          (defparameter *type* 'binop-ot))
        )
