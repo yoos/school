@@ -14,12 +14,19 @@
 
 (defparameter args (cdr (my-command-line)))
 
+(defparameter *enable-debug* NIL)
+
+(loop for arg in args do
+      (cond ((string= arg "-d")
+             (setf *enable-debug* T))
+            (T NIL)))
+
 (loop for arg in args do
       (cond ((not (string= (subseq arg 0 1) "-"))
              (format T "Parsing ~S:~%~%" arg)
              (with-open-file (istream arg)
                (let* ((lexer-list (lex istream))
-                      (dummy (format T "~%Lexer list: ~S~%~%" lexer-list))
+                      (dummy (format *enable-debug* "~%Lexer list: ~S~%~%" lexer-list))
                       (parse-result (parse lexer-list)))
                  (format T "~%Parse result: ~S~%" parse-result))
                (format T "~%~%")))
