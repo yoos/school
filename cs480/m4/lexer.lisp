@@ -1,19 +1,6 @@
 (load "tokens")
 (load "states")
 
-;;; Buffer in which to store token as we build it up
-(defparameter *lexeme* (make-array 0
-                                   :element-type 'character
-                                   :fill-pointer 0
-                                   :adjustable T))
-(defparameter *state* 'find-token)    ; FSA state
-(defparameter *type* 'unknown-t)      ; Current token type
-
-(defparameter *token-list* (make-array 0
-                                       :element-type 'list
-                                       :fill-pointer 0
-                                       :adjustable T))
-
 (defun letter? (c)
   (or (and (string>= c "A") (string<= c "Z"))
       (and (string>= c "a") (string<= c "z"))))
@@ -32,106 +19,94 @@
                   #\+ #\* #\/ #\^ #\%
                   #\= #\> #\< #\! #\:)))
 
-;(defun build-token (istream token)
-;  (let (c '(read-char istream nil))
-;    (vector-push-extend c token)
-;    c))
+(defun zero-array (eltype)
+  (make-array 0
+              :element-type eltype
+              :fill-pointer 0
+              :adjustable T))
 
-(defun clear-token ()
-  (defparameter *lexeme* (make-array 0
-                                     :element-type 'character
-                                     :fill-pointer 0
-                                     :adjustable t)))
+(defparameter *token-list* (zero-array 'cons))
+(defparameter *lexeme* (zero-array 'character))
+(defparameter *state* 'find-token)
+(defparameter *type* 'unknown-t)
 
 (defun store-token (token-type token-string)
-  ;(format T "[LEX] (~A ~A)~%" token-type token-string)
-  (vector-push-extend (cons token-type token-string) *token-list*)
-  (defparameter *state* 'find-token)
-  (defparameter *type* 'unknown-t)
-  (clear-token))
-
-
+                    (vector-push-extend (cons token-type token-string) *token-list*)
+                    (setf *lexeme* (zero-array 'character)
+                          *state* 'find-token
+                          *type* 'unknown-t))
+ 
 (defun lex (istream)
-  ;; Read in one character
   (do
     ((c (read-char istream NIL)     ; Start with first char read
-        (read-char istream NIL)))   ; Read another char each step
-    ((null c))                      ; End when c is null
+        (read-char istream NIL))    ; Read another char each step
+     (*token-list* (zero-array 'cons))
+     (*lexeme* (zero-array 'character))
+     (*state* 'find-token)
+     (*type* 'unknown-t))
+    ((null c)                   ; End when c is null
+     (nreverse *token-list*))   ; Reverse symbol table so we can pop.
     (vector-push-extend c *lexeme*)   ; Append char to token
 
     (cond
       ;; Letters
       ((letter? c)
-       (defparameter *type* 'identifier-t)
-
-       ;; More letters, non-numerals, etc?
+       ;; Consume
        (do
          ((c (read-char istream NIL)
              (read-char istream NIL)))
          ((and (not (letter? c))
                (not (digit? c)))   ; We should allow numbers, too
           (unread-char c istream)
-          (defparameter *state* 'store-token))
+          (setf *state* 'store-token))
          (vector-push-extend c *lexeme*))
-       (cond
-         ;; Constants
-         ((or (string= *lexeme* "true")
-              (string= *lexeme* "false"))
-          (defparameter *type* 'boolean-ct))
 
-         ;; Unary ops
-         ((or (string= *lexeme* "not")
-              (string= *lexeme* "sin")
-              (string= *lexeme* "cos")
-              (string= *lexeme* "tan"))
-          (defparameter *type* 'unop-ot))
+       ;; Set type
+       (setf *type*
+             (case *lexeme*
+               ;; Constants
+               (("true" "false") 'boolean-ct)
 
-         ;; Binary ops
-         ((or (string= *lexeme* "and")
-              (string= *lexeme* "or"))
-          (defparameter *type* 'binop-ot))
+               ;; Operators
+               (("and" "or")              'binop-t)
+               (("not" "sin" "cos" "tan") 'unop-t)
 
-         ;; Primitives
-         ((string= *lexeme* "bool")
-          (defparameter *type* 'boolean-pt))
-         ((string= *lexeme* "int")
-          (defparameter *type* 'integer-pt))
-         ((string= *lexeme* "real")
-          (defparameter *type* 'real-pt))
-         ((string= *lexeme* "string")
-          (defparameter *type* 'string-pt))
+               ;; Primitives
+               ("bool"   'boolean-pt)
+               ("int"    'integer-pt)
+               ("real"   'real-pt)
+               ("string" 'string-pt)
 
-         ;; Statements
-         ((string= *lexeme* "stdout")
-          (defparameter *type* 'stdout-st))
-         ((string= *lexeme* "if")
-          (defparameter *type* 'if-st))
-         ((string= *lexeme* "while")
-          (defparameter *type* 'while-st))
-         ((string= *lexeme* "let")
-          (defparameter *type* 'let-st))
+               ;; Statements
+               ("if"     'if-st)
+               ("while"  'while-st)
+               ("let"    'let-st)
+               ("stdout" 'stdout-st)
 
-         ;; Fallback
-         (T ()))
-       )
+               ;; Fallback
+               (T 'identifier-t))))
 
       ;; String
       ((char= c #\")
-       (defparameter *type* 'string-ct)
        (vector-pop *lexeme*)   ; Don't store the quotation mark
 
+       ;; Set type
+       (setf *type* 'string-ct)
+
+       ;; Consume
        (do
          ((c (read-char istream NIL)
              (read-char istream NIL)))
          ((char= c #\")   ; Read until next quotation mark
-          (defparameter *state* 'store-token))
+          (setf *state* 'store-token))
          (vector-push-extend c *lexeme*)))
-
 
       ;; Number
       ((number? c)
-       (defparameter *type* 'integer-ct)
+       ;; Set type
+       (setf *type* 'integer-ct)
 
+       ;; Consume
        (do
          ((c (read-char istream NIL)
              (read-char istream NIL)))
@@ -139,77 +114,66 @@
             (not (digit? c))
             (not (number? c)))
           (unread-char c istream)
-          (defparameter *state* 'store-token))
+          (setf *state* 'store-token))
          (vector-push-extend c *lexeme*)
-         ;; Check if real. Doesn't have to be cond here since only one condition, but just in case..
+         ;; Update type if real.
          (cond
            ((or (char= c #\e)
                 (char= c #\.))
-            (defparameter *type* 'real-ct))))
+            (setf *type* 'real-ct))))
+
+       ;; Update type. A singular minus sign is a binop.
        (if (string= *lexeme* "-")
-         (defparameter *type* 'binop-ot))
-       )
+         (setf *type* 'binop-ot)))
 
       ;; Op (and assign)
       ((op? c)
-       (defparameter *type* 'binop-ot)
-
-       ;; Try reading one more before proceeding to 'store-token.
+       ;; Set type. Peek one char further for multichar ops.
        (let ((c (read-char istream NIL)))
          (vector-push-extend c *lexeme*)
-         (cond
-           ;; Multichar ops
-           ((or (string= *lexeme* ">=")
-                (string= *lexeme* "<=")
-                (string= *lexeme* "!=")))
+         (setf *type*
+               (case *lexeme*
+                 ;; Multichar ops
+                 ((">=" "<=" "!=") 'binop-ot)
 
-           ;; Assign statement
-           ((string= *lexeme* ":=")
-            (defparameter *type* 'assign-st))
+                 ;; Assign statement
+                 (":=" 'assign-st)
 
-           ;; Unread
-           (T
-             (unread-char c istream)
-             (vector-pop *lexeme*))
-           )
+                 ;; Unread
+                 (T (unread-char c istream)
+                    (vector-pop *lexeme*)
+                    'binop-ot))))
 
-         ;; Categorize "!" as unknown lexeme
-         (cond
-           ((string= *lexeme* "(")
-            (defparameter *type* 'leftp-dt))
-           ((string= *lexeme* ")")
-            (defparameter *type* 'rightp-dt))
-           ((string= *lexeme* "!")
-            (defparameter *type* 'unknown-t)))
-
-         (defparameter *state* 'store-token)
-         )
-       )
+       ;; Set type for singlechar ops
+       (cond
+         ((string= *lexeme* "(")
+          (setf *type* 'leftp-dt))
+         ((string= *lexeme* ")")
+          (setf *type* 'rightp-dt))
+         ((string= *lexeme* "!")
+          (setf *type* 'unknown-t))
+         (T NIL))
+       (setf *state* 'store-token))
 
       ;; Whitespace
       ((or (string= c " ")
            (string= c #\tab))
-       (clear-token)
+       (setf *lexeme* (zero-array 'character))
        )
 
       ;; Newline
       ((string= c #\linefeed)
        ;(format T "~%")   ; Print out newline for readability
-       (clear-token))
+       (setf *lexeme* (zero-array 'character)))
 
       ;; Fallback
       (T
-        (defparameter *type* 'unknown-t)
-        (defparameter *state* 'store-token))
+        (setf *type* 'unknown-t)
+        (setf *state* 'store-token))
       )
 
     ;; Store token and reset FSA
     (if (equal *state* 'store-token)
       (store-token *type* *lexeme*))
     )
-
-  ;; Print symbol table
-  ;(format T "Symbol table:~%~S~%" *token-list*)
-
-  (nreverse *token-list*)   ; Reverse symbol table so we can pop.
   )
