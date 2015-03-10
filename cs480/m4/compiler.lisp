@@ -23,7 +23,7 @@
 
 (loop for arg in args do
       (cond ((not (string= (subseq arg 0 1) "-"))
-             (format T "Parsing ~S:~%~%" arg)
+             (format T "Parsing ~S:~%" arg)
              (with-open-file (istream arg)
                (let* ((lexer-list (lex istream))
                       (dummy (format *enable-debug* "~%Lexer list: ~S~%~%" lexer-list))
