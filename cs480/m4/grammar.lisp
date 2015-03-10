@@ -27,21 +27,38 @@
 
 (load "tokens")
 
-;;; S -> +S | _S
-;;; +S -> _S S
-;;; _S -> nil | ( S ) | expr
-;;; nil -> ( )
-;;; expr -> oper | stmt
-;;; oper -> ( Poper ) | const | id
-;;; Poper -> := id oper | binop oper oper | unop oper
-;;; stmt -> ( Pstmt )
-;;; Pstmt -> ifstmt | elifstmt | while expr exprs | let ( ids ) | stdout oper
-;;; ifstmt -> if expr expr
+;;; Maybe working grammar:
+;;;
+;;; S        -> +S
+;;;           | ( S )
+;;;           | expr
+;;;           | nil
+;;; +S       -> ( S ) S
+;;;           | expr S
+;;;           | nil S
+;;; expr     -> oper
+;;;           | stmt
+;;; nil      -> ( )
+;;; oper     -> ( Poper )
+;;;           | const
+;;;           | id
+;;; stmt     -> ( Pstmt )
+;;; Poper    -> := id oper
+;;;           | binop oper oper
+;;;           | unop oper
+;;; Pstmt    -> ifstmt
+;;;           | elifstmt
+;;;           | while expr exprs
+;;;           | let ( ids )
+;;;           | stdout oper
+;;; ifstmt   -> if expr expr
 ;;; elifstmt -> if expr expr expr
-;;; exprs -> +exprs | expr
-;;; +exprs -> expr exprs
-;;; ids -> +ids | ( id prim )
-;;; +ids -> ( id prim ) ids
+;;; exprs    -> +exprs
+;;;           | expr
+;;; +exprs   -> expr exprs
+;;; ids      -> +ids
+;;;           | ( id prim )
+;;; +ids     -> ( id prim ) ids
 
 (let* (;; Set of productions
        (gP (list (cons 'S        (list '+S))
