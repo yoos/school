@@ -30,6 +30,11 @@
 (defparameter *state* 'find-token)
 (defparameter *type* 'unknown-t)
 
+(defun strmatch? (strlist)
+  (if (null strlist)
+    NIL
+    (or (string= *lexeme* (car strlist)) (strmatch? (cdr strlist)))))
+
 (defun store-token (token-type token-string)
                     (vector-push-extend (cons token-type token-string) *token-list*)
                     (setf *lexeme* (zero-array 'character)
@@ -63,25 +68,25 @@
 
        ;; Set type
        (setf *type*
-             (case *lexeme*
+             (cond
                ;; Constants
-               (("true" "false") 'boolean-ct)
+               ((strmatch? '("true" "false")) 'boolean-ct)
 
                ;; Operators
-               (("and" "or")              'binop-t)
-               (("not" "sin" "cos" "tan") 'unop-t)
+               ((strmatch? '("and" "or"))              'binop-t)
+               ((strmatch? '("not" "sin" "cos" "tan")) 'unop-t)
 
                ;; Primitives
-               ("bool"   'boolean-pt)
-               ("int"    'integer-pt)
-               ("real"   'real-pt)
-               ("string" 'string-pt)
+               ((strmatch? '("bool"))   'boolean-pt)
+               ((strmatch? '("int"))    'integer-pt)
+               ((strmatch? '("real"))   'real-pt)
+               ((strmatch? '("string")) 'string-pt)
 
                ;; Statements
-               ("if"     'if-st)
-               ("while"  'while-st)
-               ("let"    'let-st)
-               ("stdout" 'stdout-st)
+               ((strmatch? '("if"))     'if-st)
+               ((strmatch? '("while"))  'while-st)
+               ((strmatch? '("let"))    'let-st)
+               ((strmatch? '("stdout")) 'stdout-st)
 
                ;; Fallback
                (T 'identifier-t))))
@@ -132,27 +137,21 @@
        (let ((c (read-char istream NIL)))
          (vector-push-extend c *lexeme*)
          (setf *type*
-               (case *lexeme*
+               (cond
                  ;; Multichar ops
-                 ((">=" "<=" "!=") 'binop-ot)
+                 ((strmatch? '(">=" "<=" "!=")) 'binop-ot)
 
                  ;; Assign statement
-                 (":=" 'assign-st)
+                 ((strmatch? '(":=")) 'assign-st)
 
-                 ;; Unread
+                 ;; Unread and process singlechar ops
                  (T (unread-char c istream)
                     (vector-pop *lexeme*)
-                    'binop-ot))))
-
-       ;; Set type for singlechar ops
-       (cond
-         ((string= *lexeme* "(")
-          (setf *type* 'leftp-dt))
-         ((string= *lexeme* ")")
-          (setf *type* 'rightp-dt))
-         ((string= *lexeme* "!")
-          (setf *type* 'unknown-t))
-         (T NIL))
+                    (cond
+                      ((strmatch? '("(")) 'leftp-dt)
+                      ((strmatch? '(")")) 'rightp-dt)
+                      ((strmatch? '("!")) 'unknown-t)
+                      (T 'binop-ot))))))
        (setf *state* 'store-token))
 
       ;; Whitespace
