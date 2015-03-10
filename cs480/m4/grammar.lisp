@@ -29,36 +29,38 @@
 
 ;;; Maybe working grammar:
 ;;;
-;;; S        -> +S
-;;;           | ( S )
-;;;           | expr
-;;;           | nil
-;;; +S       -> ( S ) S
-;;;           | expr S
-;;;           | nil S
-;;; expr     -> oper
-;;;           | stmt
-;;; nil      -> ( )
-;;; oper     -> ( Poper )
-;;;           | const
-;;;           | id
-;;; stmt     -> ( Pstmt )
-;;; Poper    -> := id oper
-;;;           | binop oper oper
-;;;           | unop oper
-;;; Pstmt    -> ifstmt
-;;;           | elifstmt
-;;;           | while expr exprs
-;;;           | let ( ids )
-;;;           | stdout oper
-;;; ifstmt   -> if expr expr
-;;; elifstmt -> if expr expr expr
-;;; exprs    -> +exprs
-;;;           | expr
-;;; +exprs   -> expr exprs
-;;; ids      -> +ids
-;;;           | ( id prim )
-;;; +ids     -> ( id prim ) ids
+;;; We need to differentiate oper with Poper in order to enforce no parens
+;;; around const and id, which are oper.
+;;;
+;;; S      -> ( PS
+;;;         | expr LS
+;;; PS     -> S ) LS
+;;;         | ) LS
+;;; LS     -> S
+;;;         | EPSILON
+;;; ------
+;;; S      -> ( S ) S
+;;;         | expr S
+;;;         | EPSILON
+;;; expr   -> oper
+;;;         | stmt
+;;; oper   -> ( Poper )
+;;;         | const
+;;;         | id
+;;; stmt   -> ( Pstmt )
+;;; Poper  -> := id oper
+;;;         | binop oper oper
+;;;         | unop oper
+;;; Pstmt  -> if expr expr else
+;;;         | while expr exprs
+;;;         | let ( ids )
+;;;         | stdout oper
+;;; else   -> expr
+;;;         | EPSILON
+;;; exprs  -> expr exprs
+;;;         | EPSILON
+;;; ids    -> ( id prim ) ids
+;;;         | EPSILON
 
 (let* (;; Set of productions
        (gP (list (cons 'S        (list '+S))

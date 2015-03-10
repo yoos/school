@@ -50,6 +50,7 @@
      (*state* 'find-token)
      (*type* 'unknown-t))
     ((null c)                   ; End when c is null
+     (vector-push-extend (cons 'eof T) *token-list*)
      (nreverse *token-list*))   ; Reverse symbol table so we can pop.
     (vector-push-extend c *lexeme*)   ; Append char to token
 
