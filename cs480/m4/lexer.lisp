@@ -75,8 +75,8 @@
                ((strmatch? '("true" "false")) 'boolean-ct)
 
                ;; Operators
-               ((strmatch? '("and" "or"))              'binop-t)
-               ((strmatch? '("not" "sin" "cos" "tan")) 'unop-t)
+               ((strmatch? '("and" "or"))              'binop-ot)
+               ((strmatch? '("not" "sin" "cos" "tan")) 'unop-ot)
 
                ;; Primitives
                ((strmatch? '("bool"))   'boolean-pt)
