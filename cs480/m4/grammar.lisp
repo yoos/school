@@ -11,13 +11,15 @@
 ;;; Pexpr is the only non-term that whose first contains an opening
 ;;; parenthesis, which is its namesake. This precludes a rule such as S -> ( PS
 ;;;
-;;; S     -> exprs
-;;; exprs -> EPSILON
-;;;        | Sexpr exprs
-;;;        | ( Pexpr ) exprs
+;;; S     -> EPSILON
+;;;        | Sexpr S
+;;;        | ( PS ) S
 ;;; Sexpr -> Soper
-;;; Pexpr -> EPSILON | exprs | Poper | Pstmt
+;;; PS    -> EPSILON
+;;;        | Pexpr
+;;;        | S
 ;;; Soper -> const | id
+;;; Pexpr -> Poper | Pstmt
 ;;; Poper -> := id oper
 ;;;        | binop oper oper
 ;;;        | unop oper
@@ -31,6 +33,37 @@
 ;;; ids   -> EPSILON | ( id prim ) ids
 
 (load "tokens")
+
+; TODO: try to define the grammar as an S-expression
+;(let ((S     (list (list exprs)))
+;      (exprs (list ()
+;                   (list Sexpr exprs)
+;                   (list 'leftp-dt Pexpr 'rightp-dt exprs)))
+;      (Sexpr (list (list Soper)))
+;      (Pexpr (list ()
+;                   (list exprs)
+;                   (list Poper)
+;                   (list Pstmt)))
+;      (Soper (list (list const)
+;                   (list id)))
+;      (Poper (list (list 'assign-st id oper)
+;                   (list binop oper oper)
+;                   (list unop oper)))
+;      (Pstmt (list (list 'if-st expr expr else)
+;                   (list 'while-st expr exprs)
+;                   (list 'let-st 'leftp-dt ids 'rightp-dt)
+;                   (list 'stdout-st oper)))
+;      (oper  (list (list Soper)
+;                   (list 'leftp-dt Poper 'rightp-dt)))
+;      (expr  (list (list Sexpr)
+;                   (list 'leftp-dt Pexpr 'rightp-dt)))
+;      (else  (list ()
+;                   (list expr)))
+;      (ids   (list ()
+;                   (list 'leftp-dt id prim 'rightp-dt ids)))
+;      (const constants)
+;      (id    identifiers)
+;      (prim  primitives)))
 
 ;;; TODO: Update this, though it's not currently being used.
 (let* (;; Set of productions
