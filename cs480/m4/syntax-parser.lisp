@@ -1,34 +1,53 @@
 (load "tokens")
 
-(defparameter *oldsym* ())
 (defparameter *sym* ())
 (defparameter *symbol-table* ())
 (defparameter *depth* 0)
 (defparameter *accept* T)
+(defparameter *idx* 0)
 
 (defun init-globals (symbol-table)
-  (setf *oldsym* ()
-        *sym* ()
+  (setf *sym* ()
         *symbol-table* symbol-table
         *depth* 0
         *accept* T
+        *idx* 0
         ))
 
 ;;; Convenience function so popping from symbol table fails gracefully.
 (defun table-pop (symbol-table)
-  (if (> (fill-pointer symbol-table) 0)
-    (vector-pop symbol-table)
-    (cons 'eof T)))
+  ;(if (> (fill-pointer symbol-table) 0)
+  ;  (vector-pop symbol-table)))
+  (cond ((< *idx* (length symbol-table))
+         (let ((ret (nth *idx* symbol-table)))
+           (setf *idx* (+ *idx* 1))
+           ret)
+         )
+        (T
+          (cons 'error NIL))))
 
 (defun get-sym ()
-  (defparameter *oldsym* *sym*)
   (setf *sym* (table-pop *symbol-table*)))
 
-(defun unget-sym ()
+(defun unget-sym (n)
   (format *enable-debug* "UNGETTING SYMBOL ~S~%" *sym*)
-  (vector-push-extend *sym* *symbol-table*)
-  (defparameter *sym* *oldsym*)
+  ;(vector-push-extend *sym* *symbol-table*)
+  (setf *idx* (- *idx* n))
+  (defparameter *sym* (get-sym))
   NIL)
+
+(defun try (&rest undos)
+  (let ((accept T)
+        (undo-count 0))
+    (loop for u in undos do
+          (cond ((>= u 0)
+                 (setf undo-count (+ undo-count u)))
+    (cond ((accept)
+           (unget-sym undo-count)
+           NIL)
+          (T T))))
+
+    ; TODO: This needs to return number of undos as well as accept/reject decision!
 
 (defun parse-reject (str)
   (format *enable-debug* "~,,v,@A" (* *depth* 2) (format NIL "[REJECT ~S] ~@?" *depth* str))
@@ -42,6 +61,25 @@
     (format *enable-debug* "~,,v,@A" (* 2 *depth*) (format NIL "[INFO ~S] ~@?" *depth* str))
     (format *enable-debug* "~@?" str))
   T)
+
+;;; Like accept, but with backtracking
+(defun parse-term (token-type)
+  (let ((*depth* (+ *depth* 1)))
+    (parse-info (format NIL "Symbol to accept is ~S.. " *sym*))
+
+    ;; First get a symbol
+    (get-sym)
+
+    ;; Check against given type. If it matches, return 1 as we've consumed
+    ;; 1 symbol. Otherwise, return -1. Similarly, non-term parsers will return
+    ;; the number of symbols consumed, otherwise -1.
+    (cond ((equal (car *sym*) token-type)
+           (parse-info (format NIL "accepting ~S. Next is ~S~%" token-type (get-sym)) NIL)
+           1)
+          (T
+            (unget-sym)
+            (parse-info (format NIL "rejecting ~S~%" token-type) NIL)
+            -1))))
 
 (defun accept (token-type)
   (let ((*depth* (+ *depth* 1)))
