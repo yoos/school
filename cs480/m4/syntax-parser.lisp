@@ -38,16 +38,13 @@
 
 (defun try-reject (expect production)
   (cond (expect
-          (parse-info (format NIL "[REJECT] FAILED ON ~@?~%" production))
-          (setf *accept* NIL)
+          (parse-reject (format NIL "PARSE FAILED ON ~@?~%" production))
           T)
         (T NIL)))
 
 (defun parse-reject (str)
   (format *enable-debug* "~,,v,@A" (* *depth* 2) (format NIL "[REJECT ~S] ~@?" *depth* str))
   (setf *accept* NIL)
-  ;(unget-sym)
-  ;(format *enable-debug* "~,,v,@A" (* *depth* 2) (format NIL "[REJECT ~S] *sym* reverted to ~S~%" *depth* *sym*))
   NIL)
 
 (defun parse-info (str &optional (enable-indent T))
