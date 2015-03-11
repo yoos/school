@@ -8,16 +8,24 @@
 ;;; Closing parentheses are left until the final productions to avoid epsilon
 ;;; productions.
 ;;;
-;;; S      -> expr S | EPSILON
-;;; expr   -> Soper | ( Pexpr
-;;; oper   -> Soper | ( Poper
+;;; Pexpr is the only non-term that whose first contains an opening
+;;; parenthesis, which is its namesake. This precludes a rule such as S -> ( PS
+;;;
+;;; S      -> exprs
+;;; exprs  -> EPSILON | expr exprs
+;;; expr   -> Soper | ( Pexpr )
 ;;; Soper  -> const | id
-;;; Pexpr  -> expr | Poper | Pstmt | )
-;;; Poper  -> := id oper ) | binop oper oper ) | unop oper )
-;;; Pstmt  -> if expr expr else | while expr exprs | let ( ids ) | stdout oper )
-;;; else   -> expr ) | )
-;;; exprs  -> expr exprs | )
-;;; ids    -> ( id prim ) ids | )
+;;; Pexpr  -> EPSILON | expr | Poper | Pstmt
+;;; Poper  -> := id oper
+;;;         | binop oper oper
+;;;         | unop oper
+;;; Pstmt  -> if expr expr else
+;;;         | while expr exprs
+;;;         | let ( ids )
+;;;         | stdout oper
+;;; oper   -> Soper | ( Poper )
+;;; else   -> EPSILON | expr
+;;; ids    -> EPSILON | ( id prim ) ids
 
 (load "tokens")
 
