@@ -1,67 +1,27 @@
 ;;;; *GRAMMAR* definition
 ;;;
-;;; The following is the IBTL grammar in BNF:
+;;; The following describes the IBTL grammar.
 ;;;
-;;;   S     -> ( ) S   |
-;;;            ( S ) S |
-;;;            expr S  |
-;;;            ( )     |
-;;;            ( S )   |
-;;;            expr
-;;;   expr  -> oper |
-;;;            stmt
-;;;   oper  -> ( := id oper )      |
-;;;            ( binop oper oper ) |
-;;;            ( unop oper )       |
-;;;            const               |
-;;;            id
-;;;   stmt  -> ( if expr expr expr ) |
-;;;            ( if expr expr )      |
-;;;            ( while expr exprs )  |
-;;;            ( let ( ids ) )       |
-;;;            ( stdout oper )
-;;;   exprs -> expr exprs |
-;;;            expr
-;;;   ids   -> ( id prim ) ids |
-;;;            ( id prim )
+;;; We take care to differentiate parenthetical expressions from those that
+;;; are not, namely const and id.
+;;;
+;;; Closing parentheses are left until the final productions to avoid epsilon
+;;; productions.
+;;;
+;;; S      -> expr S | EPSILON
+;;; expr   -> Soper | ( Pexpr
+;;; oper   -> Soper | ( Poper
+;;; Soper  -> const | id
+;;; Pexpr  -> expr | Poper | Pstmt | )
+;;; Poper  -> := id oper ) | binop oper oper ) | unop oper )
+;;; Pstmt  -> if expr expr else | while expr exprs | let ( ids ) | stdout oper )
+;;; else   -> expr ) | )
+;;; exprs  -> expr exprs | )
+;;; ids    -> ( id prim ) ids | )
 
 (load "tokens")
 
-;;; Maybe working grammar:
-;;;
-;;; We need to differentiate oper with Poper in order to enforce no parens
-;;; around const and id, which are oper.
-;;;
-;;; S      -> ( PS
-;;;         | expr LS
-;;; PS     -> S ) LS
-;;;         | ) LS
-;;; LS     -> S
-;;;         | EPSILON
-;;; ------
-;;; S      -> ( S ) S
-;;;         | expr S
-;;;         | EPSILON
-;;; expr   -> oper
-;;;         | stmt
-;;; oper   -> ( Poper )
-;;;         | const
-;;;         | id
-;;; stmt   -> ( Pstmt )
-;;; Poper  -> := id oper
-;;;         | binop oper oper
-;;;         | unop oper
-;;; Pstmt  -> if expr expr else
-;;;         | while expr exprs
-;;;         | let ( ids )
-;;;         | stdout oper
-;;; else   -> expr
-;;;         | EPSILON
-;;; exprs  -> expr exprs
-;;;         | EPSILON
-;;; ids    -> ( id prim ) ids
-;;;         | EPSILON
-
+;;; TODO: Update this, though it's not currently being used.
 (let* (;; Set of productions
        (gP (list (cons 'S        (list '+S))
                  (cons 'S        (list '_S))
