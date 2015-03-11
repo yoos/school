@@ -177,6 +177,18 @@
            (parse-info "accepted~%") T)
           (T (try-reject expect "oper") NIL))))
 
+(defun parse-expr (&optional (expect NIL))
+  (let ((*depth* (+ *depth* 1)))
+    (cond ((and (parse-info "Trying expr -> Sexpr..~%")
+                (parse-Sexpr))
+           (parse-info "accepted~%") T)
+          ((and (parse-info "Trying expr -> ( Pexpr )..~%")
+                (accept 'leftp-dt)
+                (parse-Pexpr T)
+                (expect 'rightp-dt))
+           (parse-info "accepted~%") T)
+          (T (try-reject expect "expr") NIL))))
+
 (defun parse-else (&optional (expect NIL))
   (let ((*depth* (+ *depth* 1)))
     (cond ((and (parse-info "Trying else -> EPSILON..~%")
