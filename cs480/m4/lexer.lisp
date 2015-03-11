@@ -25,7 +25,7 @@
               :fill-pointer 0
               :adjustable T))
 
-(defparameter *token-list* (zero-array 'cons))
+(defparameter *token-list* ())
 (defparameter *lexeme* (zero-array 'character))
 (defparameter *state* 'find-token)
 (defparameter *type* 'unknown-t)
@@ -36,7 +36,8 @@
     (or (string= *lexeme* (car strlist)) (strmatch? (cdr strlist)))))
 
 (defun store-token (token-type token-string)
-                    (vector-push-extend (cons token-type token-string) *token-list*)
+                    ;(vector-push-extend (cons token-type token-string) *token-list*)
+                    (setf *token-list* (cons (cons token-type token-string) *token-list*))
                     (setf *lexeme* (zero-array 'character)
                           *state* 'find-token
                           *type* 'unknown-t))
@@ -45,12 +46,12 @@
   (do
     ((c (read-char istream NIL)     ; Start with first char read
         (read-char istream NIL))    ; Read another char each step
-     (*token-list* (zero-array 'cons))
+     (*token-list* ())
      (*lexeme* (zero-array 'character))
      (*state* 'find-token)
      (*type* 'unknown-t))
     ((null c)                   ; End when c is null
-     (vector-push-extend (cons 'eof T) *token-list*)
+     (setf *token-list* (cons (cons 'eof T) *token-list*))
      (nreverse *token-list*))   ; Reverse symbol table so we can pop.
     (vector-push-extend c *lexeme*)   ; Append char to token
 
