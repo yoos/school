@@ -102,9 +102,10 @@
 
        ;; Consume
        (do
-         ((c (read-char istream NIL)
-             (read-char istream NIL)))
-         ((char= c #\")   ; Read until next quotation mark
+         ((c (read-char istream NIL 'eof)
+             (read-char istream NIL 'eof)))
+         ((or (equal c 'eof)
+              (char= c #\"))   ; Read until next quotation mark or EOF
           (setf *state* 'store-token))
          (vector-push-extend c *lexeme*)))
 
