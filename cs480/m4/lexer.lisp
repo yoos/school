@@ -91,7 +91,8 @@
                ((strmatch? '("stdout")) 'stdout-st)
 
                ;; Fallback
-               (T 'identifier-t))))
+               ;; TODO: Differentiate functions
+               (T 'variable-it))))
 
       ;; String
       ((char= c #\")
