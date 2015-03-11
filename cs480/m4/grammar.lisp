@@ -11,21 +11,24 @@
 ;;; Pexpr is the only non-term that whose first contains an opening
 ;;; parenthesis, which is its namesake. This precludes a rule such as S -> ( PS
 ;;;
-;;; S      -> exprs
-;;; exprs  -> EPSILON | expr exprs
-;;; expr   -> Soper | ( Pexpr )
-;;; Soper  -> const | id
-;;; Pexpr  -> EPSILON | expr | Poper | Pstmt
-;;; Poper  -> := id oper
-;;;         | binop oper oper
-;;;         | unop oper
-;;; Pstmt  -> if expr expr else
-;;;         | while expr exprs
-;;;         | let ( ids )
-;;;         | stdout oper
-;;; oper   -> Soper | ( Poper )
-;;; else   -> EPSILON | expr
-;;; ids    -> EPSILON | ( id prim ) ids
+;;; S     -> exprs
+;;; exprs -> EPSILON
+;;;        | Sexpr exprs
+;;;        | ( Pexpr ) exprs
+;;; Sexpr -> Soper
+;;; Pexpr -> EPSILON | exprs | Poper | Pstmt
+;;; Soper -> const | id
+;;; Poper -> := id oper
+;;;        | binop oper oper
+;;;        | unop oper
+;;; Pstmt -> if expr expr else
+;;;        | while expr exprs
+;;;        | let ( ids )
+;;;        | stdout oper
+;;; oper  -> Soper | ( Poper )
+;;; expr  -> Sexpr | ( Pexpr )
+;;; else  -> EPSILON | expr
+;;; ids   -> EPSILON | ( id prim ) ids
 
 (load "tokens")
 
