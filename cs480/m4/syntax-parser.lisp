@@ -1,4 +1,5 @@
 (load "tokens")
+(load "config")
 
 (defparameter *sym* ())
 (defparameter *symbol-table* ())
@@ -6,25 +7,20 @@
 (defparameter *depth* 0)
 (defparameter *idx* 0)
 
-(defun init-globals (symbol-table)
+(defun init-globals (token-list)
   (setf *sym* ()
-        *symbol-table* symbol-table
+        *symbol-table* token-list
         *accept* T
         *depth* 0
         *idx* 0
         ))
 
 ;;; Convenience function so popping from symbol table fails gracefully.
-(defun table-pop (symbol-table)
-  ;(if (> (fill-pointer symbol-table) 0)
-  ;  (vector-pop symbol-table)))
-  (cond ((< *idx* (length symbol-table))
-         (let ((ret (nth *idx* symbol-table)))
-           (setf *idx* (+ *idx* 1))
-           ret)
-         )
-        (T
-          (cons 'error NIL))))
+(defun table-pop (token-list)
+  (let ((token (car token-list))
+        (table (cdr token-list)))
+    (setf *symbol-table* table)
+    token))
 
 (defun get-sym ()
   (setf *sym* (table-pop *symbol-table*)))
@@ -65,8 +61,8 @@
         (T
           (parse-reject (format NIL "Expected ~S, got ~S instead~%" token-type (car *sym*))) NIL)))
 
-(defun parse (symbol-table)
-  (init-globals symbol-table)
+(defun parse (token-list)
+  (init-globals token-list)
   (get-sym)
   (cond ((and (parse-info "Attempting parse..~%")
               (parse-S)
@@ -112,14 +108,6 @@
                 (parse-S))
            (parse-info "accepted~%") T)
           (T (try-reject expect "PS") NIL))))
-
-;(defun parse-exprs (&optional (expect NIL))
-;  (let ((*depth* (+ *depth* 1)))
-;    (try-parse 'exprs (list (list 'Sexpr 'exprs)
-;                            (list 'leftp-dt 'Pexpr 'rightp-dt 'exprs))
-;               ))
-;  ; TODO: output gforth
-;  )
 
 (defun parse-Soper (&optional (expect NIL))
   (let ((*depth* (+ *depth* 1)))
@@ -266,30 +254,26 @@
 
 
 
+(defun syntax-parse (token-list)
+  (init-globals token-list)
+  (parse-info "Producing syntax tree:~%")
+  (syntax-parse-recurse))
 
-(defun syntax-parse (symbol-table grammar depth)
-  (let ((parse-tree (list (cons 'leftp-dt "("))))
+(defun syntax-parse-recurse ()
+  (let ((*depth* (+ *depth* 1))
+        (parse-tree ()))
     (do
-      ((sym (table-pop symbol-table)
-            (table-pop symbol-table)))
+      ((sym (table-pop *symbol-table*)
+            (table-pop *symbol-table*)))
       ((null sym))
-      (let ((token-type (car sym))
-            (token      (cdr sym)))
+      (let ((token-type (car sym)))
         (cond ((equal token-type 'rightp-dt)   ;; Handle closing parenthesis specially
-               (format T "~,,v,@A~%" (* 2 (- depth 1)) token)
                (return))
               ((equal token-type 'leftp-dt)   ;; Recurse on opening parenthesis
-               (format T "~,,v,@A~%" (* 2 depth) token)
-               (let ((subtree (syntax-parse symbol-table grammar (+ 1 depth))))
+               (let ((subtree (syntax-parse-recurse)))
                  (setf parse-tree
                        (cons subtree parse-tree))))
-              (T
-                ;; Print to screen at correct indentation
-                ;; See http://stackoverflow.com/questions/20072959/lisp-format-a-character-a-number-of-times
-                (format T "~,,v,@A~%" (* 2 depth) token)
-                (setf parse-tree
-                      (cons sym parse-tree))
+              (T (setf parse-tree
+                       (cons sym parse-tree))
                 ))))
-    (setf parse-tree
-          (cons (cons 'rightp-dt ")") parse-tree))
     (nreverse parse-tree)))

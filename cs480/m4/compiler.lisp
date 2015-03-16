@@ -4,6 +4,7 @@
 (load "syntax-parser")
 (load "semantics-parser")
 (load "grammar")
+(load "config")
 
 (defun my-command-line ()
   (or 
@@ -14,8 +15,6 @@
 
 (defparameter args (cdr (my-command-line)))
 
-(defparameter *enable-debug* NIL)
-
 (loop for arg in args do
       (cond ((string= arg "-d")
              (setf *enable-debug* T))
@@ -23,12 +22,18 @@
 
 (loop for arg in args do
       (cond ((not (string= (subseq arg 0 1) "-"))
-             (format T "Parsing ~S:~%" arg)
+             (format T "Parsing ~S: " arg)
              (with-open-file (istream arg)
-               (let* ((lexer-list (lex istream))
-                      (dummy (format *enable-debug* "~%Lexer list: ~S~%~%" lexer-list))
-                      (parse-result (parse lexer-list)))
-                 (format T "~%Parse result: ~S~%" parse-result))
-               (format T "~%~%")))
+               (let* ((token-list (lex istream))
+                      (dummy (format *enable-debug* "~%Token list: ~S" token-list))
+                      (parse-result (parse token-list))
+                      (dummy (format *enable-debug* "~%Syntax check: ~S" parse-result))
+                      (parse-tree (syntax-parse token-list))
+                      (dummy (format *enable-debug* "~%Syntax tree: ~S" parse-tree))
+                      ;(semantics-result (semantics-parse parse-tree))
+                      ;(dummy (format *enable-debug* "~%~%Syntax tree: ~S" semantics-result))
+                      (dummy (format *enable-debug* "~%")))
+                 (format T "~S~%~%" parse-result))
+               ))
             (T NIL))
       )
