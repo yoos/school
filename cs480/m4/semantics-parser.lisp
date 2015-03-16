@@ -1,32 +1,31 @@
 (load "tokens")
+(load "config")
 
-(defun semantics-parse (parse-tree grammar depth)
-  (let ((sentence ())
-        (gP (nth 2 grammar)))
-    (cond
-      ;; Base case
-      ((typep (car parse-tree) 'token-t)
-       (car parse-tree))
+(defun semantics-parse (parse-tree)
+  (format T "Parsing semantics:~%")
+  (semantics-parse-recurse parse-tree 0))
 
-      ;; Recurse
-      (T
-        (do
-          ((expr       (car parse-tree) (car parse-tree))
-           (parse-tree (cdr parse-tree) (cdr parse-tree)))
-          ((null expr))   ; Stop when we can't pop any more
-          (let ((expr-type (semantics-parse expr grammar (+ depth 1))))
-            (setf sentence (cons expr-type sentence))
-            ))
+(defun semantics-parse-recurse (parse-tree depth)
+  (cond
+    ;; EOF
+    ((equal (car parse-tree) 'eof)
+     NIL)
 
-        (setf sentence (nreverse sentence))   ; Reverse sentence
-        (format T "s~S: ~S~%" depth sentence)
+    ;; Base case (raw symbol)
+    ((typep (car parse-tree) 'token-t)
+     (car parse-tree))
 
-        ;; Try to match rule
-        (let ((match-pos (position T (mapcar (lambda (R)
-                                               (equal (cadr R)
-                                                      sentence))
-                                             gP))))
-          (if (null match-pos)
-            'error
-            (car (nth match-pos gP))))))
-    ))
+    ;; Recurse (list of symbols)
+    (T (let ((sentence ())
+             (return-type NIL))
+         (do
+           ((expr       (car parse-tree) (car parse-tree))
+            (parse-tree (cdr parse-tree) (cdr parse-tree)))
+           ((null expr))   ; Stop when we can't pop any more
+           (let ((expr-type (semantics-parse-recurse expr (+ depth 1))))
+             (setf sentence (cons expr-type sentence))
+             ))
+
+         (setf sentence (nreverse sentence))   ; Reverse sentence
+         (format T "s~S: ~S~%" depth sentence))))
+  )
