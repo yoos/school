@@ -1,16 +1,5 @@
 ;;;; *GRAMMAR* definition
 ;;;
-;;; The following describes the IBTL grammar.
-;;;
-;;; We take care to differentiate parenthetical expressions from those that
-;;; are not, namely const and id.
-;;;
-;;; Closing parentheses are left until the final productions to avoid epsilon
-;;; productions.
-;;;
-;;; Pexpr is the only non-term that whose first contains an opening
-;;; parenthesis, which is its namesake. This precludes a rule such as S -> ( PS
-;;;
 ;;; S     -> EPSILON
 ;;;        | Sexpr S
 ;;;        | ( PS ) S
