@@ -75,7 +75,7 @@
   (let ((*depth* (+ *depth* 1)))
     (cond ((and (parse-info "Trying S -> EPSILON..~%")
               (or (peek 'rightp-dt)
-                  (peek'eof)))
+                  (peek 'eof)))
            (parse-info "accepted~%") T)
           ((and (parse-info "Trying S -> Sexpr S..~%")
                 (parse-Sexpr)
