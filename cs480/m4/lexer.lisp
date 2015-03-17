@@ -1,5 +1,6 @@
 (load "tokens")
 (load "states")
+(load "util")
 
 (defun letter? (c)
   (or (and (string>= c "A") (string<= c "Z"))
@@ -29,11 +30,6 @@
 (defparameter *lexeme* (zero-array 'character))
 (defparameter *state* 'find-token)
 (defparameter *type* 'unknown-t)
-
-(defun strmatch? (strlist)
-  (if (null strlist)
-    NIL
-    (or (string= *lexeme* (car strlist)) (strmatch? (cdr strlist)))))
 
 (defun store-token (token-type token-string)
                     ;(vector-push-extend (cons token-type token-string) *token-list*)
@@ -72,23 +68,23 @@
        (setf *type*
              (cond
                ;; Constants
-               ((strmatch? '("true" "false")) 'boolean-ct)
+               ((strmatch? *lexeme* '("true" "false")) 'boolean-ct)
 
                ;; Operators
-               ((strmatch? '("and" "or"))              'binop-ot)
-               ((strmatch? '("not" "sin" "cos" "tan")) 'unop-ot)
+               ((strmatch? *lexeme* '("and" "or"))              'binop-ot)
+               ((strmatch? *lexeme* '("not" "sin" "cos" "tan")) 'unop-ot)
 
                ;; Primitives
-               ((strmatch? '("bool"))   'boolean-pt)
-               ((strmatch? '("int"))    'integer-pt)
-               ((strmatch? '("real"))   'real-pt)
-               ((strmatch? '("string")) 'string-pt)
+               ((strmatch? *lexeme* '("bool"))   'boolean-pt)
+               ((strmatch? *lexeme* '("int"))    'integer-pt)
+               ((strmatch? *lexeme* '("real"))   'real-pt)
+               ((strmatch? *lexeme* '("string")) 'string-pt)
 
                ;; Statements
-               ((strmatch? '("if"))     'if-st)
-               ((strmatch? '("while"))  'while-st)
-               ((strmatch? '("let"))    'let-st)
-               ((strmatch? '("stdout")) 'stdout-st)
+               ((strmatch? *lexeme* '("if"))     'if-st)
+               ((strmatch? *lexeme* '("while"))  'while-st)
+               ((strmatch? *lexeme* '("let"))    'let-st)
+               ((strmatch? *lexeme* '("stdout")) 'stdout-st)
 
                ;; Fallback
                ;; TODO: Differentiate functions
@@ -143,18 +139,18 @@
          (setf *type*
                (cond
                  ;; Multichar ops
-                 ((strmatch? '(">=" "<=" "!=")) 'binop-ot)
+                 ((strmatch? *lexeme* '(">=" "<=" "!=")) 'binop-ot)
 
                  ;; Assign statement
-                 ((strmatch? '(":=")) 'assign-st)
+                 ((strmatch? *lexeme* '(":=")) 'assign-st)
 
                  ;; Unread and process singlechar ops
                  (T (unread-char c istream)
                     (vector-pop *lexeme*)
                     (cond
-                      ((strmatch? '("(")) 'leftp-dt)
-                      ((strmatch? '(")")) 'rightp-dt)
-                      ((strmatch? '("!")) 'unknown-t)
+                      ((strmatch? *lexeme* '("(")) 'leftp-dt)
+                      ((strmatch? *lexeme* '(")")) 'rightp-dt)
+                      ((strmatch? *lexeme* '("!")) 'unknown-t)
                       (T 'binop-ot))))))
        (setf *state* 'store-token))
 
