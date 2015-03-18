@@ -18,4 +18,5 @@ view: report
 
 clean:
 	rm -f stutest.out m4.{aux,log,out,pdf}
+	rm -rf out
 	ls
