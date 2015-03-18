@@ -19,6 +19,7 @@
 ;;; oper  -> Soper | ( Poper )
 ;;; expr  -> Sexpr | ( Pexpr )
 ;;; else  -> EPSILON | expr
+;;; exprs -> EPSILON | expr exprs
 ;;; ids   -> EPSILON | ( id prim ) ids
 
 (load "tokens")

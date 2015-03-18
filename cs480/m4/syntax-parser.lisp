@@ -196,6 +196,17 @@
            (parse-info "accepted~%") T)
           (T (try-reject expect "else") NIL))))
 
+(defun parse-exprs (&optional (expect NIL))
+  (let ((*depth* (+ *depth* 1)))
+    (cond ((and (parse-info "Trying exprs -> EPSILON..~%")
+                (peek 'rightp-dt))
+           (parse-info "accepted~%") T)
+          ((and (parse-info "Trying exprs -> expr exprs..~%")
+                (parse-expr)
+                (parse-exprs T))
+           (parse-info "accepted~%") T)
+          (T (try-reject expect "exprs") NIL))))
+
 (defun parse-ids (&optional (expect NIL))
   (let ((*depth* (+ *depth* 1)))
     (cond ((and (parse-info "Trying ids -> EPSILON..~%")
