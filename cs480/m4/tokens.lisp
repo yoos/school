@@ -1,12 +1,10 @@
-(defpackage #:lexer-tokens)
-
 ;;; Define terminals
 (defparameter constants   (list 'boolean-ct
                                 'integer-ct
                                 'real-ct
                                 'string-ct))
 (defparameter delimiters  (list 'leftp-dt
-                                'rightp-dt))   ; TODO(yoos)' Do we really need to categorize these separately?
+                                'rightp-dt))
 (defparameter identifiers (list 'function-it
                                 'variable-it))
 (defparameter operators   (list 'binop-ot
@@ -31,7 +29,6 @@
 (deftype unknown-t    ())
 
 ;;; Encapsulate the above symbols as a token type
-;;; TODO(yoos): Include unknown-t? Do I need this?
 (deftype token-t ()
   `(member ,@constants
            ,@delimiters
