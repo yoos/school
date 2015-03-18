@@ -33,7 +33,14 @@
                       (semantics-result (semantics-parse parse-tree))
                       (dummy (format *enable-debug* "~%Semantics check: ~S~%~%" semantics-result))
                       (dummy (format *enable-debug* "~%")))
-                 (format T "~S~%~%" parse-result))
+                 (format T "~S~%~%" parse-result)
+
+                 ;; Write to file, creating directories if necessary and overwriting preexisting files.
+                 (with-open-file (ostream (ensure-directories-exist (format NIL "out/~A" arg))
+                                          :direction :output
+                                          :if-exists :supersede)
+                   (format ostream "~A" semantics-result))
+                 )
                ))
             (T NIL))
       )
