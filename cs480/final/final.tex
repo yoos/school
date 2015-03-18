@@ -1,0 +1,181 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{fancyhdr}
+\usepackage[utf8]{inputenc}
+\usepackage{palatino}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{lastpage}
+\usepackage[hang,small,margin=1in]{caption}
+\usepackage{titlesec}
+\usepackage{pdfpages}
+\usepackage{natbib}
+
+\renewcommand{\headrulewidth}{0pt}
+\fancyhead{}
+\fancyfoot{}
+\fancyfoot[C]{\sffamily Page \thepage\ of \pageref{LastPage}}
+\pagestyle{fancy}
+
+\titleformat{\section}{\bfseries\MakeUppercase}{\arabic{\thesection}}{1em}{}
+\titleformat{\subsection}{\bfseries}{\arabic{\thesection}.\arabic{\thesubsection}}{1em}{}
+\titleformat{\subsubsection}{\itshape}{\arabic{\thesection}.\arabic{\thesubsection}.\arabic{\thesubsubsection}}{1em}{}
+
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{1em}
+
+\captionsetup[figure]{labelfont=it, font=it}
+\captionsetup[table]{labelfont={it,sc}, font={it,sc}}
+
+\hypersetup{colorlinks, linkcolor = black, citecolor = black, urlcolor = black}
+\urlstyle{same}
+
+
+
+\begin{document}
+
+\fancyfoot{}
+\begin{center}
+    \hfill \\
+    \vspace{4in}
+    {\bf\Huge CS480 Final Exam \\}
+    \vspace{2in}
+    {\Large Soo-Hyun Yoo \\ March 17, 2015}
+\end{center}
+
+\newpage
+\fancyfoot[C]{\sffamily Page \thepage\ of~\pageref{LastPage}}
+
+We examine two papers on efforts to optimize Lisp for modern RISC systems
+(\cite{steenkiste1987}) and to optimize general functional programs by grammar
+thinning (\cite{webber1995}).
+
+\section*{Lisp on a Reduced-Instruction-Set Processor: Characterization and Optimization}
+
+Steenkiste first briefly explains the need to consider an implementation of
+Lisp optimized for RISC architectures rather than dedicated Lisp machines,
+which were traditionally more prevalent for running Lisp programs at the time.
+He points out that RISC architecture development was driven by the execution
+characteristics of compiled high-level languages such as C, Fortran, and
+Pascal, and that the one RISC processor designed for Common Lisp provided
+limited hardware support for the language.
+
+Thus, the author presents a set of 10 programs to determine the execution
+behavior of compiled Lisp programs and to determine the kinds of hardware
+support or compiler optimizations that could substantially improve performance.
+MIPS-X is used as the exemplary RISC processor, while SPUR is used as the RISC
+Lisp platform. In running the benchmark tests, the author ensures the
+functional verification of the hardware devices being used as well as counts
+the number of functions, lines of code, and the machine instructions included
+in each program.
+
+Using the test programs, Steenkiste determines the frequency of various
+instruction types, including function calls, car/cdr/cons operations, and
+accessing local variables at the source code level and function calls and stack
+handling at the MIPS architecture level. With these identified, he drills down
+deeper to examine how each type of instruction can be sped up either in
+hardware or via software optimizations.
+
+For example, he notes that of the total time required to call and return from
+a function, 60 percent is used just to set up and tear down the stack frame,
+which is unnecessary for functions that perform all their work in registers.
+Although little can be done in hardware to speed up function calls, the author
+suggests the use of inline expansion and optimizing calls to the underlying
+Lisp runtime system specifically, as he cites Lisp programs spend about 52
+percent of their time there. He further suggests avoiding inlining of recursive
+functions, as unrolling recursion leads to increased code size, which in turn
+is heavily penalized by the small MIPS-X instruction cache.
+
+Following discussion such as the one above regarding other aspects of the
+compilation and runtime processes, the author compares prior results from three
+different architectures with his own experimental results on the MIPS-X and
+SPUR platforms.
+
+Steenkiste concludes that function calling and stack manipulation account for
+over 60 percent of unoptimized Lisp programs and that both hardware and
+software optimizations can significantly reduce the time cost of these
+operations. He notes that even without these optimizations, however, the MIPS-X
+processor outperforms special-purpose Lisp machines and that further
+explorations in type checking during compile time and using larger instruction
+caches may yield important answers to how well such compiler optimizations can
+scale.
+
+Steenkiste does a very good job of thoroughly examining the various parts of
+the code before and after compilation and their resource costs. Organization of
+the paper was good, with concepts clearly explained prior to sections that
+built upon them or used them as assumptions in evaluating the experimental test
+results. His use of ten different test programs is respectable, though he does
+not go into much detail on how much hardware coverage of the MIPS architecture
+these cases cover. Nevertheless, he sets up a good foundation for future
+studies that can cover more hardware in depth.
+
+
+\section*{Optimization of Functional Programs by Grammar Thinning}
+
+Unlike the Steenkiste paper, which looks at optimizing various aspects of the
+source-to-executable compilation process and runtime characteristics, Webber
+presents a proof of concept source-to-source optimizer, Thinner, meant for
+``purely functional, first-order programs.'' He points out that although
+Thinner is not practical in that it rediscovers many commonly known compiler
+optimizations, it is capable of finding certain exotic grammar transformations.
+
+Webber introduces some key concepts used in Thinner and the concept of grammar
+thinning with an example. The basis of the Thinner algorithm seems to be
+a blind expansion of the existing grammar and searching for thinnable graphs
+that contain an unnecessary computation. A subgraph is extracted from such
+graphs, and a ``kernel set'' containing minimal subgraphs that could expand to
+these thinnable graphs is constructed (it is this blind expansion that makes
+Thinner very computationally expensive but powerful). Ultimately, a final
+grammar is produced that is functionally equivalent but never generates a graph
+with redundant calculations as the original does.
+
+The author presents some related work that optimized in other ways, including
+user-supplied test inputs and proofs of correctness to remove disconnected
+functions and unnecessary copy operators.
+
+Following this, Webber carefully examines the problem through multiple formal
+definitions and proofs of the subproblems that Thinner solves via the kernel
+set and intermediate ``trace grammars'' and ``trace graphs'', which model the
+flow of data. Webber shows that a single program is a set of such trace graphs,
+so a trace grammar is formulated to express these graphs. Since the trace
+graphs inherently avoid unnecessary computation, the corresponding grammars
+produce optimized code. Thinner finds a particular grammar by a depth-first
+iterative deepening search of the possible grammars for one that optimizes
+recursive cases (which yield more significant improvements over base cases).
+
+Webber closes with a listing of some of the shortcomings of Thinner, namely the
+fact that it is still a proof of concept optimizer and that neither the kernel
+set generation nor grammar selection through iterative deepening are
+exhaustive; more useful optimizations could be found of Thinner searched more
+exhaustively. However, as Thinner is able to find optimizations otherwise not
+obvious to humans or in the canonical list of compiler optimizations, if
+a solid foundation could be laid for optimizers to decide when to use grammar
+thinning to find such optimizations instead of rediscovering the same, grammar
+thinning could be a powerful addition to compilers in general.
+
+The author does a fair job of covering all of the topics involved in his
+research. This is a long paper -- perhaps by necessity, the author jumps around
+quite a bit regarding different parts of the same concept. Once explained,
+however, he demonstrates the use of the concepts to prove the correctness of
+his algorithm and experimentally verifies the result. It is slightly
+anticlimactic that he was yet unable to produce a practical optimizer, but as
+a proof of concept, grammar thinning sounds exciting.
+
+
+\section*{Reflection}
+
+Although these papers are rather old by computing standards (Steenkiste talked
+about 20 MHz processors; I imagine they really felt the difference made through
+compiler and runtime optimizations), the topics discussed seem still very
+relevant today.
+
+Both authors were very meticulous in their thinking and presentation of their
+work. I appreciated that they provided both a theoretical and experimental
+foundation for their optimizers. The former is something I will personally need
+more time to put into practice.
+
+\bibliographystyle{apa}
+\bibliography{final}
+
+\end{document}
