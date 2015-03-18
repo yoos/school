@@ -1,10 +1,10 @@
 (load "tokens")
+(load "util")
 (load "config")
 
 (defparameter *sym* ())
 (defparameter *symbol-table* ())
 (defparameter *accept* T)
-(defparameter *depth* 0)
 (defparameter *idx* 0)
 
 (defun init-globals (token-list)
@@ -31,16 +31,6 @@
           (setf *accept* NIL)
           T)
         (T NIL)))
-
-(defun parse-reject (str)
-  (format *enable-debug* "~,,v,@A" (* *depth* 2) (format NIL "[REJECT ~S] ~@?" *depth* str))
-  NIL)
-
-(defun parse-info (str &optional (enable-indent T))
-  (if enable-indent
-    (format *enable-debug* "~,,v,@A" (* 2 *depth*) (format NIL "[INFO ~S] ~@?" *depth* str))
-    (format *enable-debug* "~@?" str))
-  T)
 
 (defun peek (token-type)
   (equal (car *sym*) token-type))
