@@ -18,11 +18,15 @@
           (cond ((string= ibtl-expr "!=")  "<>")
                 ((string= ibtl-expr "%")   "mod")
                 ((string= ibtl-expr "^")   "**")
+                ((string= ibtl-expr ":=")  "!")
                 ((string= ibtl-expr "not") "invert")
                 ((string= ibtl-expr "sin") "fsin")
                 ((string= ibtl-expr "cos") "fcos")
                 ((string= ibtl-expr "tan") "ftan")
+                ((string= ibtl-expr "let") "create")
+                ((string= ibtl-expr "stdout") ".")
                 ((equal ibtl-type 'real-ct) (format NIL "~Ae" ibtl-expr))
+                ((equal ibtl-type 'string-ct) (format NIL "s\" ~A\"" ibtl-expr))
                 (T ibtl-expr)))
     )
   sym)
@@ -64,12 +68,79 @@
        (parse-info (format NIL "Bare symbol ~S~%" parse-tree))
        (ibtl-to-gforth parse-tree))
 
+      ;; Catch statements
+      ((typep (caar parse-tree) 'statement-t)
+       (parse-info (format NIL "Stmt ~S~%" (car parse-tree)))
+       (let ((stmt          (car parse-tree))
+             (operands-tree (cdr parse-tree))
+             (operands ())
+             (return-type (cons 'unknown "gforth")))
+         (case (car stmt)
+           ('if-st
+            (let ((if-cond  (nth 0 operands-tree))
+                  (if-true  (nth 1 operands-tree))
+                  (if-false (nth 2 operands-tree)))
+              ;; Manually stick some gforth on the stack..
+              ;; TODO: This is icky.
+              (setf operands (cons (semantics-parse-recurse if-cond) operands))
+              (setf operands (cons (cons 'if-st "if") operands))
+              (setf operands (cons (semantics-parse-recurse if-true) operands))
+              (cond ((not (null if-false))
+                     (setf operands (cons (cons 'ifelse-st "else") operands))
+                     (setf operands (cons (semantics-parse-recurse if-false) operands))))
+              (setf operands (cons (cons 'ifthen-st "then") operands)))
+            (setf (car return-type) 'integer-ct))   ; TODO: What should I return here?
+           ('while-st
+            (let ((while-cond (car operands-tree))
+                  (while-exprs (cdr operands-tree)))
+              (setf operands (cons (cons 'whilebegin-st "begin") operands))
+              (setf operands (cons (semantics-parse-recurse while-cond) operands))
+              (setf operands (cons (cons 'whilebegin-st "while") operands))
+              (setf operands (cons (semantics-parse-recurse while-exprs) operands))
+              (setf operands (cons (cons 'whilebegin-st "repeat") operands)))
+            (setf (car return-type) 'integer-ct))
+           ('let-st
+            (let ((let-exprs (car operands-tree)))
+              (parse-info (format NIL "~S~%" let-exprs))
+              (do ((id        (car let-exprs) (car let-exprs))
+                   (let-exprs (cdr let-exprs) (cdr let-exprs)))
+                ((null id))
+                (setf operands (cons (cons 'letcreate-st "create") operands))
+                (setf operands (cons (car id) operands))   ; Variable name
+                ; TODO: Should we do anything with the variable type?
+                ))
+            (setf (car return-type) 'integer-ct))
+           ('stdout-st
+            (setf operands (cons (semantics-parse-recurse operands-tree) operands))
+            (setf operands (cons (cons 'stdoutpad-st "pad place") operands))
+            (setf operands (cons (cons 'stdoutpad-st "pad count type") operands))
+            (setf (car return-type) 'integer-ct))
+           ('assign-st
+            (let ((assign-id  (nth 0 operands-tree))
+                  (assign-val (nth 1 operands-tree)))
+              (setf operands (cons (semantics-parse-recurse assign-val) operands))
+              (setf operands (cons assign-id operands))
+              (if (equal (car return-type) 'real-ct)
+                (setf operands (cons (cons 'assign-st "f!") operands))
+                (setf operands (cons (cons 'assign-st "!") operands))))
+            (setf (car return-type) 'integer-ct)))
+
+         (setf operands (nreverse operands))
+
+         ;; Grab only the gforth code, as we no longer need operand types.
+         (setf operands (mapcar #'cdr operands))
+         (setf (cdr return-type) operands)
+
+         (parse-info (format NIL "Operands: ~S~%" operands))
+         (parse-info (format NIL "Return: ~S~%" return-type))
+         return-type))
+
       ;; Catch expressions led by an operator, primitive, or statement before
       ;; we go deeper.
       ((or (typep (caar parse-tree) 'operator-t)
-           (typep (caar parse-tree) 'primitive-t)
-           (typep (caar parse-tree) 'statement-t))
-       (parse-info (format NIL "Op/prim/stmt ~S~%" (car parse-tree)))
+           (typep (caar parse-tree) 'primitive-t))
+           ;(typep (caar parse-tree) 'statement-t))
+       (parse-info (format NIL "Op/prim ~S~%" (car parse-tree)))
 
        ;; Collect operands and stick the operator/primitive/statement
        ;; (opriment?) at the end.
@@ -132,8 +203,12 @@
                (parse-tree (cdr parse-tree) (cdr parse-tree)))
             ((null expr))   ; Stop when we can't pop any more
             (if (not (equal (car expr) 'eof))
-              (setf return-type (semantics-parse-recurse expr)))
-            )
+              (let ((return-old (cdr return-type))
+                    (return-new (semantics-parse-recurse expr)))
+                (setf return-type (cons (car return-new)
+                                        (append return-old (cdr return-new))
+                                        )))
+              ))
 
           (parse-info (format NIL "Final return: ~S~%" return-type))
           return-type))
