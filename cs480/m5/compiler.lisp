@@ -27,20 +27,25 @@
                (let* ((token-list (lex istream))
                       (dummy (format *enable-debug* "~%Token list: ~A~%~%" token-list))
                       (parse-result (parse token-list))
-                      (dummy (format *enable-debug* "~%Syntax check: ~A~%~%" parse-result))
-                      (parse-tree (syntax-parse token-list))
-                      (dummy (format *enable-debug* "~%Syntax tree: ~A~%~%" parse-tree))
-                      (semantics-result (semantics-parse parse-tree))
-                      (dummy (format *enable-debug* "~%Gforth output: ~A~%~%" semantics-result))
-                      (dummy (format *enable-debug* "~%")))
-                 (format T "~S~%" parse-result)
+                      (dummy (format *enable-debug* "~%Syntax check: ~A~%~%" parse-result)))
 
-                 ;; Write to file, creating directories if necessary and overwriting preexisting files.
-                 (with-open-file (ostream (ensure-directories-exist (format NIL "out/~A" arg))
-                                          :direction :output
-                                          :if-exists :supersede)
-                   (format ostream "~A" semantics-result))
-                 )
-               ))
+                 ;; Abort on syntax error
+                 (if (not parse-result)
+                   (format T "Syntax error")
+                   (let* ((parse-tree (syntax-parse token-list))
+                          (dummy (format *enable-debug* "~%Syntax tree: ~A~%~%" parse-tree))
+                          (semantics-result (semantics-parse parse-tree))
+                          (dummy (format *enable-debug* "~%Gforth output: ~A~%~%" semantics-result))
+                          (dummy (format *enable-debug* "~%")))
+                     (format T "~S" parse-result)
+
+                     ;; Write to file, creating directories if necessary and overwriting preexisting files.
+                     (with-open-file (ostream (ensure-directories-exist (format NIL "out/~A" arg))
+                                              :direction :output
+                                              :if-exists :supersede)
+                       (format ostream "~A" semantics-result)
+                       )))
+                 (format T "~%")
+                 )))
             (T NIL))
       )
