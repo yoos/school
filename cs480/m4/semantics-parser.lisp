@@ -5,38 +5,50 @@
 (defparameter *gforth-stack* ())
 (defparameter *depth* 0)   ; TODO: The syntax parser initializes this on its own. We shouldn't use global vars.
 
-;;; Add gforth expression to global stack.
-(defun add-gforth (expr)
-  (parse-info (format NIL "Adding ~S to stack~%" expr))
-  (setf *gforth-stack* (cons expr *gforth-stack*)))
+;;; Add gforth expressions from symbol list to global stack.
+(defun add-gforth (gforth-list)
+  (parse-info (format NIL "Adding ~S to stack~%" gforth-list))
+  (setf *gforth-stack* (append gforth-list *gforth-stack*)))
 
 ;;; Translate some differences between IBTL and Forth.
 (defun ibtl-to-gforth (sym)
-  (let ((gforth-expr (cdr sym)))
-    (setf gforth-expr
-          (cond ((string= gforth-expr "!=")  "<>")
-                ((string= gforth-expr "%")   "mod")
-                ((string= gforth-expr "^")   "**")
-                ((string= gforth-expr "not") "invert")
-                (T gforth-expr)))
-    (add-gforth gforth-expr)   ; Add to stack. TODO: maybe I shouldn't do this here
-    (setf (cdr sym) gforth-expr))
+  (let ((ibtl-type (car sym))
+        (ibtl-expr (cdr sym)))
+    (setf (cdr sym)
+          (cond ((string= ibtl-expr "!=")  "<>")
+                ((string= ibtl-expr "%")   "mod")
+                ((string= ibtl-expr "^")   "**")
+                ((string= ibtl-expr "not") "invert")
+                ((string= ibtl-expr "sin") "fsin")
+                ((string= ibtl-expr "cos") "fcos")
+                ((string= ibtl-expr "tan") "ftan")
+                ((equal ibtl-type 'real-ct) (format NIL "~Ae" ibtl-expr))
+                (T ibtl-expr)))
+    )
   sym)
 
-;;; Cast integer to float (if not already)
-;;; TODO: add safeties against other types?
-(defun itof (sym)
-  (if (equal (car sym) 'real-ct)
-    sym
-    (format NIL "~Se" (car sym))))
+;;; Convert gforth symbol to real type
+(defun itof (sym-gforth)
+  (parse-info (format NIL "Symbol: ~S~%" sym-gforth))
+  (cond ((equal (car sym-gforth) 'integer-ct)
+         (cons 'real-ct (format NIL "~Ae" (cdr sym-gforth))))
+        ((or (equal (car sym-gforth) 'binop-ot)
+             (equal (car sym-gforth) 'unop-ot))
+         (cond ((not (strmatch? (cdr sym-gforth) '("and" "or" "not")))
+                (cons (car sym-gforth) (format NIL "f~A" (cdr sym-gforth))))   ; Prepend with f
+               (T sym-gforth)))
+        (T sym-gforth)
+        ))
 
 ;;; Top parser call
 (defun semantics-parse (parse-tree)
-  (format T "Parsing semantics:~%")
-  (semantics-parse-recurse parse-tree)
-
-  ;; Neat formatting trick: http://stackoverflow.com/questions/8830888/whats-the-canonical-way-to-join-strings-in-a-list
-  (format NIL "~{~A~^ ~}" (nreverse *gforth-stack*)))
+  (setf *gforth-stack* ())   ; Reset stack
+  (parse-info "Parsing semantics:~%")
+  (let* ((gforth-result (semantics-parse-recurse parse-tree))
+         (gforth-type (car gforth-result))
+         (gforth-tree (cdr gforth-result)))
+    ;; Neat formatting trick: http://stackoverflow.com/questions/8830888/whats-the-canonical-way-to-join-strings-in-a-list
+    (format NIL "~{~A~^ ~}" (flatten gforth-tree))))
 
 ;;; Recursive parser call
 (defun semantics-parse-recurse (parse-tree)
@@ -64,32 +76,46 @@
        (let ((opriment      (car parse-tree))
              (operands-tree (cdr parse-tree))
              (operands ())
-             (return-type (cons 'unknown "gforth")))
+             (return-type (cons 'unknown "gforth")))   ; TODO: Replace with something less arbitrary
+         ;; Process opriment and set it aside for now
+         (setf (car return-type)
+               (case (car opriment)
+                 (('binop-ot 'unop-ot)
+                  (cond ((strmatch? (cdr opriment) '("and" "or" "not" ">=" "<=" "!="))
+                         'boolean-ct)
+                        ((strmatch? (cdr opriment) '("sin" "cos" "tan"))
+                         'real-ct)
+                        (T 'integer-ct)))
+                 ))
+
+         ;; Process operands
          (do ((expr          (car operands-tree) (car operands-tree))
               (operands-tree (cdr operands-tree) (cdr operands-tree)))
            ((null expr))   ;; Stop when we can't pop any more
            (let ((operand (semantics-parse-recurse expr)))
-             (setf operands (cons operand operands))
-             ;; Update return-type depending on opriment
-             (case (car opriment)
-               (('binop-ot 'unop-ot)
-                (setf (cdr return-type) (cdr opriment))
-                ;; TODO: process operands and adjust return type accordingly
-                (setf (car return-type)
-                      (cond ((strmatch? (cdr opriment) '("and" "or" "not" ">=" "<=" "!="))
-                             'boolean-ct)
-                            ((strmatch? (cdr opriment) '("sin" "cos" "tan"))
-                             'real-ct)
-                            (T 'integer-ct)
-                            )))
-               )))
+             (setf operands (cons operand operands))   ; Add to list
+             ;; Update return-type depending on operand
+             (case (car return-type)
+               ('integer-ct
+                (case (car operand)
+                  ('real-ct (setf (car return-type) 'real-ct))))
+               (otherwise
+                 (case (car operand)
+                   ('string-ct (setf (car return-type) 'string-ct))
+                   (otherwise (setf (car return-type) 'integer-ct)))))
+             ))
 
-         ;; Finally, convert opriment to gforth and add to stack.
+         ;; Finally, convert opriment to gforth and add to local symbol stack.
          (setf opriment (semantics-parse-recurse opriment))
          (setf operands (cons opriment operands))
-         ;(setf operands (nreverse operands))
+         (setf operands (nreverse operands))
 
-         ;(do ((g
+         ;; If return-type is real-ct at this point, blanket convert everything
+         ;; to reals types, including the operator.
+         (parse-info (format NIL "Operands: ~S~%" operands))
+         (if (equal (car return-type) 'real-ct)
+           (setf operands (mapcar #'itof operands)))
+         (parse-info (format NIL "Operands: ~S~%" operands))
 
          ;; Grab only the gforth code, as we no longer need operand types.
          (setf operands (mapcar #'cdr operands))
