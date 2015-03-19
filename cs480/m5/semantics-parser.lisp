@@ -198,17 +198,15 @@
       ;; excluding EOF.
       (T
         ;; Loop through all expressions
-        (let ((return-type NIL))
+        (let ((return-type ()))
           (do ((expr       (car parse-tree) (car parse-tree))
                (parse-tree (cdr parse-tree) (cdr parse-tree)))
             ((null expr))   ; Stop when we can't pop any more
             (if (not (equal (car expr) 'eof))
               (let ((return-old (cdr return-type))
                     (return-new (semantics-parse-recurse expr)))
-                (setf return-type (cons (car return-new)
-                                        (append return-old (cdr return-new))
-                                        )))
-              ))
+                (setf return-type (cons (car return-new) (list (cdr return-type) (cdr return-new))))
+                )))
 
           (parse-info (format NIL "Final return: ~S~%" return-type))
           return-type))
