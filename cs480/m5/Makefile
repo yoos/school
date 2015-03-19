@@ -2,7 +2,7 @@ compiler:
 	@echo "Usage: ./compiler.lisp <input file> [-d]"
 
 stutest.out:
-	./compiler.lisp test/good/*.txt test/bad/*.txt >> stutest.out
+	./compiler.lisp test/good/*.ibtl test/bad/*.ibtl >> stutest.out
 
 proftest.out:
 	cat $(PROFTEST)
