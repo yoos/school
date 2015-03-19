@@ -9,6 +9,9 @@ Just use:
   ./compiler.lisp <input file> [-d]
 ```
 
+The optional `-d` flag enables debug, which will make the lexer, syntax parser,
+and semantic parser print debug info.
+
 Test files are located in `test`, categorized between `good` and `bad` per
 their expected parse results. The resultant gforth code will be output to the
 `out` directory mirroring the input directory structure.
