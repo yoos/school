@@ -1,0 +1,46 @@
+#!/usr/bin/sbcl --script
+
+(load "lexer")
+(load "syntax-parser")
+(load "semantics-parser")
+(load "grammar")
+(load "config")
+
+(defun my-command-line ()
+  (or 
+    #+SBCL *posix-argv*  
+    #+LISPWORKS system:*line-arguments-list*
+    #+CMU extensions:*command-line-words*
+    nil))
+
+(defparameter args (cdr (my-command-line)))
+
+(loop for arg in args do
+      (cond ((string= arg "-d")
+             (setf *enable-debug* T))
+            (T NIL)))
+
+(loop for arg in args do
+      (cond ((not (string= (subseq arg 0 1) "-"))
+             (format T "Parsing ~S: " arg)
+             (with-open-file (istream arg)
+               (let* ((token-list (lex istream))
+                      (dummy (format *enable-debug* "~%Token list: ~S~%~%" token-list))
+                      (parse-result (parse token-list))
+                      (dummy (format *enable-debug* "~%Syntax check: ~S~%~%" parse-result))
+                      (parse-tree (syntax-parse token-list))
+                      (dummy (format *enable-debug* "~%Syntax tree: ~S~%~%" parse-tree))
+                      (semantics-result (semantics-parse parse-tree))
+                      (dummy (format *enable-debug* "~%Semantics check: ~S~%~%" semantics-result))
+                      (dummy (format *enable-debug* "~%")))
+                 (format T "~S~%" parse-result)
+
+                 ;; Write to file, creating directories if necessary and overwriting preexisting files.
+                 (with-open-file (ostream (ensure-directories-exist (format NIL "out/~A" arg))
+                                          :direction :output
+                                          :if-exists :supersede)
+                   (format ostream "~A" semantics-result))
+                 )
+               ))
+            (T NIL))
+      )
