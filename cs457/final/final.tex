@@ -1,0 +1,116 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{fancyhdr}
+\usepackage[utf8]{inputenc}
+\usepackage{palatino}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{lastpage}
+\usepackage[hang,small,margin=1in]{caption}
+\usepackage{titlesec}
+
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot{}
+\fancyfoot[C]{\sffamily Page \thepage\ of \pageref{LastPage}}
+\pagestyle{fancy}
+
+\titleformat{\section}{\bfseries\MakeUppercase}{\arabic{\thesection}}{1em}{}
+\titleformat{\subsection}{\bfseries}{\arabic{\thesection}.\arabic{\thesubsection}}{1em}{}
+\titleformat{\subsubsection}{\itshape}{\arabic{\thesection}.\arabic{\thesubsection}.\arabic{\thesubsubsection}}{1em}{}
+
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{1em}
+
+\captionsetup[figure]{labelfont=it, font=it}
+\captionsetup[table]{labelfont={it,sc}, font={it,sc}}
+
+\hypersetup{colorlinks, linkcolor = black, citecolor = black, urlcolor = black}
+\urlstyle{same}
+
+
+
+\begin{document}
+
+\fancyfoot{}
+\begin{center}
+    \hfill \\
+    \vspace{4in}
+    {\bf\Huge CS457 Final Project \\}
+    \vspace{2in}
+    {\Large Soo-Hyun Yoo \\ March 18, 2015}
+\end{center}
+
+\newpage
+\fancyfoot[C]{\sffamily Page \thepage\ of \pageref{LastPage}}
+
+\section*{Source Files}
+
+Source files are located in the {\tt src} subdirectory.
+
+\begin{itemize}
+    \item main.cpp
+    \item smoke.vert
+    \item smoke.frag
+    \item glshader.hpp
+    \item glshader.cpp
+\end{itemize}
+
+
+\section*{Explanation}
+
+\subsection*{main.cpp}
+
+The {\tt main} function in this file is the entry point to the program. It sets
+up the output window size and some drawing flags before setting up the resize
+and display functions which perform the actual object placement.
+
+The vertex and fragment shaders are loaded using {\tt LoadShader} (found
+online), which compiles and links the shaders to the program.
+
+The scene itself contains a few geometric objects as seen through a uniform
+fog.
+
+\subsection*{smoke.vert}
+
+We output some position vectors for lighting in the fragment shader.
+
+\subsection*{smoke.frag}
+
+We declare the input vectors and uniform variables.
+
+After setting the color, we simulate fog by raycasting from each vertex to the
+eye position. Although in the glman attempt of the same, noise and timer
+functions preexisted and were trivial to use, implementing them here was not so
+simple. A simplex noise function (again from the web) is included, though the
+effect is not as pleasing as that of perlin noise due to the relatively sharper
+cutoffs between light and dark.
+
+\section*{Scope}
+
+Due to poor timing, this is not quite the volumetric smoke outcome that was
+promised in the project proposal. In order to render realistic volumetric
+smoke, the smoke should be modeled as a particle system in a vector field
+simulated by Navier-Stokes equations that model incompressible fluid flow.
+
+The project as-is demonstrates that one-step raycasting in itself is fairly
+simple. For the full effect showing realistic fluid flow, I envision that I can
+set up two buffers in the main program and alternate between them to step
+through each timestep in the fluid flow simulation.
+
+\newpage
+\section*{Results}
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=1.0\textwidth]{img/smoke.png}
+    \caption{Objects in uniform fog.}
+\end{figure}
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=1.0\textwidth]{img/simplexsmoke.png}
+    \caption{Simplex noise added to fog.}
+\end{figure}
+
+\end{document}

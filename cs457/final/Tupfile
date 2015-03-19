@@ -1,0 +1,9 @@
+LD = g++
+CXX = clang++
+CXXFLAGS = -std=c++11 -O2 -Wall
+INCLUDES = -Isrc -Iinclude/tinyobjloader
+LDFLAGS = -lboost_system -lglfw -lGL -lGLEW
+LDFLAGS += -lGLU -lglut
+
+: foreach src/*.cpp include/tinyobjloader/tiny_obj_loader.cc |> $(CXX) -c $(CXXFLAGS) $(INCLUDES) %f -o %o |> %B.o
+: *.o |> $(LD) %f $(LDFLAGS) -o %o |> smoke
