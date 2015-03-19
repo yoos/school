@@ -112,10 +112,8 @@
 
          ;; If return-type is real-ct at this point, blanket convert everything
          ;; to reals types, including the operator.
-         (parse-info (format NIL "Operands: ~S~%" operands))
          (if (equal (car return-type) 'real-ct)
            (setf operands (mapcar #'itof operands)))
-         (parse-info (format NIL "Operands: ~S~%" operands))
 
          ;; Grab only the gforth code, as we no longer need operand types.
          (setf operands (mapcar #'cdr operands))
