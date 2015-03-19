@@ -1,0 +1,4 @@
+( (let ((x int))) (:= x 10) (stdout (- 20 x))
+  (if (> x 3) (stdout "yes"))
+  (if (< x 3) (stdout (+ "yes" " true")) (stdout (+ "no" " true")))
+  (while (> x 5) (stdout "hello") (:= x (- x 1))) )
