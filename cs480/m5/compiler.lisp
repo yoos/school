@@ -15,6 +15,9 @@
 
 (defparameter args (cdr (my-command-line)))
 
+(if (= (length args) 0)
+  (format T "Usage:~%    ./compiler.lisp <input file> [-d]~%"))
+
 (loop for arg in args do
       (cond ((string= arg "-d")
              (setf *enable-debug* T))
