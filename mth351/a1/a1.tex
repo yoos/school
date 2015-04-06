@@ -1,0 +1,89 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage{amsmath}
+\usepackage[margin=1in]{geometry}
+\usepackage{fancyhdr}
+\usepackage[utf8]{inputenc}
+\usepackage{palatino}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{lastpage}
+\usepackage[hang,small,margin=1in]{caption}
+\usepackage{titlesec}
+
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot{}
+\fancyfoot[C]{\sffamily Page \thepage\ of~\pageref{LastPage}}
+\pagestyle{fancy}
+
+\titleformat{\section}{\bfseries\MakeUppercase}{\arabic{\thesection}}{1em}{}
+\titleformat{\subsection}{\bfseries}{\arabic{\thesection}.\arabic{\thesubsection}}{1em}{}
+\titleformat{\subsubsection}{\itshape}{\arabic{\thesection}.\arabic{\thesubsection}.\arabic{\thesubsubsection}}{1em}{}
+
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{1em}
+
+\captionsetup[figure]{labelfont=it, font=it}
+\captionsetup[table]{labelfont={it,sc}, font={it,sc}}
+
+\hypersetup{colorlinks, linkcolor = black, citecolor = black, urlcolor = black}
+\urlstyle{same}
+
+
+
+\begin{document}
+
+\fancyfoot{}
+\begin{center}
+  \hfill \\
+  \vspace{4in}
+  {\bf\Huge MTH351 Assignment 1} \\
+  \vspace{2in}
+  {\Large Soo-Hyun Yoo \\ 930569466 \\ April 3, 2015}
+\end{center}
+
+\newpage
+\fancyfoot[C]{\sffamily Page \thepage\ of~\pageref{LastPage}}
+
+\begin{enumerate}
+  \item
+    \begin{enumerate}
+      \item 16384. When adding 10000 to x, the value of 10000 cannot be
+        represented with enough significant digits in the same significand used
+        to represent 1e20. This results in a loss of significance.
+      \item {\tt 1/(eps(1)/2) = 9.0072e+15}
+    \end{enumerate}
+  \item
+    \begin{enumerate}
+      \item Large $x$ will result in high cancellation error. For
+        $x={\tt single(1e6)}$, $\sqrt{1+\frac{1}{x}}-1 = {\tt 4.7684e-07}$. An
+        equivalent expression $\cfrac{1}{x\left(\sqrt{1+\frac{1}{x}}+1\right)}
+        = {\tt
+        5.0000e-07}$.
+      \item $x$ close to zero will result in high cancellation error. For
+        $x={\tt single(1e-6)}$, $\frac{e^x-e^{-x}}{x} = 1.9670$. The Taylor
+        series approximation $2+\frac{x^2}{3}+\frac{x^4}{60} = 2$.
+    \end{enumerate}
+  \item
+    \begin{enumerate}
+      \item The roots turn from $-2, -8$ to $-1.9997, -8.0003$.
+      \item The roots turn from $-4, -4$ to $-3.96, -4.04$.
+      \item Problem a is well-conditioned, as a change in $\gamma$ results in
+        a reasonably proportional change in the roots. Problem b is
+        ill-conditioned due to the closeness of $\beta$ to $\gamma$, resulting
+        in large changes in the roots for a small change in $\gamma$.
+    \end{enumerate}
+  \item
+    \begin{enumerate}
+      \item As $x_1$ is a root of $g$, $g(x_1)$ should be zero. In this case,
+        however, $g(x_1) = -0.02502441$, which is inaccurate considering the
+        number of digits in $x_1$. It is the calculation of $x$ that is causing
+        the inaccuracy.
+      \item[(b,c)] $x = \cfrac{-2q}{u^2+uv+v^2} = {\tt -8.33333121e-04}$ gives
+        $g(x) = 0.00000286$, which is much closer to the ideal value of $0$.
+        This new expression for $x$ avoids the cancellation error-prone
+        operation of $u-v$, where $u$ and $v$ are very close in value.
+    \end{enumerate}
+\end{enumerate}
+
+\end{document}
