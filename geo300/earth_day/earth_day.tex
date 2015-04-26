@@ -1,0 +1,101 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{fancyhdr}
+\usepackage[utf8]{inputenc}
+\usepackage{palatino}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{lastpage}
+\usepackage[hang,small,margin=1in]{caption}
+\usepackage{titlesec}
+\usepackage[authoryear,comma,sort&compress]{natbib}
+
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot{}
+\fancyfoot[C]{\sffamily Page \thepage\ of \pageref{LastPage}}
+\pagestyle{fancy}
+
+\titleformat{\section}{\bfseries\MakeUppercase}{\arabic{\thesection}}{1em}{}
+\titleformat{\subsection}{\bfseries}{\arabic{\thesection}.\arabic{\thesubsection}}{1em}{}
+\titleformat{\subsubsection}{\itshape}{\arabic{\thesection}.\arabic{\thesubsection}.\arabic{\thesubsubsection}}{1em}{}
+
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{1em}
+
+\captionsetup[figure]{labelfont=it, font=it}
+\captionsetup[table]{labelfont={it,sc}, font={it,sc}}
+
+\hypersetup{colorlinks, linkcolor = black, citecolor = black, urlcolor = black}
+\urlstyle{same}
+
+\renewcommand{\citep}[1]{(\cite{#1})}
+
+
+\begin{document}
+
+%\fancyfoot{}
+%\begin{center}
+%    \hfill \\
+%    \vspace{4in}
+%    {\bf\Huge GEO300 CT2 \\}
+%    \vspace{2in}
+%    {\Large Soo-Hyun Yoo \\ April 24, 2015}
+%\end{center}
+%
+%\newpage
+%\fancyfoot[C]{\sffamily Page \thepage\ of \pageref{LastPage}}
+
+\section*{Earth Day}
+
+Many consider Earth Day 1970, which has since occurred every April 22, to have
+birthed the modern environmental movement. Years of wartime industrial growth
+had caused extensive damage to U.S. waterways and natural resources, especially
+given a lack of regulation for such activities. Factories liberally spilled
+toxic wastes into rivers. Synthetic chemicals such as DDT were used with little
+concern for their environmental and health consequences~\citep{green2015}.
+
+Gaylord Nelson, a Wisconsin senator, founded Earth Day by channeling the
+American population's anti-war energy towards this increasingly evident
+environmental degradation. In an age where the smell of pollution was
+considered the smell of prosperity, Nelson managed to lead the nation in
+a united effort to preserve the environment~\citep{edn2015}. Nelson's founding
+of Earth Day conveniently followed several environmental catastrophes: in
+November 1966, 168 people died in New York City due to horrible air quality; in
+1969, an oil rig off the shore of Santa Barbara exploded, spilling 10,000
+gallons of crude oil into the surrounding water and beaches; also in 1969, the
+Cuyahoga river running through Cleveland burst into flames due to contaminants
+in the water~\citep{green2015}.
+
+Student response to these catastrophes was fierce, and they were particularly
+involved in spreading the idea of Earth Day and the awareness of environmental
+degradation. Some of the first Earth Day demonstrations involved many mock
+trials and funerals of polluting objects. At Florida Technological University,
+for example, students charged a Chevrolet and found it guilty of poisoning the
+air and proceeded to execute it with a sledgehammer. By year's end, Congress
+had authorized the creation of the Environmental Protection Agency, and by the
+following year, the event even gained the President's official
+sanction~\citep{latson2015}.
+
+The newly formed Environmental Protection Agency reported that since 1969, when
+polled in 1971, 25 times as many people (for a total of 25 percent of the U.S.
+population) declared environmental protection to be an important
+goal~\citep{history2009}.
+
+In a journal in 1980, Nelson stated that his ``primary objective in planning
+Earth Day was to show the political leadership of the Nation that there was
+broad and deep support for the environmental movement.'' Within the decade
+following the first Earth Day in 1970, numerous laws were passed to protect the
+environment~\citep{nelson1980} following public opinion newly brought to front
+stage.
+
+The movement has since continued to grow. In 1990, more than 200 million people
+from over 140 nations participated in Earth Day
+celebrations~\citep{history2009}.  \cite{edn2015}, which coordinates Earth Day
+celebrations around the world, claims that more than a billion people are now
+involved in Earth Day activities.
+
+\bibliographystyle{apa}
+\bibliography{earth_day.bib}
+
+\end{document}
